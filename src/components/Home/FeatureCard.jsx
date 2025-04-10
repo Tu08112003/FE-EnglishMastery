@@ -1,5 +1,5 @@
 import React from 'react'
-import Button from '../components/Button.jsx'
+import Button from '../Button.jsx'
 const FeatureCard = ({title, icon, description}) => {
   return (
     <div className="border-2 border-gray-200 rounded-lg p-6 flex flex-col items-center text-center 
