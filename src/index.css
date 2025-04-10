@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
 
-
+/* Autofill icon password Chrome & Edge */
+input::-ms-reveal,
+input::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-ms-reveal {
+  display: none !important;
+  visibility: hidden;
+}
 
 /* 
 :root {
