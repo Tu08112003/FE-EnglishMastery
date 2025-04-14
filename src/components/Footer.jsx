@@ -50,24 +50,42 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Social Media Column */}
+        {/* Social Media Column */}
           <div className="space-y-4">
             <h3 className="font-semibold text-base">Liên hệ</h3>
             <div className="flex space-x-3">
-                <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100'>
-                  <FontAwesomeIcon icon="fa-brands fa-facebook" size="xl" style={{color: "#49719c"}} />
-                </div>
-                <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100'>
-                  <FontAwesomeIcon icon="fa-brands fa-linkedin" size="xl" style={{color: "#49719c",}}/>
-                </div>
-                <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100'>
-                  <FontAwesomeIcon icon="fa-brands fa-instagram" size="xl" style={{color: "#49719c",}}/>
-                </div>
-                <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100'>
-                <FontAwesomeIcon icon="fa-brands fa-square-x-twitter" size="xl" style={{color: "#49719c",}}/>
-                </div>
+              <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110'>
+                <FontAwesomeIcon 
+                  icon="fa-brands fa-facebook" 
+                  size="xl" 
+                  style={{color: "#49719c"}} 
+                />
+              </div>
+              <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 '>
+                <FontAwesomeIcon 
+                  icon="fa-brands fa-linkedin" 
+                  size="xl" 
+                  style={{color: "#49719c"}} 
+                />
+              </div>
+              <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110'>
+                <FontAwesomeIcon 
+                  icon="fa-brands fa-instagram" 
+                  size="xl" 
+                  style={{color: "#49719c"}} 
+                />
+              </div>
+              <div className='w-10 h-10 flex items-center justify-center bg-white border border-[#49719c] p-2 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-110 '>
+                <FontAwesomeIcon 
+                  icon="fa-brands fa-square-x-twitter" 
+                  size="xl" 
+                  style={{color: "#49719c"}} 
+                />
+              </div>
             </div>
           </div>
+
+
         </div>
         
       </div>
