@@ -2,29 +2,58 @@ const Button = ({
   text,
   onClick,
   icon = null,
-  iconPosition = 'left', 
+  iconPosition = 'left',
   variant = 'default',
   size = 'md',
+  className = '',
+  bg,
+  border,
+  textColor,
+  textSize = 'text-base',
+  hoverBg,
 }) => {
-  const variantClasses = {
-    primary: 'bg-[#2C99E2] cursor-pointer text-white font-semibold border border-[#2C99E2] hover:bg-[#2C99E2]/80',
-    default: 'bg-white cursor-pointer text-[#49719C] font-semibold border border-[#49719C] hover:bg-gray-100',
+  const defaultVariantClasses = {
+    primary: {
+      bg: 'bg-[#2C99E2]',
+      text: 'text-white',
+      border: 'border border-[#2C99E2]',
+      hover: 'hover:bg-[#2C99E2]/80',
+    },
+    default: {
+      bg: 'bg-white',
+      text: 'text-[#49719C]',
+      border: 'border border-[#49719C]',
+      hover: 'hover:bg-gray-100',
+    },
+    delete: {
+      bg: 'bg-red-500',
+      text: 'text-white',
+      border: 'border border-red-500',
+      hover: 'hover:bg-red-100',
+    },
   };
 
   const sizeClasses = {
-    sm: 'px-4 py-1.5 ',
-    md: 'w-45 px-4 py-2.5 ',
-    lg: 'w-full px-4 py-2.5 ',
+    sm: 'px-4 py-1.5',
+    md: 'px-10 py-2.5',
+    lg: 'w-full px-5 py-2.5',
   };
+
+  const current = defaultVariantClasses[variant];
+  const bgClass = bg? bg : current.bg;
+  const borderClass = border? border : current.border;
+  const textClass = textColor? textColor : current.text;
+  const hoverClass = hoverBg ? `hover:${hoverBg}` : current.hover; 
 
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center justify-center gap-2 rounded-md ${variantClasses[variant]} ${sizeClasses[size]}`}
+      className={`inline-flex items-center justify-center rounded-md font-semibold transition duration-200
+        ${bgClass} ${textClass} ${borderClass} ${hoverClass} ${sizeClasses[size]} ${textSize} ${className}`}
     >
-      {icon && iconPosition === 'left' && <span className="flex items-center mr-3">{icon}</span>}
-      <span>{text}</span>
-      {icon && iconPosition === 'right' && <span className="flex items-center ml-3">{icon}</span>}
+      {icon && iconPosition === 'left' && <span className="flex items-center mr-2">{icon}</span>}
+      {text && <span>{text}</span>}
+      {icon && iconPosition === 'right' && <span className="flex items-center ml-2">{icon}</span>}
     </button>
   );
 };
