@@ -13,6 +13,7 @@ const AddVocabulary = ({ show, onClose }) => {
       <form 
         className="w-full max-w-2xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 sm:px-4 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar"
       >
+        {/* Header */}
         <div className="flex flex-col items-center p-3">
           <div className='flex items-center justify-between w-full mb-1'>
             <h2 className="text-xl font-medium text-center sm:text-2xl">Thêm từ vựng</h2>
@@ -22,29 +23,28 @@ const AddVocabulary = ({ show, onClose }) => {
           </div>
           <p className="flex justify-start w-full text-sm text-muted-foreground text-gray-600 font-medium">Nhập thông tin từ vựng bạn muốn lưu trữ và học tập</p>
         </div>
-
+        {/* Từ vựng */}
         <div className='flex flex-col space-y-3 items-center justify-center w-full mb-4 p-3'>
-          {/* Responsive label/input stacking on small screens */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Từ vựng</label>
             <input type="text" className='flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400' />
           </div>
-
+        {/* Nghĩa */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Nghĩa</label>
             <input type="text" className='flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400' />
           </div>
-
+        {/* Phát âm */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
-            <label className='w-full sm:w-1/5 font-semibold'>Phát</label>
+            <label className='w-full sm:w-1/5 font-semibold'>Phát âm</label>
             <input type="text" className='flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400' />
           </div>
-
+        {/* Ví dụ */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Ví dụ</label>
             <textarea rows={5} className='flex-1 w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400' />
           </div>
-
+        {/* Chủ đề */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Chủ đề</label>
             <select className='flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-400'>
@@ -54,7 +54,7 @@ const AddVocabulary = ({ show, onClose }) => {
               <option value="study">Học tập</option>
             </select>
           </div>
-
+        {/* Trạng thái */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Trạng thái</label>
             <select className='flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-400'>
@@ -63,13 +63,13 @@ const AddVocabulary = ({ show, onClose }) => {
               <option value="learned">Đã học</option>
             </select>
           </div>
-
+        {/* Ghi chú */}
           <div className='flex w-full flex-col sm:flex-row items-start sm:items-center gap-2'>
             <label className='w-full sm:w-1/5 font-semibold'>Ghi chú</label>
             <textarea rows={5} className='flex-1 p-3 w-full border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400' />
           </div>
         </div>
-
+        {/* Button*/}
         <div className='flex gap-4 justify-end p-3'>
           <Button text="Hủy" variant="default" size="sm" onClick={onClose} />
           <Button text="Lưu" variant="primary" size="sm" />

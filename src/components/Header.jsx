@@ -36,7 +36,7 @@ const Header = () => {
               Trang chủ
             </NavLink>
             <NavLink
-              to="/test"
+              to="/exame"
               className={({ isActive }) =>
                 isActive
                   ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
@@ -161,7 +161,7 @@ const Header = () => {
                 Trang chủ
               </NavLink>
               <NavLink
-                to="/test"
+                to="/exame"
                 onClick={toggleMobileMenu}
                 className={({ isActive }) =>
                   isActive

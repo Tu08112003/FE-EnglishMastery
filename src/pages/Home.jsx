@@ -87,47 +87,51 @@ const sectionData = {
 }
 
 const Home = () => {
+  const isLoggedIn = false;
   return (
     <main className="flex flex-col space-y-16">
       
       {/* Banner Section */}
       <section className="py-16 bg-gradient-to-b from-[#E6F0FA] to-white">
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-7 items-center">
-          <div className="space-y-6">
-            <h1 className="text-4xl font-bold leading-tight">{sectionData.banner.title}</h1>
-            <p className="text-gray-600 font-medium">{sectionData.banner.description}</p>
-            <Button text={sectionData.banner.buttonText} variant="primary" size="md"/>
-          </div>
-          <div className="h-75 md:h-80">
-            <img src={sectionData.banner.image} alt="" className="object-cover rounded-3xl"/>
-          </div>
-        </div>
+        {
+          !isLoggedIn ? (
+            <div className="container mx-auto px-4 grid md:grid-cols-2 gap-7 items-center">
+              <div className="space-y-6">
+                <h1 className="text-4xl font-bold leading-tight">{sectionData.banner.title}</h1>
+                <p className="text-gray-600 font-medium">{sectionData.banner.description}</p>
+                <Button text={sectionData.banner.buttonText} variant="primary" size="md"/>
+              </div>
+              <div className="h-75 md:h-80">
+                <img src={sectionData.banner.image} alt="" className="object-cover rounded-3xl"/>
+              </div>
+            </div>
+          ) : (
+            /* User Welcome Section */
+            <>
+            <div className="container mx-auto px-4 grid md:grid-cols-1 gap-8 items-center">
+              <div className="space-y-6 flex flex-col justify-center items-center">
+                <h1 className="text-4xl text-center font-bold leading-tight">Chào mừng bạn trở lại, {sectionData.userWelcome.username}!</h1>
+                <p className="text-gray-600">{sectionData.userWelcome.message}</p>
+                <Button text={sectionData.userWelcome.buttonText} variant="primary" size="md"/>
+              </div>
+            </div>
+            <div className="container mx-auto px-4 mt-20">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center items-center">
+                {sectionData.userWelcome.statistics.map((stat, index) => (
+                  <LearningStatisticsCard
+                    key={index}
+                    icon={stat.icon}
+                    value={stat.value}
+                    description={stat.description}
+                  />
+                ))}
+              </div>
+            </div>
+            </>
+          )}   
       </section>
 
-      {/* User Welcome Section */}
-      {/* <section className="py-16 bg-gradient-to-b from-[#E6F0FA] to-white">
-        <div className="container mx-auto px-4 grid md:grid-cols-1 gap-8 items-center">
-          <div className="space-y-6 flex flex-col justify-center items-center">
-            <h1 className="text-4xl text-center font-bold leading-tight">Chào mừng bạn trở lại, {sectionData.userWelcome.username}!</h1>
-            <p className="text-gray-600">{sectionData.userWelcome.message}</p>
-            <Button text={sectionData.userWelcome.buttonText} variant="primary" size="md"/>
-          </div>
-        </div>
 
-        <div className="container mx-auto px-4 mt-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center items-center">
-            {sectionData.userWelcome.statistics.map((stat, index) => (
-              <LearningStatisticsCard
-                key={index}
-                icon={stat.icon}
-                value={stat.value}
-                description={stat.description}
-              />
-            ))}
-          </div>
-        </div>
-      </section> */}
-            
       {/*Recent Result Section */}
       {/* <section className="py-3">
         <h2 className="text-3xl font-bold text-center mb-10">Kết quả gần đây</h2>
