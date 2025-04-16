@@ -2,7 +2,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../Button.jsx'
 import PropTypes from 'prop-types'
-import image_exame from '../..//assets/images/img-exame.png'
+import image_exame from '../../assets/images/img-exame.png'
 
 const ExamCard = ({ title, onClick }) => {
   return (

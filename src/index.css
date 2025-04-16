@@ -30,6 +30,14 @@ input[type="password"]::-ms-reveal {
   background-color: #a0a0a0;
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  
+  scrollbar-width: none;   
+}
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
