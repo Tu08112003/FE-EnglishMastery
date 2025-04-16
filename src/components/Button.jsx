@@ -43,7 +43,7 @@ const Button = ({
   const bgClass = bg? bg : current.bg;
   const borderClass = border? border : current.border;
   const textClass = textColor? textColor : current.text;
-  const hoverClass = hoverBg ? `hover:${hoverBg}` : current.hover; 
+  const hoverClass = hoverBg ? hoverBg : current.hover; 
 
   return (
     <button

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../Button.jsx'
-
+import { Link } from 'react-router-dom'
 const testStructure = {
   listening: [
     { part: "Part 1", description: "Mô tả hình ảnh", number: "6 câu" },
@@ -16,7 +16,8 @@ const testStructure = {
   ]
 }
 
-const PreviewExame = ({ title, onClose }) => {
+const PreviewExam = ({ title, onClose }) => {
+
   return (
     <div className='fixed inset-0 w-full h-full flex items-center justify-center bg-black/30 z-10 p-4'>
       <form className='container mx-auto w-full max-w-3xl bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 py-6 max-h-[95vh] overflow-y-auto custom-scrollbar'>
@@ -76,20 +77,6 @@ const PreviewExame = ({ title, onClose }) => {
           </div>
         </div>
 
-        {/* Time*/}
-        <div className='flex flex-col sm:flex-row justify-end items-start sm:items-center gap-2 mt-6'>
-            <span className='font-medium'>Chọn thời gian làm bài</span>
-            <select
-                className='border-2 border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#2C99E2] focus:ring-1 focus:ring-[#2C99E2]'  
-                defaultValue="120"
-            >
-                {[...Array(12)].map((_, i) => {
-                const time = (i + 1) * 10;
-                return <option key={time} value={time}>{time} phút</option>
-                })}
-            </select>
-        </div>
-
         {/* Buttons */}
         <div className='flex justify-end gap-2 items-center mt-6'>
           <Button
@@ -99,16 +86,18 @@ const PreviewExame = ({ title, onClose }) => {
             size='sm'
             onClick={onClose}
           />
-          <Button
-            text="Bắt đầu làm"
-            variant='primary'
-            icon={<FontAwesomeIcon icon="fa-solid fa-angle-right" />}
-            size='sm'
-          />
+         <Link to="/exam/take">
+            <Button
+                text="Bắt đầu làm"
+                variant="primary"
+                icon={<FontAwesomeIcon icon="fa-solid fa-angle-right" />}
+                size="sm"
+            />
+            </Link>
         </div>
       </form>
     </div>
   )
 }
 
-export default PreviewExame
+export default PreviewExam

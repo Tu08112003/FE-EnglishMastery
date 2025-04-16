@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../components/Button.jsx'
 import SearchBar from '../components/SearchBar.jsx'
-import ExamCard from '../components/Exame/ExameCard.jsx'
+import ExamCard from '../components/Exam/ExamCard.jsx'
 import Pagination from '../components/Pagination.jsx'
-import PreviewExame from '../components/Exame/PreviewExame.jsx'
+import PreviewExam from '../components/Exam/PreviewExam.jsx'
 
-const Exame = () => {
+const Exam = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const totalPages = 3
   const listExams = ['2024', '2023', '2022', 'New economy']
@@ -68,7 +68,7 @@ const Exame = () => {
 
       {/* PreviewExame (Modal) */}
       {previewTitle && (
-        <PreviewExame
+        <PreviewExam
           title={previewTitle}
           onClose={() => setPreviewTitle(null)}
         />
@@ -77,4 +77,4 @@ const Exame = () => {
   )
 }
 
-export default Exame
+export default Exam
