@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SearchBar from '../components/SearchBar.jsx'
 import VocabularyCard from '../components/Note/VocabularyCard.jsx'
 import AddVocabulary from '../components/Note/AddVocabulary.jsx'
-import ModalConfirm from '../components/ModalConfirm.jsx'
+import ModalConfirm from '../components/ConfirmModal.jsx'
 
 const Note = () => {
   const [showFilter, setShowFilter] = useState(false)
@@ -33,10 +33,7 @@ const Note = () => {
             onClick={() => setShowAddForm(true)}
           />
         </div>
-
-        {showAddForm && (
-          <AddVocabulary show={showAddForm} onClose={() => setShowAddForm(false)} />
-        )}
+        <AddVocabulary show={showAddForm} onClose={() => setShowAddForm(false)} />
       </div>
 
 
@@ -108,6 +105,7 @@ const Note = () => {
               title="Xác nhận xóa từ vựng"
               description="Bạn có chắc chắn muốn xóa từ vựng 'Collaborate'? Hành động này không thể hoàn tác."
               onCancel={handleCancel}
+              hoverBgConfirm="hover:bg-red-700"
               // onConfirm={handleConfirmDelete}
             />
           )}

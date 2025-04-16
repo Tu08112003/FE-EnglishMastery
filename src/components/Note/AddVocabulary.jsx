@@ -1,15 +1,11 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../../components/Button.jsx'
-
+import ModalWrapper from '../ModalWrapper.jsx'
 const AddVocabulary = ({ show, onClose }) => {
-  if (!show) return null
 
   return (
-    <div 
-      onClick={onClose}
-      className='fixed inset-0 w-full h-full flex items-center justify-center bg-black/30 z-10 py-4 px-5 sm:px-3'
-    >
+    <ModalWrapper show={show} onClose={onClose}>
       <form 
         className="w-full max-w-2xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 sm:px-4 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar"
       >
@@ -75,7 +71,7 @@ const AddVocabulary = ({ show, onClose }) => {
           <Button text="Lưu" variant="primary" size="sm" />
         </div>
       </form>
-    </div>
+    </ModalWrapper>
 
   )
 }
