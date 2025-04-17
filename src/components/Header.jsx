@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = false;
+  const isLoggedIn = true;
   const [showFilter, setShowFilter] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -114,13 +114,12 @@ const Header = () => {
 
               {showFilter && (
                 <ul className="absolute top-12 left-3 bg-white border-2 border-gray-200 rounded-lg shadow-lg w-35 z-10">
-                  <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
-                    <FontAwesomeIcon
-                      icon="fa-solid fa-user"
-                      className="w-4 h-4"
-                    />
-                    <span>Hồ sơ</span>
-                  </li>
+                  <Link to="/account-info">
+                    <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer">
+                      <FontAwesomeIcon icon="fa-solid fa-user" className="w-4 h-4" />
+                      <span>Hồ sơ</span>
+                    </li>
+                  </Link>
                   <li className="flex items-center text-red-500 gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
                     <FontAwesomeIcon
                       icon="fa-solid fa-right-from-bracket"
