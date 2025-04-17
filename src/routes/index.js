@@ -6,6 +6,7 @@ import Login from '../components/Login.jsx';
 import SignUp from '../components/SignUp.jsx';
 import TakeTheExam from '../components/Exam/TakeTheExam.jsx';
 import ExamResult from '../components/Exam/ExamResult.jsx';
+import AccountInformation from '../components/AccountInformation.jsx';
 // Public routes
 const publicRoutes = [
   {
@@ -31,6 +32,9 @@ const publicRoutes = [
   },
   {
     path: '/signup', component: SignUp
+  },
+  {
+    path: '/account-info', component: AccountInformation
   }
   
 ];
