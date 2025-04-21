@@ -21,11 +21,14 @@ const Header = () => {
       <header className="border-b border-gray-200">
         <div className="mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <div 
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             <img src={Logo} alt="" className="h-14 w-auto" />
             <span className="font-bold text-lg -ml-2">EnglishMastery</span>
           </div>
-
+          {/* Navbar */}
             <nav className="hidden md:flex items-center space-x-8">
               <NavLink
                 to="/"
@@ -112,7 +115,7 @@ const Header = () => {
               </div>
 
               {dropdownOpen && (
-                <ul  className={`absolute left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${
+                <ul  className={`absolute top-10 left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${
                   dropdownOpen
                     ? 'opacity-100 translate-y-0'
                     : 'opacity-0 -translate-y-2'
