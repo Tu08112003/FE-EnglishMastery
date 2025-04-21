@@ -35,11 +35,6 @@ const ExamCard = ({ title, onClick }) => {
   )
 }
 
-ExamCard.propTypes = {
-  image: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  duration: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-}
+
 
 export default ExamCard
