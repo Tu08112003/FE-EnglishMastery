@@ -4,7 +4,7 @@ import Button from '../components/Button.jsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import PricingCard from '../components/Home/PricingCard.jsx'
 import FeedbackCard from '../components/Home/FeedbackCard.jsx'
-import LearningStatisticsCard from '../components/Home/LearningStatisticsCard.jsx'
+import LearningStatisticsCard from '../components/StatisticsCard.jsx'
 import RecentResultsCard from '../components/Home/RecentResultsCard.jsx'
 
 import banner from '../assets/images/banner.png'
