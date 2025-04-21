@@ -26,7 +26,7 @@ const AccountInformation = () => {
 
             <div className="flex flex-col gap-1">
               <label className="font-semibold text-gray-600">Loại người dùng</label>
-              <input type="text" className={inputStyle + " bg-[#F3F4F6]"} value="Student" readOnly />
+              <input type="text" className={inputStyle + " bg-[#F3F4F6]"} value="User" readOnly />
             </div>
 
             <div className="flex flex-col gap-1">
@@ -58,7 +58,7 @@ const AccountInformation = () => {
             </div>
             <div>
               <p className="font-semibold text-gray-600">Loại người dùng</p>
-              <p className="font-bold">Student</p>
+              <p className="font-bold">User</p>
             </div>
             <div>
               <p className="font-semibold text-gray-600">Ngày tạo</p>

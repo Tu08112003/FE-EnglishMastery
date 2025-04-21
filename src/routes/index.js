@@ -1,45 +1,45 @@
-import Home from '../pages/Home.jsx';
-import Dictionary from '../pages/Dictionary.jsx'; 
-import Exam from '../pages/Exam.jsx';
-import Note from '../pages/Note.jsx';
-import Login from '../components/Login.jsx';
-import SignUp from '../components/SignUp.jsx';
-import TakeTheExam from '../components/Exam/TakeTheExam.jsx';
-import ExamResult from '../components/Exam/ExamResult.jsx';
-import AccountInformation from '../components/AccountInformation.jsx';
-// Public routes
-const publicRoutes = [
+import Home from '../pages/Home';
+import Dictionary from '../pages/Dictionary'; 
+import Exam from '../pages/Exam';
+import Note from '../pages/Note';
+import Login from '../components/Login';
+import SignUp from '../components/SignUp';
+import TakeTheExam from '../components/Exam/TakeTheExam';
+import ExamResult from '../components/Exam/ExamResult';
+import AccountInformation from '../components/AccountInformation';
+
+import AdminLayout from '../layout/AdminLayout';
+import PublicLayout from '../layout/PublicLayout';
+
+import Dashboard from '../pages/Admin/Dashboard';
+import ManageExam from '../pages/Admin/ManageExam';
+import ManageUser from '../pages/Admin/ManageUser';
+import ManagePayment from '../pages/Admin/ManagePayment';
+
+const routes = [
   {
-    path: '/', component: Home
+    layout: PublicLayout,
+    children: [
+      { path: '/', component: Home },
+      { path: '/dictionary', component: Dictionary },
+      { path: '/exam', component: Exam },
+      { path: '/exam/take', component: TakeTheExam },
+      { path: '/exam/result', component: ExamResult },
+      { path: '/note', component: Note },
+      { path: '/login', component: Login },
+      { path: '/signup', component: SignUp },
+      { path: '/account-info', component: AccountInformation },
+    ]
   },
   {
-    path: '/dictionary', component: Dictionary
-  },
-  {
-    path: '/exam', component: Exam,  
-  },
-  { 
-    path: '/exam/take', component: TakeTheExam
-  }, 
-  {
-    path: '/exam/result', component: ExamResult
-  },
-  {
-    path: '/note', component: Note
-  },
-  {
-    path: '/login', component: Login
-  },
-  {
-    path: '/signup', component: SignUp
-  },
-  {
-    path: '/account-info', component: AccountInformation
+    layout: AdminLayout,
+    children: [
+      { path: '/admin', component: Dashboard },
+      { path: '/admin/exam', component: ManageExam },
+      { path: '/admin/user', component: ManageUser },
+      { path: '/admin/payment', component: ManagePayment }
+    ]
   }
-  
 ];
 
-// Private routes
-const privateRoutes = [];
-
-export { publicRoutes, privateRoutes };
+export default routes;

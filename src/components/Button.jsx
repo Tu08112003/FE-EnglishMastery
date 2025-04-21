@@ -48,7 +48,7 @@ const Button = ({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center justify-center rounded-md font-semibold transition duration-200
+      className={`inline-flex items-center cursor-pointer justify-center rounded-md font-semibold transition duration-200
         ${bgClass} ${textClass} ${borderClass} ${hoverClass} ${sizeClasses[size]} ${textSize} ${className}`}
     >
       {icon && iconPosition === 'left' && <span className="flex items-center mr-2">{icon}</span>}
