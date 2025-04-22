@@ -4,6 +4,7 @@ import Exam from '../pages/Exam';
 import Note from '../pages/Note';
 import Login from '../components/Login';
 import SignUp from '../components/SignUp';
+import ForgotPassword from '../components/ForgotPassword'
 import TakeTheExam from '../components/Exam/TakeTheExam';
 import ExamResult from '../components/Exam/ExamResult';
 import AccountInformation from '../components/AccountInformation';
@@ -28,6 +29,7 @@ const routes = [
       { path: '/note', component: Note },
       { path: '/login', component: Login },
       { path: '/signup', component: SignUp },
+      {path: '/forgotpassword', component: ForgotPassword},
       { path: '/account-info', component: AccountInformation },
     ]
   },
