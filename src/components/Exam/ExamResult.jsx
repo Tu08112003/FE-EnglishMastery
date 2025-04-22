@@ -8,7 +8,7 @@ import DetailExamResult from "../Exam/DetailExamResult";
 const ExamResult = () => {
   const [activePart, setActivePart] = useState(1);
   const [showDetailPart, setShowDetailPart] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showDetailResultExam, setShowDetailResultExam] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
   const partData = {
@@ -18,111 +18,111 @@ const ExamResult = () => {
       correctAnswer: "A",
       correct: i % 2 === 0,
       question: `What is shown in the picture ${i + 1}?`,
-      image: "https://via.placeholder.com/150", // Placeholder image for Part 1
+      image: "https://via.placeholder.com/150", 
       options: {
         A: "A person walking",
         B: "A car on the road",
         C: "A tree in a park",
         D: "A building",
       },
-    })), // Photographs: 6 questions
+    })), 
     2: Array.from({ length: 25 }, (_, i) => ({
       id: i + 7,
       userAnswer: i % 3 === 0 ? "C" : "A",
       correctAnswer: "A",
       correct: i % 3 !== 0,
       question: `Where are you going? (${i + 7})`,
-      image: null, // No image for most Part 2 questions
+      image: null, 
       options: {
         A: "To the office",
         B: "To the park",
         C: "To the store",
         D: "To the beach",
       },
-    })), // Question-Response: 25 questions
+    })), 
     3: Array.from({ length: 39 }, (_, i) => ({
       id: i + 32,
       userAnswer: i % 2 === 0 ? "B" : "D",
       correctAnswer: "B",
       correct: i % 2 === 0,
       question: `What time does the meeting start?`,
-      image: i % 5 === 0 ? "https://via.placeholder.com/150" : null, // Image for some Part 3 questions
+      image: i % 5 === 0 ? "https://via.placeholder.com/150" : null,
       options: {
         A: "At 9 AM",
         B: "At 10 AM",
         C: "At 11 AM",
         D: "At 12 PM",
       },
-    })), // Conversations: 39 questions
+    })),
     4: Array.from({ length: 30 }, (_, i) => ({
       id: i + 71,
       userAnswer: i % 4 === 0 ? "A" : "C",
       correctAnswer: "C",
       correct: i % 4 !== 0,
       question: `What is the speaker talking about?`,
-      image: i % 6 === 0 ? "https://via.placeholder.com/150" : null, // Image for some Part 4 questions
+      image: i % 6 === 0 ? "https://via.placeholder.com/150" : null, 
       options: {
         A: "A new product",
         B: "A company event",
         C: "A weather update",
         D: "A travel plan",
       },
-    })), // Short Talks: 30 questions
+    })), 
     5: Array.from({ length: 30 }, (_, i) => ({
       id: i + 101,
       userAnswer: i % 2 === 0 ? "D" : "B",
       correctAnswer: "D",
       correct: i % 2 === 0,
       question: `She ___ to the meeting yesterday.`,
-      image: null, // No image for Part 5
+      image: null, 
       options: {
         A: "go",
         B: "goes",
         C: "going",
         D: "went",
       },
-    })), // Incomplete Sentences: 30 questions
+    })),
     6: Array.from({ length: 16 }, (_, i) => ({
       id: i + 131,
       userAnswer: i % 3 === 0 ? "A" : "C",
       correctAnswer: "C",
       correct: i % 3 !== 0,
       question: `The company ___ a new branch next month.`,
-      image: null, // No image for Part 6
+      image: null,
       options: {
         A: "open",
         B: "opened",
         C: "will open",
         D: "opens",
       },
-    })), // Text Completion: 16 questions
+    })),
     7: Array.from({ length: 54 }, (_, i) => ({
       id: i + 147,
       userAnswer: i % 2 === 0 ? "B" : "A",
       correctAnswer: "B",
       correct: i % 2 === 0,
       question: `What is the main topic of the passage?`,
-      image: i % 10 === 0 ? "https://via.placeholder.com/150" : null, // Image for some Part 7 questions
+      image: i % 10 === 0 ? "https://via.placeholder.com/150" : null, 
       options: {
         A: "A new technology",
         B: "A historical event",
         C: "A scientific discovery",
         D: "A cultural festival",
       },
-    })), // Reading Comprehension: 54 questions
+    })),
   };
 
   const handleShowDetailPart = () => {
     setShowDetailPart(!showDetailPart);
   };
 
-  const handleShowPopup = (item) => {
+  const handleShowDetailResultExam = (item) => {
     setSelectedQuestion(item);
-    setShowPopup(true);
+    setShowDetailResultExam(true);
   };
 
   const handleClosePopup = () => {
-    setShowPopup(false);
+    setShowDetailResultExam(false);
     setSelectedQuestion(null);
   };
 
@@ -273,7 +273,7 @@ const ExamResult = () => {
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleShowPopup(item);
+                      handleShowDetailResultExam(item);
                     }}
                   >
                     [Chi tiết]
@@ -286,9 +286,9 @@ const ExamResult = () => {
       )}
 
       {/* Popup for question details */}
-      {showPopup && selectedQuestion && (
+      {showDetailResultExam && selectedQuestion && (
         <DetailExamResult
-          show={showPopup}
+          show={showDetailResultExam}
           onClose={handleClosePopup}
           item={selectedQuestion}
         />

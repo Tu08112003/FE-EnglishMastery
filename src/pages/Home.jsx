@@ -6,7 +6,6 @@ import PricingCard from '../components/Home/PricingCard.jsx'
 import FeedbackCard from '../components/Home/FeedbackCard.jsx'
 import LearningStatisticsCard from '../components/StatisticsCard.jsx'
 import RecentResultsCard from '../components/Home/RecentResultsCard.jsx'
-
 import banner from '../assets/images/banner.png'
 import feedback_1 from '../assets/images/feedback_1.jpg'
 import feedback_2 from '../assets/images/feedback_2.jpg'
