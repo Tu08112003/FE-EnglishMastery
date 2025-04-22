@@ -57,7 +57,7 @@ const Login = () => {
 
           {/* Forgot password */}
           <div className="text-right text-sm">
-            <Link to="#" className="text-[#49719C] font-semibold hover:underline">
+            <Link to="/forgotpassword" className="text-[#49719C] font-semibold hover:underline">
               Quên mật khẩu?
             </Link>
           </div>
