@@ -3,25 +3,57 @@ import Logo from "../assets/images/logo-bg_white.png";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import Button from "../components/Button.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/slice/authSlice";
+import { authLogout } from "../service/authService";
+import { toast } from "react-toastify";
+// import { checkRefreshToken } from "../service/authService";
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = true;
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user); // Lấy thông tin user
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const toggleDropdown = () =>{
-    setDropdownOpen(!dropdownOpen);
-  }
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const toggleMobileMenu = () =>{
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  } 
+  };
+  // const handleGetAccessToken = async () => {
+  //   const getRefreshToken = localStorage.getItem('refresh_token');
+  //   const res = await checkRefreshToken({refreshToken:getRefreshToken})
+  //   if(res.status != 200){
+  //     toast.info("Người dùng đã hết hạn đăng nhập. Vui lòng đăng nhập lại!")
+  //     navigate("/login");
+  //   }
+  // };
+  const handleLogout = async () => {
+      const refresh_token = localStorage.getItem('refresh_token')
+      const res = await authLogout({refreshToken: refresh_token});
+      if(res.status == 200){
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        dispatch(logout());
+        toast.success("Đăng xuất thành công!");
+        navigate("/");
+        setDropdownOpen(false);
+        setIsMobileMenuOpen(false);
+      }else{
+        toast.error("Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.");
+      }
+  };
+
   return (
     <>
       <header className="border-b border-gray-200">
         <div className="mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <div 
+          <div
             className="flex items-center cursor-pointer"
             onClick={() => navigate("/")}
           >
@@ -29,48 +61,48 @@ const Header = () => {
             <span className="font-bold text-lg -ml-2">EnglishMastery</span>
           </div>
           {/* Navbar */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
-                    : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
-                }
-              >
-                Trang chủ
-              </NavLink>
-              <NavLink
-                to="/exam"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
-                    : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
-                }
-              >
-                Đề thi
-              </NavLink>
-              <NavLink
-                to="/dictionary"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
-                    : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
-                }
-              >
-                Từ điển
-              </NavLink>
-              <NavLink
-                to="/note"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
-                    : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
-                }
-              >
-                Ghi chú
-              </NavLink>
-            </nav>
+          <nav className="hidden md:flex items-center space-x-8">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
+                  : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
+              }
+            >
+              Trang chủ
+            </NavLink>
+            <NavLink
+              to="/exam"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
+                  : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
+              }
+            >
+              Đề thi
+            </NavLink>
+            <NavLink
+              to="/dictionary"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
+                  : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
+              }
+            >
+              Từ điển
+            </NavLink>
+            <NavLink
+              to="/note"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-[#2C99E2] font-bold border-b-2 border-[#2C99E2] py-2"
+                  : "text-gray-600 font-semibold py-2 hover:text-[#2C99E2] hover:font-bold"
+              }
+            >
+              Ghi chú
+            </NavLink>
+          </nav>
 
           {/* Mobile menu icon */}
           <div className="md:hidden">
@@ -107,28 +139,41 @@ const Header = () => {
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-600">
                   <FontAwesomeIcon icon="fa-solid fa-user" size="lg" />
                 </div>
-                <span className="font-bold">Anhdaden</span>
-                <FontAwesomeIcon 
-                  icon="fa-solid fa-caret-down"  
-                  className={`ml-auto text-gray-600 transform transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`}
+                <span className="font-bold">{user?.userName || "User"}</span>
+                <FontAwesomeIcon
+                  icon="fa-solid fa-caret-down"
+                  className={`ml-auto text-gray-600 transform transition-transform duration-300 ${
+                    dropdownOpen ? "rotate-180" : ""
+                  }`}
                 />
               </div>
 
               {dropdownOpen && (
-                <ul  className={`absolute top-10 left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${
-                  dropdownOpen
-                    ? 'opacity-100 translate-y-0'
-                    : 'opacity-0 -translate-y-2'
-                }`}>
+                <ul
+                  className={`absolute top-10 left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${
+                    dropdownOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2"
+                  }`}
+                >
                   <Link to="/account-info">
-                    <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer">
-                      <FontAwesomeIcon icon="fa-solid fa-user" className="w-4 h-4" />
+                    <li 
+                      className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer"
+                      // onClick={handleGetAccessToken}
+                    >
+                      <FontAwesomeIcon
+                        icon="fa-solid fa-user"
+                        className="w-4 h-4"
+                      />
                       <span>Hồ sơ</span>
                     </li>
                   </Link>
-                  <li className="flex items-center text-red-500 gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
-                    <FontAwesomeIcon 
-                      icon="fa-solid fa-arrow-right-from-bracket" 
+                  <li
+                    onClick={handleLogout}
+                    className="flex items-center text-red-500 gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer"
+                  >
+                    <FontAwesomeIcon
+                      icon="fa-solid fa-arrow-right-from-bracket"
                       className="w-4 h-4"
                     />
                     <span>Đăng xuất</span>
@@ -144,9 +189,9 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/40 z-50">
           <div
-           className={`absolute right-0 top-0 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 rounded-l-xl p-4 ${
-            isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+            className={`absolute right-0 top-0 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 rounded-l-xl p-4 ${
+              isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
           >
             <div className="flex justify-end mb-4">
               <button onClick={toggleMobileMenu} className="text-gray-600">
@@ -154,52 +199,52 @@ const Header = () => {
               </button>
             </div>
 
-              <nav className="flex flex-col space-y-3 border-b-2 border-gray-200 pb-4 mb-5">
-                <NavLink
-                  to="/"
-                  onClick={toggleMobileMenu}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
-                      : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
-                  }
-                >
-                  Trang chủ
-                </NavLink>
-                <NavLink
-                  to="/exam"
-                  onClick={toggleMobileMenu}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
-                      : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
-                  }
-                >
-                  Đề thi
-                </NavLink>
-                <NavLink
-                  to="/dictionary"
-                  onClick={toggleMobileMenu}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
-                      : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
-                  }
-                >
-                  Từ điển
-                </NavLink>
-                <NavLink
-                  to="/note"
-                  onClick={toggleMobileMenu}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
-                      : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
-                  }
-                >
-                  Ghi chú
-                </NavLink>
-              </nav>
+            <nav className="flex flex-col space-y-3 border-b-2 border-gray-200 pb-4 mb-5">
+              <NavLink
+                to="/"
+                onClick={toggleMobileMenu}
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
+                    : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
+                }
+              >
+                Trang chủ
+              </NavLink>
+              <NavLink
+                to="/exam"
+                onClick={toggleMobileMenu}
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
+                    : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
+                }
+              >
+                Đề thi
+              </NavLink>
+              <NavLink
+                to="/dictionary"
+                onClick={toggleMobileMenu}
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
+                    : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
+                }
+              >
+                Từ điển
+              </NavLink>
+              <NavLink
+                to="/note"
+                onClick={toggleMobileMenu}
+                className={({ isActive }) =>
+                  isActive
+                    ? "bg-[#2C99E2] text-white font-bold px-4 py-2 rounded-lg"
+                    : "text-gray-600 font-medium hover:text-[#2C99E2] px-4 py-2 rounded-lg"
+                }
+              >
+                Ghi chú
+              </NavLink>
+            </nav>
 
             {isLoggedIn ? (
               <div className="relative cursor-pointer w-full">
@@ -210,24 +255,31 @@ const Header = () => {
                   <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-600">
                     <FontAwesomeIcon icon="fa-solid fa-user" size="lg" />
                   </div>
-                  <span className="font-bold">Anhdaden</span>
-                  <FontAwesomeIcon 
-                    icon="fa-solid fa-caret-down" 
-                    className={` text-gray-600 transform transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  <span className="font-bold">{user?.userName || "User"}</span>
+                  <FontAwesomeIcon
+                    icon="fa-solid fa-caret-down"
+                    className={`text-gray-600 transform transition-transform duration-300 ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </div>
 
                 {dropdownOpen && (
                   <ul className="absolute top-full mt-2 w-full bg-white border-2 border-gray-200 rounded-lg shadow-lg z-50">
-                    <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
+                    <Link to="/account-info">
+                      <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
+                        <FontAwesomeIcon
+                          icon="fa-solid fa-user"
+                          className="w-4 h-4"
+                        />
+                        <span>Hồ sơ</span>
+                      </li>
+                    </Link>
+                    <li
+                      onClick={handleLogout}
+                      className="flex items-center text-red-500 gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold"
+                    >
                       <FontAwesomeIcon
-                        icon="fa-solid fa-user"
-                        className="w-4 h-4"
-                      />
-                      <span>Hồ sơ</span>
-                    </li>
-                    <li className="flex items-center text-red-500 gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold">
-                      <FontAwesomeIcon 
                         icon="fa-solid fa-arrow-right-from-bracket"
                         className="w-4 h-4"
                       />

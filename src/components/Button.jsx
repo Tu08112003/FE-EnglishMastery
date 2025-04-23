@@ -11,6 +11,7 @@ const Button = ({
   textColor,
   textSize = 'text-base',
   hoverBg,
+  type = 'button',
 }) => {
   const defaultVariantClasses = {
     primary: {
@@ -47,6 +48,7 @@ const Button = ({
 
   return (
     <button
+      type={type}
       onClick={onClick}
       className={`inline-flex items-center cursor-pointer justify-center rounded-md font-semibold transition duration-200
         ${bgClass} ${textClass} ${borderClass} ${hoverClass} ${sizeClasses[size]} ${textSize} ${className}`}
