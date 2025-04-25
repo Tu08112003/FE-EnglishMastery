@@ -10,7 +10,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const [formErrors, setFormErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
@@ -35,21 +38,19 @@ const Login = () => {
         console.log('API Response:', res);
 
         if (res && res.data) {
-          const { accessToken,refreshToken, userId, userName, email, typeUser } = res.data;
-          const user = { id: userId, userName, email, typeUser };
+          const { accessToken, refreshToken } = res.data;
           localStorage.setItem('access_token', accessToken);
-          localStorage.setItem('user', JSON.stringify(user));
-          localStorage.setItem('refresh_token', refreshToken)
-          dispatch(loginSuccess({ user, access_token: accessToken }));
+          localStorage.setItem('refresh_token', refreshToken);
+          dispatch(loginSuccess());
           toast.success('Đăng nhập thành công!');
           navigate('/');
         } else {
-          toast.error(res.message);
+          toast.error(res.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
         }
       } catch (error) {
         console.error('Login Error:', error);
-        setFormErrors({ general: error.message || 'Đã xảy ra lỗi. Vui lòng thử lại.' });
-        toast.error(error.message || 'Đã xảy ra lỗi. Vui lòng thử lại.');
+        const message = error.response?.data?.message || 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.';
+        toast.error(message);
       }
     }
   };
@@ -69,7 +70,9 @@ const Login = () => {
 
         <div className="space-y-5">
           <div className="flex flex-col gap-1">
-            <label className="font-semibold" htmlFor="email">Email</label>
+            <label className="font-semibold" htmlFor="email">
+              Email
+            </label>
             <input
               id="email"
               name="email"
@@ -78,7 +81,9 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               className={`w-full text-[#49719C] font-medium px-4 py-2.5 placeholder-[#49719C] border ${
-                formErrors.email ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500' : 'border-[#CEDBE8]'
+                formErrors.email
+                  ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                  : 'border-[#CEDBE8]'
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
             />
             {formErrors.email && (
@@ -87,7 +92,9 @@ const Login = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="font-semibold" htmlFor="password">Mật khẩu</label>
+            <label className="font-semibold" htmlFor="password">
+              Mật khẩu
+            </label>
             <div className="relative">
               <input
                 id="password"
@@ -97,7 +104,9 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className={`w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
-                  formErrors.password ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500' : 'border-[#CEDBE8]'
+                  formErrors.password
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
                 } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
               />
               <span
@@ -146,6 +155,7 @@ const Login = () => {
           </Link>
         </div>
       </form>
+      <ToastContainer />
     </div>
   );
 };

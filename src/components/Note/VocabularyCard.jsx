@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../../components/Button.jsx'
 const VocabularyCard = ({
@@ -7,24 +7,16 @@ const VocabularyCard = ({
   meaning,
   example,
   note,
-  topic,
-  status = "Chưa học",
+  status,
   onEdit,
   onDelete,
-  onStudy
+  // onStudy
 }) => {
 
-  const [currentStatus, setCurrentStatus] = useState(status)
-
-  const handleStudy = () => {
-    if (currentStatus !== "Đã học") {
-      setCurrentStatus("Đã học")
-      if (onStudy) onStudy()
-    }
-  }
+  
 
   const statusStyles =
-    currentStatus === "Đã học"
+    status === "Đã học"
       ? "bg-black text-white border-gray-200"
       : "text-black border-gray-200"
 
@@ -38,7 +30,7 @@ const VocabularyCard = ({
           {ipa && <div className="text-gray-600 font-medium text-sm ">{ipa}</div>}
         </div>
         <span className={`font-bold text-xs px-3 py-1 rounded-xl border-2 ${statusStyles}`}>
-            {currentStatus}
+            {status}
         </span>
       </div>
       {meaning && <div className="mb-1 text-black font-bold">{meaning}</div>}
@@ -50,15 +42,6 @@ const VocabularyCard = ({
           <div className="text-sm text-gray-600 font-medium mb-3">{note}</div>
         </div>
       )}
-
-      {topic && (
-        <div className='flex items-start'>
-        <span className="flex items-center justify-center text-xs text-black font-bold border-2 border-gray-200 rounded-xl px-4 py-1">
-            {topic}
-        </span>
-        </div>
-      )}
-
       <div className="flex items-center justify-between gap-4 mt-4">
         <div className="flex items-start gap-2">
  
@@ -100,7 +83,7 @@ const VocabularyCard = ({
               iconPosition='left'
               textColor="text-gray-600"
               border="border-2 border-gray-200"
-              onClick={handleStudy}
+              // onClick={handleStudy}
             />
         </div>
         
