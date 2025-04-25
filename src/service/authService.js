@@ -1,7 +1,7 @@
 import axios from '../utils/axios-customize'
 
 const authLogin = ({email, password}) => {
-    const URL_BACKEND = '/auth/login';
+    const URL_BACKEND = '/auth-service/login';
     const data = {
         email: email,
         password: password
@@ -10,7 +10,7 @@ const authLogin = ({email, password}) => {
 }
 
 const authRegister = ({userName, email, password}) => {
-    const URL_BACKEND = '/auth/register';
+    const URL_BACKEND = '/auth-service/register';
     const data = {
         userName: userName,
         email: email,
@@ -19,7 +19,7 @@ const authRegister = ({userName, email, password}) => {
     return axios.post(URL_BACKEND,data);
 }
 const authLogout = ({refreshToken}) => {
-    const URL_BACKEND = '/auth/logout';
+    const URL_BACKEND = '/auth-service/logout';
     const data = {
         refreshToken: refreshToken
     }
@@ -27,7 +27,7 @@ const authLogout = ({refreshToken}) => {
 };
 
 const checkRefreshToken = ({refreshToken}) => {
-    const URL_BACKEND = '/auth/refresh';
+    const URL_BACKEND = '/auth-service/refresh';
     const data = {
         refreshToken: refreshToken
     }
