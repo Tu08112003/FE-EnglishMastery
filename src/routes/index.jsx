@@ -37,10 +37,10 @@ const routes = [
   {
     layout: AdminLayout,
     children: [
-      { path: '/admin', component: <Dashboard />, protected: true },
-      { path: '/admin/exam', component: <ManageExam />, protected: true },
-      { path: '/admin/user', component: <ManageUser />, protected: true },
-      { path: '/admin/payment', component: <ManagePayment />, protected: true },
+      { path: '/admin', component: <Dashboard />, protected: false },
+      { path: '/admin/exam', component: <ManageExam />, protected: false },
+      { path: '/admin/user', component: <ManageUser />, protected: false },
+      { path: '/admin/payment', component: <ManagePayment />, protected: false },
     ],
   },
 ];

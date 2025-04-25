@@ -1,32 +1,34 @@
 // src/App.jsx
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch ,useSelector} from 'react-redux';
 import { Routes, Route } from 'react-router-dom';
 import routes from './routes/index.jsx';
 import './plugins/font-awesome.js';
 import PrivateRoute from './routes/PrivateRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { restoreSession } from './redux/slice/authSlice';
+import { loginSuccess, logout } from './redux/slice/authSlice';
+import { fetchUserInfo } from './redux/slice/userSlice';
 
 function App() {
   const dispatch = useDispatch();
+  const { userInfo, error } = useSelector((state) => state.user);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const user = localStorage.getItem('user');
-
-    if (token && user) {
-      try {
-        const parsedUser = JSON.parse(user);
-        dispatch(restoreSession({ user: parsedUser, token }));
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
-      }
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      dispatch(fetchUserInfo());
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(loginSuccess());
+    } else if (error) {
+      localStorage.removeItem('access_token');
+      dispatch(logout());
+    }
+  }, [userInfo, error, dispatch]);
 
   return (
     <>
