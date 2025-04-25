@@ -12,6 +12,7 @@ import feedback_1 from '../assets/images/feedback_1.jpg';
 import feedback_2 from '../assets/images/feedback_2.jpg';
 import feedback_3 from '../assets/images/feedback_3.jpg';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 const sectionData = {
   banner: {
@@ -46,16 +47,19 @@ const sectionData = {
       icon: <FontAwesomeIcon icon="fa-solid fa-file" size="2xl" style={{ color: '#2C99E2' }} />,
       title: 'Luyện đề chuẩn quốc tế',
       description: 'Hơn 500 đề thi từ cơ bản đến nâng cao',
+      path: '/exam'
     },
     {
       icon: <FontAwesomeIcon icon="fa-solid fa-book-open" size="2xl" style={{ color: '#2C99E2' }} />,
       title: 'Tra từ điển thông minh',
       description: 'Học từ vựng, phát âm và từ đồng nghĩa',
+      path: '/dictionary'
     },
     {
       icon: <FontAwesomeIcon icon="fa-solid fa-pen-to-square" size="2xl" style={{ color: '#2C99E2' }} />,
       title: 'Ghi chú cá nhân hóa',
       description: 'Lưu trữ và quản lý ghi chú dễ dàng',
+      path: '/note'
     },
   ],
   feedbacks: [
@@ -88,7 +92,7 @@ const sectionData = {
 
 const Home = () => {
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
-  const user = useSelector((state) => state.auth.user);
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   return (
     <main className="flex flex-col space-y-16">
@@ -99,7 +103,9 @@ const Home = () => {
             <div className="space-y-6">
               <h1 className="text-4xl font-bold leading-tight">{sectionData.banner.title}</h1>
               <p className="text-gray-600 font-medium">{sectionData.banner.description}</p>
-              <Button text={sectionData.banner.buttonText} variant="primary" size="md" />
+              <Link to="/login">
+                <Button text={sectionData.banner.buttonText} variant="primary" size="md" />
+              </Link>
             </div>
             <div className="h-75 md:h-80">
               <img src={sectionData.banner.image} alt="" className="object-cover rounded-3xl" />
@@ -111,7 +117,7 @@ const Home = () => {
             <div className="container mx-auto px-4 grid md:grid-cols-1 gap-8 items-center">
               <div className="space-y-6 flex flex-col justify-center items-center">
                 <h1 className="text-4xl text-center font-bold leading-tight">
-                  Chào mừng bạn trở lại, {user?.userName || 'User'}!
+                  Chào mừng bạn trở lại, {userInfo?.userName || 'User'}!
                 </h1>
                 <p className="text-gray-600">{sectionData.userWelcome.message}</p>
                 <Button text={sectionData.userWelcome.buttonText} variant="primary" size="md" />
@@ -187,7 +193,9 @@ const Home = () => {
           <section className="py-15 bg-[#E6F0FA] flex items-center justify-center">
             <div className="text-center mx-auto px-4 flex-col items-center justify-center">
               <h2 className="text-3xl font-bold mb-6">{sectionData.cta.title}</h2>
-              <Button text={sectionData.cta.buttonText} variant="primary" size="md" />
+              <Link to="/login">
+                <Button text={sectionData.cta.buttonText} variant="primary" size="md" />
+              </Link>
             </div>
           </section>
         </>
