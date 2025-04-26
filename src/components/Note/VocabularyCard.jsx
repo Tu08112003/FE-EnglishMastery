@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '../../components/Button.jsx'
 const VocabularyCard = ({
   word,
-  ipa,
-  meaning,
+  pronounce,
+  description,
   example,
   note,
   status,
   onEdit,
   onDelete,
-  // onStudy
+  onStudy
 }) => {
 
   
@@ -27,13 +27,13 @@ const VocabularyCard = ({
       <div className="flex justify-between items-center mb-2 border-b-1 pb-2 border-gray-200">
         <div>
           <h3 className="font-bold text-lg">{word}</h3>
-          {ipa && <div className="text-gray-600 font-medium text-sm ">{ipa}</div>}
+          {pronounce && <div className="text-gray-600 font-medium text-sm ">{pronounce}</div>}
         </div>
         <span className={`font-bold text-xs px-3 py-1 rounded-xl border-2 ${statusStyles}`}>
             {status}
         </span>
       </div>
-      {meaning && <div className="mb-1 text-black font-bold">{meaning}</div>}
+      {description && <div className="mb-1 text-black font-bold">{description}</div>}
       {example && <div className="text-sm mb-3 text-gray-600 font-medium">{example}</div>}
 
       {note && (
@@ -83,7 +83,7 @@ const VocabularyCard = ({
               iconPosition='left'
               textColor="text-gray-600"
               border="border-2 border-gray-200"
-              // onClick={handleStudy}
+              onClick={onStudy}
             />
         </div>
         
