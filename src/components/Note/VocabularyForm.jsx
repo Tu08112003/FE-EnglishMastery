@@ -4,54 +4,95 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../Button.jsx';
 import ModalWrapper from '../ModalWrapper.jsx';
 import { addVocabulary, updateVocabulary } from '../../redux/slice/noteSlice.js';
-
+import { validateAddUpdateVocabulary } from '../../utils/validate.js';
+import { toast } from 'react-toastify';
 const VocabularyForm = ({ show, onClose, vocabularyData }) => {
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [word, setWord] = useState(vocabularyData?.word || '');
-  const [description, setDescription] = useState(vocabularyData?.description || '');
-  const [pronounce, setPronounce] = useState(vocabularyData?.pronounce || '');
-  const [example, setExample] = useState(vocabularyData?.example || '');
-  const [learned, setLearned] = useState(vocabularyData?.learned || false);
-  const [note, setNote] = useState(vocabularyData?.note || '');
+  const [formData, setFormData] = useState({
+    word: vocabularyData?.word || '',
+    description: vocabularyData?.description || '',
+    pronounce: vocabularyData?.pronounce || '',
+    example: vocabularyData?.example || '',
+    note: vocabularyData?.note || '',
+    learned: vocabularyData?.learned || false,
+  });
+  const [formErrors, setFormErrors] = useState({});
 
   // Đồng bộ dữ liệu khi vocabularyData thay đổi
   useEffect(() => {
-    setWord(vocabularyData?.word || '');
-    setDescription(vocabularyData?.description || '');
-    setPronounce(vocabularyData?.pronounce || '');
-    setExample(vocabularyData?.example || '');
-    setLearned(vocabularyData?.learned || false);
-    setNote(vocabularyData?.note || '');
+    setFormData({
+      word: vocabularyData?.word || '',
+      description: vocabularyData?.description || '',
+      pronounce: vocabularyData?.pronounce || '',
+      example: vocabularyData?.example || '',
+      note: vocabularyData?.note || '',
+      learned: vocabularyData?.learned || false,
+    });
+    setFormErrors({}); // Reset lỗi khi dữ liệu thay đổi
   }, [vocabularyData]);
+
+  // Xử lý thay đổi input và validate real-time
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+
+    // Validate ngay khi thay đổi
+    const errors = validateAddUpdateVocabulary(updatedFormData);
+    setFormErrors(errors);
+  };
+
+  // Xử lý thay đổi trạng thái learned
+  const handleLearnedChange = (e) => {
+    const updatedFormData = { ...formData, learned: e.target.value === 'learned' };
+    setFormData(updatedFormData);
+
+    // Validate sau khi thay đổi trạng thái
+    const errors = validateAddUpdateVocabulary(updatedFormData);
+    setFormErrors(errors);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
 
+    // Validate trước khi submit
+    const errors = validateAddUpdateVocabulary(formData);
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return; // Dừng lại nếu có lỗi
+    }
+
     setIsSubmitting(true);
-    const formData = {
-      word,
-      description,
-      pronounce,
-      learned,
-      note,
-      example,
+    const submitData = {
+      word: formData.word,
+      description: formData.description,
+      pronounce: formData.pronounce,
+      example: formData.example,
+      note: formData.note,
+      learned: formData.learned,
     };
 
     try {
       if (vocabularyData) {
         // Update existing vocabulary
-        await dispatch(updateVocabulary({ ...formData, wordId: vocabularyData.id })).unwrap();
+        await dispatch(updateVocabulary({ ...submitData, wordId: vocabularyData.id })).unwrap();
+        toast.success('Cập nhật từ vựng thành công!');
+
       } else {
         // Add new vocabulary
-        await dispatch(addVocabulary(formData)).unwrap();
-        setWord(vocabularyData?.word || '');
-        setDescription('');
-        setPronounce('');
-        setExample('');
-        setLearned(false);
-        setNote('');
+        await dispatch(addVocabulary(submitData)).unwrap();
+        toast.success('Thêm từ vựng thành công!');
+        setFormData({
+          word: '',
+          description: '',
+          pronounce: '',
+          example: '',
+          note: '',
+          learned: false,
+        });
       }
       onClose();
     } catch (err) {
@@ -92,73 +133,147 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
         <div className="flex flex-col space-y-3 items-center justify-center w-full mb-4 p-3">
           {/* Từ vựng */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Từ vựng</label>
-            <input
-              type="text"
-              className="flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={word}
-              onChange={(e) => setWord(e.target.value)}
-              required
-            />
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="word">
+              Từ vựng
+            </label>
+            <div className="flex-1 w-full">
+              <input
+                id="word"
+                name="word"
+                type="text"
+                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                  formErrors.word
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                value={formData.word}
+                onChange={handleChange}
+              />
+              {formErrors.word && (
+                <div className="text-sm text-red-500 font-medium">{formErrors.word}</div>
+              )}
+            </div>
           </div>
           {/* Nghĩa */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Nghĩa</label>
-            <input
-              type="text"
-              className="flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="description">
+              Nghĩa
+            </label>
+            <div className="flex-1 w-full">
+              <input
+                id="description"
+                name="description"
+                type="text"
+                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                  formErrors.description
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                value={formData.description}
+                onChange={handleChange}
+              />
+              {formErrors.description && (
+                <div className="text-sm text-red-500 font-medium">{formErrors.description}</div>
+              )}
+            </div>
           </div>
           {/* Phát âm */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Phát âm</label>
-            <input
-              type="text"
-              className="flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={pronounce}
-              onChange={(e) => setPronounce(e.target.value)}
-            />
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="pronounce">
+              Phát âm
+            </label>
+            <div className="flex-1 w-full">
+              <input
+                id="pronounce"
+                name="pronounce"
+                type="text"
+                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                  formErrors.pronounce
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                value={formData.pronounce}
+                onChange={handleChange}
+              />
+              {formErrors.pronounce && (
+                <div className="text-sm text-red-500 font-medium">{formErrors.pronounce}</div>
+              )}
+            </div>
           </div>
           {/* Ví dụ */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Ví dụ</label>
-            <textarea
-              rows={5}
-              className="flex-1 w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={example}
-              onChange={(e) => setExample(e.target.value)}
-            />
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="example">
+              Ví dụ
+            </label>
+            <div className="flex-1 w-full">
+              <textarea
+                id="example"
+                name="example"
+                rows={5}
+                className={`flex-1 w-full p-3 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                  formErrors.example
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                value={formData.example}
+                onChange={handleChange}
+              />
+              {formErrors.example && (
+                <div className="text-sm text-red-500 font-medium">{formErrors.example}</div>
+              )}
+            </div>
           </div>
           {/* Trạng thái */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Trạng thái</label>
-            <select
-              className="flex-1 w-full border-2 border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={learned ? 'learned' : 'learning'}
-              onChange={(e) => setLearned(e.target.value === 'learned')}
-            >
-              <option value="learning">Chưa học</option>
-              <option value="learned">Đã học</option>
-            </select>
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="learned">
+              Trạng thái
+            </label>
+            <div className="flex-1 w-full">
+              <select
+                id="learned"
+                name="learned"
+                className="flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE] bg-white"
+                value={formData.learned ? 'learned' : 'learning'}
+                onChange={handleLearnedChange}
+              >
+                <option value="learning">Chưa học</option>
+                <option value="learned">Đã học</option>
+              </select>
+            </div>
           </div>
           {/* Ghi chú */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="w-full sm:w-1/5 font-semibold">Ghi chú</label>
-            <textarea
-              rows={5}
-              className="flex-1 w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
+            <label className="w-full sm:w-1/5 font-semibold" htmlFor="note">
+              Ghi chú
+            </label>
+            <div className="flex-1 w-full">
+              <textarea
+                id="note"
+                name="note"
+                rows={5}
+                className={`flex-1 w-full p-3 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                  formErrors.note
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-[#CEDBE8]'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                value={formData.note}
+                onChange={handleChange}
+              />
+              {formErrors.note && (
+                <div className="text-sm text-red-500 font-medium">{formErrors.note}</div>
+              )}
+            </div>
           </div>
         </div>
         {/* Button */}
         <div className="flex gap-4 justify-end p-3">
           <Button text="Hủy" variant="default" size="sm" onClick={onClose} />
-          <Button text="Lưu" variant="primary" size="sm" type="submit" disabled={isSubmitting} />
+          <Button
+            text="Lưu"
+            variant="primary"
+            size="sm"
+            type="submit"
+          />
         </div>
       </form>
     </ModalWrapper>
