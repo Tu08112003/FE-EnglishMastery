@@ -1,54 +1,41 @@
 // src/App.jsx
-import { useEffect } from 'react';
-import { useDispatch ,useSelector} from 'react-redux';
-import { Routes, Route } from 'react-router-dom';
-import routes from './routes/index.jsx';
-import './plugins/font-awesome.js';
-import PrivateRoute from './routes/PrivateRoute';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { loginSuccess, logout } from './redux/slice/authSlice';
-import { fetchUserInfo } from './redux/slice/userSlice';
+import { Routes, Route } from "react-router-dom";
+import routes from "./routes/index.jsx";
+import "./plugins/font-awesome.js";
+import PrivateRoute from "./routes/PrivateRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useSelector, useDispatch } from "react-redux";
+import { loginSuccess, finishLoading } from "./redux/slice/authSlice";
+import { useEffect } from "react";
 
 function App() {
   const dispatch = useDispatch();
-  const { userInfo, error } = useSelector((state) => state.user);
+  const loading = useSelector((state) => state.auth.loading);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access_token');
-    if (accessToken) {
-      dispatch(fetchUserInfo());
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      dispatch(loginSuccess());
+    } else {
+      dispatch(finishLoading());
     }
   }, [dispatch]);
 
-  useEffect(() => {
-    if (userInfo) {
-      dispatch(loginSuccess());
-    } else if (error) {
-      localStorage.removeItem('access_token');
-      dispatch(logout());
-    }
-  }, [userInfo, error, dispatch]);
+  if (loading) return <div>Loading...</div>;
 
   return (
     <>
       <Routes>
         {routes.map((group, i) => {
           const Layout = group.layout;
-          return group.children.map((route, j) => {
-            const Page = route.protected ? (
-              <PrivateRoute>{route.component}</PrivateRoute>
-            ) : (
-              route.component
-            );
-            return (
-              <Route
-                key={`${i}-${j}`}
-                path={route.path}
-                element={<Layout>{Page}</Layout>}
-              />
-            );
-          });
+          return group.children.map((route, j) => (
+            <Route
+              key={`${i}-${j}`}
+              path={route.path}
+              element={<Layout>{route.component}</Layout>}
+            />
+          ));
         })}
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />

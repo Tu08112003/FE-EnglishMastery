@@ -1,9 +1,4 @@
 import axios from 'axios';
-// import { toast } from 'react-toastify';
-// import { store } from '../redux/store';
-// import { logout } from '../redux/slice/authSlice';
-// import { clearUserInfo } from '../redux/slice/userSlice';
-// import { checkRefreshToken } from '../service/authService';
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -30,30 +25,10 @@ instance.interceptors.response.use(
     return response;
   },
   async function (error) {
-    // if (error.response?.status === 401) {
-    //   try {
-    //     const refreshToken = localStorage.getItem('refresh_token');
-    //     if (!refreshToken) {
-    //       throw new Error('Không tìm thấy refresh token');
-    //     }
-    //     await checkRefreshToken({ refreshToken });
+    
 
-    //     throw error;
-    //   } catch (refreshError) {
-    //     localStorage.removeItem('access_token');
-    //     localStorage.removeItem('refresh_token');
-    //     store.dispatch(logout());
-    //     store.dispatch(clearUserInfo());
-    //     toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+    if (error.response && error.response.data) return error.response.data;
 
-    //     window.location.href = '/login';
-    //     return Promise.reject(refreshError);
-    //   }
-    // }
-
-    if (error.response && error.response.data) {
-      return error.response.data;
-    }
     return Promise.reject(error);
   }
 );

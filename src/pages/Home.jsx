@@ -160,6 +160,7 @@ const Home = () => {
                 icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
+                path={feature.path}
               />
             ))}
           </div>
