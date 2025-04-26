@@ -3,18 +3,16 @@ import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../Button.jsx';
 import ModalWrapper from '../ModalWrapper.jsx';
-import { addVocabulary } from '../../redux/slice/noteSlice.js';
-import { toast } from 'react-toastify';
+import { addVocabulary, updateVocabulary } from '../../redux/slice/noteSlice.js';
 
 const VocabularyForm = ({ show, onClose, vocabularyData }) => {
   const dispatch = useDispatch();
-  const accessToken = localStorage.getItem('access_token') || '';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [word, setWord] = useState(vocabularyData?.word || '');
   const [description, setDescription] = useState(vocabularyData?.description || '');
   const [pronounce, setPronounce] = useState(vocabularyData?.pronounce || '');
   const [example, setExample] = useState(vocabularyData?.example || '');
-  const [learned, setLearned] = useState(vocabularyData?.learned);
+  const [learned, setLearned] = useState(vocabularyData?.learned || false);
   const [note, setNote] = useState(vocabularyData?.note || '');
 
   // Đồng bộ dữ liệu khi vocabularyData thay đổi
@@ -23,7 +21,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
     setDescription(vocabularyData?.description || '');
     setPronounce(vocabularyData?.pronounce || '');
     setExample(vocabularyData?.example || '');
-    setLearned(vocabularyData?.learned);
+    setLearned(vocabularyData?.learned || false);
     setNote(vocabularyData?.note || '');
   }, [vocabularyData]);
 
@@ -40,12 +38,24 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
       note,
       example,
     };
+
     try {
-      await dispatch(addVocabulary({ ...formData, accessToken })).unwrap();
+      if (vocabularyData) {
+        // Update existing vocabulary
+        await dispatch(updateVocabulary({ ...formData, wordId: vocabularyData.id })).unwrap();
+      } else {
+        // Add new vocabulary
+        await dispatch(addVocabulary(formData)).unwrap();
+        setWord(vocabularyData?.word || '');
+        setDescription('');
+        setPronounce('');
+        setExample('');
+        setLearned(false);
+        setNote('');
+      }
       onClose();
     } catch (err) {
-      console.error('Error adding vocabulary:', err);
-      toast.error("Không thể thêm mới từ vựng. Vui lòng thử lại!");
+      console.error('Error processing vocabulary:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,6 +90,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
         </div>
         {/* Input Fields */}
         <div className="flex flex-col space-y-3 items-center justify-center w-full mb-4 p-3">
+          {/* Từ vựng */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Từ vựng</label>
             <input
@@ -90,6 +101,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               required
             />
           </div>
+          {/* Nghĩa */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Nghĩa</label>
             <input
@@ -100,6 +112,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               required
             />
           </div>
+          {/* Phát âm */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Phát âm</label>
             <input
@@ -109,6 +122,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               onChange={(e) => setPronounce(e.target.value)}
             />
           </div>
+          {/* Ví dụ */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Ví dụ</label>
             <textarea
@@ -118,6 +132,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               onChange={(e) => setExample(e.target.value)}
             />
           </div>
+          {/* Trạng thái */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Trạng thái</label>
             <select
@@ -129,6 +144,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               <option value="learned">Đã học</option>
             </select>
           </div>
+          {/* Ghi chú */}
           <div className="flex w-full flex-col sm:flex-row items-start sm:items-center gap-2">
             <label className="w-full sm:w-1/5 font-semibold">Ghi chú</label>
             <textarea
@@ -142,7 +158,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
         {/* Button */}
         <div className="flex gap-4 justify-end p-3">
           <Button text="Hủy" variant="default" size="sm" onClick={onClose} />
-          <Button text="Lưu" variant="primary" size="sm" type="submit" />
+          <Button text="Lưu" variant="primary" size="sm" type="submit" disabled={isSubmitting} />
         </div>
       </form>
     </ModalWrapper>
