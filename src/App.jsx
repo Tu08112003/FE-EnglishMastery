@@ -22,7 +22,7 @@ function App() {
     }
   }, [dispatch]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="flex items-center justify-center font-bold text-gray-600">Loading...</div>;
 
   return (
     <>
