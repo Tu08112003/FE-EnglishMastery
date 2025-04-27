@@ -141,11 +141,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
                 id="word"
                 name="word"
                 type="text"
-                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                className={`flex-1 w-full px-4 py-2.5 text-gray-600 font-medium border ${
                   formErrors.word
                     ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                    : 'border-[#CEDBE8]'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg`}
                 value={formData.word}
                 onChange={handleChange}
               />
@@ -164,11 +164,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
                 id="description"
                 name="description"
                 type="text"
-                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                className={`flex-1 w-full px-4 py-2.5 text-gray-600 font-medium  border ${
                   formErrors.description
                     ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                    : 'border-[#CEDBE8]'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg`}
                 value={formData.description}
                 onChange={handleChange}
               />
@@ -187,11 +187,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
                 id="pronounce"
                 name="pronounce"
                 type="text"
-                className={`flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                className={`flex-1 w-full px-4 py-2.5 text-gray-600 font-medium border ${
                   formErrors.pronounce
                     ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                    : 'border-[#CEDBE8]'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg`}
                 value={formData.pronounce}
                 onChange={handleChange}
               />
@@ -210,11 +210,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
                 id="example"
                 name="example"
                 rows={5}
-                className={`flex-1 w-full p-3 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                className={`flex-1 w-full p-3 text-gray-600 font-medium  border ${
                   formErrors.example
                     ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                    : 'border-[#CEDBE8]'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg`}
                 value={formData.example}
                 onChange={handleChange}
               />
@@ -232,7 +232,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
               <select
                 id="learned"
                 name="learned"
-                className="flex-1 w-full px-4 py-2.5 text-[#49719C] font-medium border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE] bg-white"
+                className={`flex-1 w-full px-4 py-2.5 text-gray-600 font-medium border ${
+                  formErrors.learned
+                    ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg bg-white`}
                 value={formData.learned ? 'learned' : 'learning'}
                 onChange={handleLearnedChange}
               >
@@ -251,11 +255,11 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
                 id="note"
                 name="note"
                 rows={5}
-                className={`flex-1 w-full p-3 text-[#49719C] font-medium placeholder-[#49719C] border ${
+                className={`flex-1 w-full p-3 text-gray-600 font-medium border ${
                   formErrors.note
                     ? 'border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                    : 'border-[#CEDBE8]'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]`}
+                    : 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400'
+                } rounded-lg`}
                 value={formData.note}
                 onChange={handleChange}
               />
