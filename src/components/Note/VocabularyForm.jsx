@@ -96,7 +96,7 @@ const VocabularyForm = ({ show, onClose, vocabularyData }) => {
       }
       onClose();
     } catch (err) {
-      console.error('Error processing vocabulary:', err);
+      toast.error(err || 'Đã xảy ra lỗi. Vui lòng thử lại!');
     } finally {
       setIsSubmitting(false);
     }

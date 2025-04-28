@@ -1,14 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
 });
 
+// Excluded endpoints
+const excludedEndpoints = [
+  "/auth-service/login",
+  "/auth-service/register",
+  "/auth-service/refresh",
+  "/auth-service/forgot-password",
+];
+
 // Interceptor cho request
 instance.interceptors.request.use(
   function (config) {
-    const token = localStorage.getItem('access_token');
-    if (token) {
+    const token = localStorage.getItem("access_token");
+    if (config.url && !excludedEndpoints.includes(config.url) && token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -25,8 +33,6 @@ instance.interceptors.response.use(
     return response;
   },
   async function (error) {
-    
-
     if (error.response && error.response.data) return error.response.data;
 
     return Promise.reject(error);
