@@ -22,21 +22,20 @@ const Note = () => {
   const [vocabularyToDelete, setVocabularyToDelete] = useState(null);
   const [currentVocabulary, setCurrentVocabulary] = useState(null);
   const [studyVocabulary, setStudyVocabulary] = useState(null);
-  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
 
   const {
     vocabularies,
     loading,
-    error: reduxError,
+    error,
   } = useSelector((state) => state.note);
   const dispatch = useDispatch();
   const accessToken = localStorage.getItem("access_token") || "";
 
   useEffect(() => {
     if (!accessToken) {
-      setError("Vui lòng đăng nhập để xem danh sách từ vựng.");
+      toast.error("Vui lòng đăng nhập để xem danh sách từ vựng.");
     } else {
       dispatch(fetchNotes(accessToken))
         .unwrap()
@@ -259,17 +258,15 @@ const Note = () => {
           >
             Đang tải từ vựng...
           </p>
-        ) : error || reduxError ? (
+        ) : error? (
           <p className="text-center text-red-500 text-lg font-medium py-8">
-            {error || reduxError}
+            {error}
           </p>
         ) : filteredVocabularies.length === 0 ? (
           <p className="text-center text-gray-600 text-lg font-medium py-8">
-            {searchQuery || filter !== "all"
-              ? "Không tìm thấy từ vựng phù hợp."
-              : "Chưa có từ vựng nào để hiển thị. Hãy thêm từ vựng mới!"}
+            Không tìm thấy từ vựng nào.
           </p>
-        ) : (
+        ) :(
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredVocabularies.map((vocab) => (
               <VocabularyCard

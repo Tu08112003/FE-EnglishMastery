@@ -6,7 +6,7 @@ import { validateLogin } from "../utils/validate.js";
 import { authLogin } from "../service/authService.js";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slice/authSlice";
-import { ToastContainer, toast } from "react-toastify";
+import {toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
@@ -45,7 +45,7 @@ const Login = () => {
           localStorage.setItem("access_token", accessToken);
           localStorage.setItem("refresh_token", refreshToken);
           dispatch(loginSuccess());
-          toast.success("Đăng nhập thành công!");
+          toast.success("Đăng nhập thành công");
           navigate("/");
         } else {
           toast.error(res.message || "Đăng nhập thất bại. Vui lòng thử lại.");
@@ -173,7 +173,6 @@ const Login = () => {
           </Link>
         </div>
       </form>
-      <ToastContainer />
     </div>
   );
 };
