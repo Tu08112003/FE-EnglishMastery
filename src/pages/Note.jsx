@@ -1,32 +1,42 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchNotes, deleteVocabulary, updateVocabulary } from '../redux/slice/noteSlice';
-import Button from '../components/Button.jsx';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SearchBar from '../components/SearchBar.jsx';
-import VocabularyCard from '../components/Note/VocabularyCard.jsx';
-import VocabularyForm from '../components/Note/VocabularyForm.jsx';
-import ModalConfirm from '../components/ConfirmModal.jsx';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchNotes,
+  deleteVocabulary,
+  updateVocabulary,
+} from "../redux/slice/noteSlice";
+import Button from "../components/Button.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SearchBar from "../components/SearchBar.jsx";
+import VocabularyCard from "../components/Note/VocabularyCard.jsx";
+import VocabularyForm from "../components/Note/VocabularyForm.jsx";
+import ModalConfirm from "../components/ConfirmModal.jsx";
+import { toast } from "react-toastify";
+import FlipCard from "../components/Note/FlipCard.jsx";
 
 const Note = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showStudyModal, setShowStudyModal] = useState(false);
   const [vocabularyToDelete, setVocabularyToDelete] = useState(null);
   const [currentVocabulary, setCurrentVocabulary] = useState(null);
+  const [studyVocabulary, setStudyVocabulary] = useState(null);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState('all'); 
-  // Lấy trạng thái từ Redux store
-  const { vocabularies, loading, error: reduxError } = useSelector((state) => state.note);
-  const dispatch = useDispatch();
-  const accessToken = localStorage.getItem('access_token') || '';
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("all");
 
-  // Fetch vocabularies on mount or when accessToken changes
+  const {
+    vocabularies,
+    loading,
+    error: reduxError,
+  } = useSelector((state) => state.note);
+  const dispatch = useDispatch();
+  const accessToken = localStorage.getItem("access_token") || "";
+
   useEffect(() => {
     if (!accessToken) {
-      setError('Vui lòng đăng nhập để xem danh sách từ vựng.');
+      setError("Vui lòng đăng nhập để xem danh sách từ vựng.");
     } else {
       dispatch(fetchNotes(accessToken))
         .unwrap()
@@ -48,11 +58,12 @@ const Note = () => {
     setShowModal(true);
   };
 
- 
   const handleConfirmDelete = async () => {
     if (vocabularyToDelete) {
       try {
-        await dispatch(deleteVocabulary({ wordId: vocabularyToDelete.id })).unwrap();
+        await dispatch(
+          deleteVocabulary({ wordId: vocabularyToDelete.id })
+        ).unwrap();
         toast.success("Xóa từ vựng thành công!");
       } catch (err) {
         toast.error(err || "Xóa từ vựng thất bại!");
@@ -67,22 +78,28 @@ const Note = () => {
     setVocabularyToDelete(null);
   };
 
-
   const handleStudyVocabulary = async (vocabulary) => {
     try {
-      await dispatch(updateVocabulary({
-        wordId: vocabulary.id,
-        word: vocabulary.word,
-        description: vocabulary.description,
-        pronounce: vocabulary.pronounce,
-        example: vocabulary.example,
-        learned: !vocabulary.learned,
-        note: vocabulary.note,
-      })).unwrap();
+      await dispatch(
+        updateVocabulary({
+          wordId: vocabulary.id,
+          word: vocabulary.word,
+          description: vocabulary.description,
+          pronounce: vocabulary.pronounce,
+          example: vocabulary.example,
+          learned: true,
+          note: vocabulary.note,
+        })
+      ).unwrap();
       toast.success("Cập nhật trạng thái từ vựng thành công!");
     } catch (err) {
       toast.error(err || "Cập nhật trạng thái thất bại!");
     }
+  };
+
+  const handleOpenStudyModal = (vocabulary) => {
+    setStudyVocabulary(vocabulary);
+    setShowStudyModal(true);
   };
 
   const handleSearch = (e) => {
@@ -91,22 +108,19 @@ const Note = () => {
 
   const handleFilter = (filterValue) => {
     setFilter(filterValue);
-    setShowFilter(false); 
+    setShowFilter(false);
   };
-
 
   const filteredVocabularies = useMemo(() => {
     return vocabularies.filter((vocab) => {
-      // Search
       const matchesSearch =
         vocab.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
         vocab.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Lọc
       const matchesFilter =
-        filter === 'all' ||
-        (filter === 'learned' && vocab.learned) ||
-        (filter === 'not_learned' && !vocab.learned);
+        filter === "all" ||
+        (filter === "learned" && vocab.learned) ||
+        (filter === "not_learned" && !vocab.learned);
 
       return matchesSearch && matchesFilter;
     });
@@ -118,14 +132,22 @@ const Note = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-5">
         <div className="flex flex-col items-center text-center gap-2">
           <h2 className="text-3xl font-bold">Ghi chú từ vựng của bạn</h2>
-          <p className="text-gray-600 font-medium">Lưu trữ và quản lý từ vựng Tiếng Anh dễ dàng</p>
+          <p className="text-gray-600 font-medium">
+            Lưu trữ và quản lý từ vựng Tiếng Anh dễ dàng
+          </p>
         </div>
         <div className="flex justify-center">
           <Button
             text="Thêm từ mới"
             variant="primary"
             size="sm"
-            icon={<FontAwesomeIcon icon="fa-solid fa-plus" size="md" style={{ color: '#ffffff' }} />}
+            icon={
+              <FontAwesomeIcon
+                icon="fa-solid fa-plus"
+                size="md"
+                style={{ color: "#ffffff" }}
+              />
+            }
             onClick={() => {
               setCurrentVocabulary(null);
               setShowForm(true);
@@ -145,18 +167,24 @@ const Note = () => {
             <div className="text-center">
               <h2 className="text-gray-600 font-medium">Số từ đã học</h2>
               <p className="text-2xl font-bold mt-2">
-                {vocabularies.filter((v) => v.learned === true).length}/{vocabularies.length}
+                {vocabularies.filter((v) => v.learned === true).length}/
+                {vocabularies.length}
               </p>
             </div>
             <div className="flex flex-col items-center">
-              <h2 className="text-gray-600 font-medium mb-2">Tiến độ học tập</h2>
+              <h2 className="text-gray-600 font-medium mb-2">
+                Tiến độ học tập
+              </h2>
               <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-black"
                   style={{
                     width: `${
                       vocabularies.length > 0
-                        ? (vocabularies.filter((v) => v.learned === true).length / vocabularies.length) * 100
+                        ? (vocabularies.filter((v) => v.learned === true)
+                            .length /
+                            vocabularies.length) *
+                          100
                         : 0
                     }%`,
                   }}
@@ -164,7 +192,11 @@ const Note = () => {
               </div>
               <div className="font-bold mt-1 text-sm">
                 {vocabularies.length > 0
-                  ? Math.round((vocabularies.filter((v) => v.learned === true).length / vocabularies.length) * 100)
+                  ? Math.round(
+                      (vocabularies.filter((v) => v.learned === true).length /
+                        vocabularies.length) *
+                        100
+                    )
                   : 0}
                 %
               </div>
@@ -173,7 +205,7 @@ const Note = () => {
         </div>
       )}
 
-      {/* Search & Filter */}
+      {/* Tìm kiếm & Lọc */}
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 px-4 md:px-12">
         <SearchBar
           text="Tìm kiếm từ vựng"
@@ -191,20 +223,26 @@ const Note = () => {
           {showFilter && (
             <ul className="absolute top-14 -right-14 bg-white border-2 border-gray-200 rounded-lg shadow-lg w-40 z-10">
               <li
-                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${filter === 'all' ? 'bg-gray-100 font-bold' : ''}`}
-                onClick={() => handleFilter('all')}
+                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${
+                  filter === "all" ? "bg-gray-100 font-bold" : ""
+                }`}
+                onClick={() => handleFilter("all")}
               >
                 Tất cả
               </li>
               <li
-                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${filter === 'learned' ? 'bg-gray-100 font-bold' : ''}`}
-                onClick={() => handleFilter('learned')}
+                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${
+                  filter === "learned" ? "bg-gray-100 font-bold" : ""
+                }`}
+                onClick={() => handleFilter("learned")}
               >
                 Đã học
               </li>
               <li
-                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${filter === 'not_learned' ? 'bg-gray-100 font-bold' : ''}`}
-                onClick={() => handleFilter('not_learned')}
+                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium ${
+                  filter === "not_learned" ? "bg-gray-100 font-bold" : ""
+                }`}
+                onClick={() => handleFilter("not_learned")}
               >
                 Chưa học
               </li>
@@ -216,14 +254,20 @@ const Note = () => {
       {/* Vocabulary Cards */}
       <div className="mt-6 max-h-[calc(100vh-100px)] w-full p-2 overflow-y-auto">
         {loading ? (
-          <p className="text-center text-gray-600 text-lg font-medium py-8">Đang tải từ vựng...</p>
+          <p
+            className="text-center text-gray-600 text-lg font-medium py-8"
+          >
+            Đang tải từ vựng...
+          </p>
         ) : error || reduxError ? (
-          <p className="text-center text-red-500 text-lg font-medium py-8">{error || reduxError}</p>
+          <p className="text-center text-red-500 text-lg font-medium py-8">
+            {error || reduxError}
+          </p>
         ) : filteredVocabularies.length === 0 ? (
           <p className="text-center text-gray-600 text-lg font-medium py-8">
-            {searchQuery || filter !== 'all'
-              ? 'Không tìm thấy từ vựng phù hợp.'
-              : 'Chưa có từ vựng nào để hiển thị. Hãy thêm từ vựng mới!'}
+            {searchQuery || filter !== "all"
+              ? "Không tìm thấy từ vựng phù hợp."
+              : "Chưa có từ vựng nào để hiển thị. Hãy thêm từ vựng mới!"}
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -231,20 +275,20 @@ const Note = () => {
               <VocabularyCard
                 key={vocab.id}
                 word={vocab.word}
-                ipa={vocab.pronounce}
+                pronounce={vocab.pronounce}
                 description={vocab.description}
-                example={vocab.example || ''}
+                example={vocab.example || ""}
                 note={vocab.note}
-                status={vocab.learned ? 'Đã học' : 'Chưa học'}
+                status={vocab.learned ? "Đã học" : "Chưa học"}
                 onEdit={() => handleEdit(vocab)}
                 onDelete={() => handleDelete(vocab)}
-                onStudy={() => handleStudyVocabulary(vocab)}
+                onStudy={() => handleOpenStudyModal(vocab)}
               />
             ))}
           </div>
         )}
       </div>
-
+        {/* Thêm/Cập nhật từ vựng */}
       <VocabularyForm
         show={showForm}
         onClose={() => {
@@ -253,7 +297,7 @@ const Note = () => {
         }}
         vocabularyData={currentVocabulary}
       />
-
+      {/* Xóa từ vựng */}
       {showModal && (
         <ModalConfirm
           show={showModal}
@@ -265,6 +309,15 @@ const Note = () => {
           hoverBgConfirm="hover:bg-red-700"
         />
       )}
+      {/* Học từ vựng */}
+      <FlipCard
+        show={showStudyModal}
+        onClose={() => setShowStudyModal(false)}
+        vocabulary={studyVocabulary}
+        vocabularies={filteredVocabularies}
+        onStudy={handleStudyVocabulary}
+      />
+
     </main>
   );
 };

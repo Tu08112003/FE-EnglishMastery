@@ -14,7 +14,7 @@ const ResultCard = ({ wordData, query }) => {
               <button className="rounded-full p-1 hover:bg-gray-100">
                 <FontAwesomeIcon icon="fa-solid fa-volume-high" size="md" style={{color: "#565E6C"}} />
               </button>
-              <span className="ml-2 text-gray-600 font-medium">{wordData.phonetic}</span>
+              <span className="ml-2 text-gray-600 font-medium">{wordData.pronounce}</span>
             </div>
           </div>
 
