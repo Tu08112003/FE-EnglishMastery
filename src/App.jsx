@@ -26,6 +26,7 @@ function App() {
 
   return (
     <>
+      <ToastContainer position="top-right" autoClose={2000} />
       <Routes>
         {routes.map((group, i) => {
           const Layout = group.layout;
@@ -38,7 +39,6 @@ function App() {
           ));
         })}
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
