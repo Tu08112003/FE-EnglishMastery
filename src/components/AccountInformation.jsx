@@ -6,7 +6,7 @@ import { fetchUserInfo } from "../redux/slice/userSlice";
 import Button from "./Button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import { updateUser } from '../service/userService';
+import { updateUser } from '../service/userService';
 import formatDate from "../utils/formatDate";
 import {
   validateUpdateInforUser,
@@ -46,8 +46,6 @@ const AccountInformation = () => {
   const inputStyle =
     "w-full px-3 py-1.5 text-[#49719C] font-medium placeholder-[#49719C] border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]";
 
- 
-
   const handleUserChange = (e) => {
     const { name, value } = e.target;
     const updatedFormData = { ...userFormData, [name]: value };
@@ -64,26 +62,26 @@ const AccountInformation = () => {
     setPasswordFormErrors(errors);
   };
 
-  // const handleUpdateUser = async () => {
-  //   const errors = validateUpdateInforUser(userFormData);
-  //   setUserFormErrors(errors);
+  const handleUpdateUser = async () => {
+    const errors = validateUpdateInforUser(userFormData);
+    setUserFormErrors(errors);
 
-  //   if (Object.keys(errors).length === 0) {
-  //     try {
-  //       const res = await updateUser({ userName: userFormData.userName });
-  //       if (res && res.data) {
-  //         toast.success('Cập nhật tên người dùng thành công!');
-  //         dispatch(fetchUserInfo());
-  //         setIsCheck(false);
-  //       } else {
-  //         toast.error('Cập nhật tên người dùng thất bại! Vui lòng thử lại.');
-  //       }
-  //     } catch (error) {
-  //       console.log('Error:', error);
-  //       toast.error(error.message || 'Lỗi khi cập nhật tên');
-  //     }
-  //   }
-  // };
+    if (Object.keys(errors).length === 0) {
+      try {
+        const res = await updateUser({ userName: userFormData.userName });
+        if (res && res.data) {
+          toast.success('Cập nhật tên người dùng thành công!');
+          dispatch(fetchUserInfo());
+          setIsCheck(false);
+        } else {
+          toast.error('Cập nhật tên người dùng thất bại! Vui lòng thử lại.');
+        }
+      } catch (error) {
+        console.log('Error:', error);
+        toast.error(error.message || 'Lỗi khi cập nhật tên');
+      }
+    }
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -197,7 +195,7 @@ const AccountInformation = () => {
                   text="Lưu"
                   variant="primary"
                   size="sm"
-                  // onClick={handleUpdateUser}
+                  onClick={handleUpdateUser}
                 />
               </div>
             </form>

@@ -166,16 +166,13 @@ const Dictionary = () => {
             </p>
           ) : currentWord ? (
             <DictionaryResultCard
-              wordData={{
-                word: currentWord.word,
-                pronounce: currentWord.pronounce || "",
-                definitions: currentWord.description
-                  ? [currentWord.description]
-                  : [],
-                synonyms: currentWord.description ? [] : [],
-              }}
-              query={searchVocabulary}
-            />
+            wordData={{
+              word: currentWord.word,
+              pronounce: currentWord.pronounce,
+              description: currentWord.description,
+            }}
+            query={searchVocabulary}
+          />
           ) : (
             <p className="text-center text-gray-600 font-semibold">
               Không tìm thấy thông tin cho từ này.
