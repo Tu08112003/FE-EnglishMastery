@@ -1,80 +1,167 @@
-import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Button from '../components/Button.jsx'
-import SearchBar from '../components/SearchBar.jsx'
-import ExamCard from '../components/Exam/ExamCard.jsx'
-import Pagination from '../components/Pagination.jsx'
-import PreviewExam from '../components/Exam/PreviewExam.jsx'
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Button from "../components/Button.jsx";
+import SearchBar from "../components/SearchBar.jsx";
+import ExamCard from "../components/Exam/ExamCard.jsx";
+import PreviewExam from "../components/Exam/PreviewExam.jsx";
+import {
+  fetchAllExamsByYear,
+  fetchExamsByYear,
+  setSelectedYear,
+} from "../redux/slice/examSlice.js";
+import Pagination from "../components/Pagination.jsx";
 
 const Exam = () => {
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = 3
-  const listExams = ['2024', '2023', '2022', 'New economy']
-  const [selectedExam, setSelectedExam] = useState(null)
+  const [previewExam, setPreviewExam] = useState(false);
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const examsPerPage = 8;
+  const dispatch = useDispatch();
+  const {
+    exams = [],
+    examYears = [],
+    loading,
+    error,
+    selectedYear,
+  } = useSelector((state) => state.exam || {});
 
-  const [previewTitle, setPreviewTitle] = useState(null)
+  useEffect(() => {
+    dispatch(fetchAllExamsByYear());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (examYears.length > 0 && !selectedYear) {
+      const firstYear = examYears[0];
+      dispatch(setSelectedYear(firstYear));
+      dispatch(fetchExamsByYear(firstYear));
+    }
+  }, [examYears, selectedYear, dispatch]);
+
+  const handleYearClick = (year) => {
+    dispatch(setSelectedYear(year));
+    dispatch(fetchExamsByYear(year));
+    setCurrentPage(1);
+    setSearchQuery("");
+  };
+
+  const filteredExams = exams.filter((exam) =>
+    exam.testName?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalExams = filteredExams.length;
+  const totalPages = Math.ceil(totalExams / examsPerPage);
+  const startIndex = (currentPage - 1) * examsPerPage;
+  const endIndex = startIndex + examsPerPage;
+  const currentExams = filteredExams.slice(startIndex, endIndex);
+
+  const handleShowPreviewExam = (exam) => {
+    setSelectedExam(exam);
+    setPreviewExam(true);
+  };
+
+  const handleClosePreviewExam = () => {
+    setPreviewExam(false);
+    setSelectedExam(null);
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
 
   return (
-    <main className='container mx-auto px-4 py-6 sm:flex-col'>
+    <main className="container mx-auto px-4 py-6 sm:flex-col">
       {/* Header */}
-      <section className='flex flex-col space-y-6'>
-        <h1 className='text-3xl font-bold'>Thư viện đề thi TOEIC</h1>
+      <section className="flex flex-col space-y-6">
+        <h1 className="text-3xl font-bold">Thư viện đề thi TOEIC</h1>
 
         <div className="flex gap-3 flex-wrap">
-          {listExams.map((item, index) => (
+          {examYears.map((item, index) => (
             <span
               key={index}
               className={`
                 flex items-center justify-center px-4 py-2
                 rounded-lg cursor-pointer select-none text-sm font-medium
                 transition duration-300 ease-in-out
-                ${selectedExam === item
-                  ? 'bg-[#2C99E2] text-white border-[#2C99E2]'
-                  : 'border-2 border-gray-200 hover:border-[#2C99E2]'}
+                ${
+                  selectedYear === item
+                    ? "bg-[#2C99E2] text-white border-[#2C99E2]"
+                    : "border-2 border-gray-200 hover:border-[#2C99E2]"
+                }
               `}
-              onClick={() => setSelectedExam(item)}
+              onClick={() => handleYearClick(item)}
             >
               {item}
             </span>
           ))}
         </div>
 
-        <div className='flex flex-col sm:flex-row items-center justify-center gap-5 mb-6'>
-          <SearchBar text="Nhập từ khóa bạn muốn tìm kiếm: tên đề, ..." />
+        {/* Tìm kiếm */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-6">
+          <SearchBar
+            text="Nhập từ khóa bạn muốn tìm kiếm: tên đề, năm..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
           <Button
             text="Tìm kiếm"
-            variant='primary'
-            size='sm'
+            variant="primary"
+            size="sm"
+            onClick={handleSearch}
           />
         </div>
       </section>
 
       {/* Content */}
-      <section className='space-y-6'>
-        <div className='grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6'>
-          <ExamCard title="New economy" onClick={() => setPreviewTitle("New economy")} />
-          <ExamCard title="Practice Test 1 2024" onClick={() => setPreviewTitle("Practice Test 1 2024")} />
-          <ExamCard title="Practice Test 2 2024" onClick={() => setPreviewTitle("Practice Test 2 2024")} />
-          <ExamCard title="Practice Test 3 2024" onClick={() => setPreviewTitle("Practice Test 3 2024")} />
-        </div>
-
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
-        />
+      <section className="space-y-6">
+        {loading ? (
+          <p className="text-lg font-semibold text-center text-gray-600 py-4">
+            Loading exams...
+          </p>
+        ) : error ? (
+          <p className="text-red-500">Error: {error}</p>
+        ) : filteredExams.length === 0 ? (
+          <p className="font-semibold text-center text-gray-600">
+            Không tìm thấy thông tin đề thi {searchQuery}.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6">
+              {currentExams.map((exam, index) => (
+                <ExamCard
+                  key={index}
+                  title={exam.testName || `Exam ${index + 1}`}
+                  onClick={() => handleShowPreviewExam(exam)}
+                />
+              ))}
+            </div>
+               {/* Pagination */}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => setCurrentPage(page)}
+                />
+              )}
+          </>
+        )}
       </section>
 
-      {/* PreviewExame (Modal) */}
-      {previewTitle && (
+      {/* PreviewExam (Modal) */}
+      {previewExam && selectedExam && (
         <PreviewExam
-          title={previewTitle}
-          onClose={() => setPreviewTitle(null)}
+          title={selectedExam.testName || "Không tìm thấy đề thi"}
+          examId={selectedExam.idTest}
+          onClose={handleClosePreviewExam}
         />
       )}
     </main>
-  )
-}
+  );
+};
 
-export default Exam
+export default Exam;

@@ -1,9 +1,10 @@
 import axios from "axios";
-// import { logout } from "../redux/slice/authSlice";
-// import { clearUserInfo } from "../redux/slice/userSlice";
+import { logout } from "../redux/slice/authSlice";
+import { clearUserInfo } from "../redux/slice/userSlice";
+import { getStore } from "../redux/storeAccessor";
+
 import { toast } from "react-toastify";
 import { checkRefreshToken } from "../service/authService";
-
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
 });
@@ -14,6 +15,7 @@ const excludedEndpoints = [
   "/auth-service/register",
   "/auth-service/refresh",
   "/auth-service/forgot-password",
+  '/auth-service/refresh'
 ];
 
 // Interceptor cho request
@@ -68,11 +70,16 @@ instance.interceptors.response.use(
             refreshError.response?.data?.message &&
             refreshError.response.data.message.includes("refresh token")
           ) {
-            toast.info("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
-            // store.dispatch(logout());
-            // store.dispatch(clearUserInfo());
+            try {
+              const store = getStore();
+              store.dispatch(logout());
+              store.dispatch(clearUserInfo());
+            } catch (storeError) {
+              console.error("Failed to access Redux store:", storeError.message);
+            }
+            toast.info("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
             window.location.href = "/login";
           }
           return Promise.reject(refreshError);
