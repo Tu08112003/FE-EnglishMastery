@@ -44,7 +44,7 @@ const routes = [
         protected: true,
       },
       {
-        path: "/exam/take",
+        path: "/exam/take/:idTest",
         component: (
           <PrivateRoute>
             <TakeTheExam />
