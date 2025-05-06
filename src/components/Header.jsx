@@ -128,7 +128,7 @@ const Header = () => {
                 text="Đăng ký"
                 variant="default"
                 size="sm"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/register")}
               />
             </div>
           ) : (

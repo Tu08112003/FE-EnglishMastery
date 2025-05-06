@@ -20,7 +20,7 @@ const validateLogin = ({ email, password }) => {
 };
 
 // Hàm validate form đăng ký
-const validateSignUp = ({ userName, email, password, confirmPassword }) => {
+const validateRegister = ({ userName, email, password, confirmPassword }) => {
   const errors = {};
 
   if (!userName || userName.trim().length < 2) {
@@ -85,6 +85,8 @@ const validateChangePassword = ({ password, newPassword, confirmPassword }) => {
     errors.newPassword = 'Mật khẩu mới không được để trống';
   } else if (newPassword.length < 8) {
     errors.newPassword = 'Mật khẩu mới phải có ít nhất 8 ký tự';
+  }else if (newPassword === password) {
+    errors.newPassword = 'Mật khẩu mới không được giống mật khẩu cũ';
   }
 
   if (!confirmPassword) {
@@ -107,5 +109,5 @@ const validateUpdateInforUser = ({userName}) => {
 }
 
 export {
-    validateLogin, validateSignUp, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser
+    validateLogin, validateRegister, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser
 }

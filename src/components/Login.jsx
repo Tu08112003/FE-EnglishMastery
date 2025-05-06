@@ -7,7 +7,6 @@ import { authLogin } from "../service/authService.js";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slice/authSlice";
 import {toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -166,7 +165,7 @@ const Login = () => {
             Bạn chưa có tài khoản?{" "}
           </span>
           <Link
-            to="/signup"
+            to="/register"
             className="text-[#49719C] font-bold hover:underline"
           >
             Đăng ký

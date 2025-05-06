@@ -3,12 +3,12 @@ import Dictionary from "../pages/Dictionary";
 import Exam from "../pages/Exam";
 import Note from "../pages/Note";
 import Login from "../components/Login";
-import SignUp from "../components/SignUp";
+import Register from "../components/Register";
 import ForgotPassword from "../components/ForgotPassword";
 import TakeTheExam from "../components/Exam/TakeTheExam";
 import ExamResult from "../components/Exam/ExamResult";
 import AccountInformation from "../components/AccountInformation";
-
+import HistoryExamResult from "../components/Exam/HistoryExamResult";
 import AdminLayout from "../layout/AdminLayout";
 import PublicLayout from "../layout/PublicLayout";
 
@@ -62,6 +62,14 @@ const routes = [
         protected: true,
       },
       {
+        path:"exam/result/:idTest",
+        component: (
+          <PrivateRoute>
+            <HistoryExamResult />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "/note",
         component: (
           <PrivateRoute>
@@ -80,10 +88,10 @@ const routes = [
         protected: false,
       },
       {
-        path: "/signup",
+        path: "/register",
         component: (
           <PublicRoute>
-            <SignUp />
+            <Register />
           </PublicRoute>
         ),
         protected: false,

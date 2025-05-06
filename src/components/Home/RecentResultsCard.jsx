@@ -1,54 +1,63 @@
-import React from 'react';
-import Button from '../Button.jsx';
+import React, { useState } from "react";
+import Button from "../Button.jsx";
+import Pagination from "../Pagination.jsx";
+import { Link } from "react-router-dom";
+const RecentResultsCard = ({ data }) => {
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
 
-const RecentResultsCard = ({ data = [] }) => {
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = data.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto rounded-2xl border-2 border-gray-200 shadow-lg overflow-hidden">
-      <div className="max-h-[70vh] overflow-auto">
-        <table className="w-full min-w-[600px] text-center">
-          <thead className="bg-gray-200 sticky top-0 z-10">
-            <tr className="text-black font-bold">
-              <th className="py-3 px-4 rounded-tl-2xl">ID</th>
-              <th className="py-3 px-4">Điểm số</th>
-              <th className="py-3 px-4">Ngày nộp bài</th>
-              <th className="py-3 px-4 rounded-tr-2xl">Hành động</th>
+    <div className="max-w-5xl w-full mx-auto border-2 border-gray-200 rounded-2xl shadow-lg px-8 py-6">
+      <table className="w-full text-center border-2 border-gray-200 shadow-lg rounded-2xl border-separate border-spacing-0 overflow-hidden">
+        <thead className="bg-gray-200">
+          <tr className="text-black font-bold">
+            <th className="py-3 px-4">Tên đề thi</th>
+            <th className="py-3 px-4">Điểm số</th>
+            <th className="py-3 px-4">Ngày nộp bài</th>
+            <th className="py-3 px-4">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentData.map((result, index) => (
+            <tr key={index} className="hover:bg-[#E6F0FA]">
+              <td className="py-3 px-4 text-gray-600 font-medium">
+                {result.nameTest}
+              </td>
+              <td className="py-3 px-4 text-[#2C99E2] font-bold">
+                {`${result.score}/${result.total}`}
+              </td>
+              <td className="py-3 px-4 text-gray-600 font-medium">
+                {result.date}
+              </td>
+              <td className="py-3 px-4">
+                <Link to={`/exam/result/${result.idTestHistory}`}>
+                  <Button text="Xem chi tiết" variant="primary" size="sm" />
+                </Link>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {data.map((result, index) => {
-              const isLast = index === data.length - 1;
-              const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray-100';
-              return (
-                <tr
-                  key={index}
-                  className={`${rowBg} hover:bg-[#E6F0FA] transition-colors`}
-                >
-                  <td
-                    className={`py-3 px-4 text-gray-600 font-medium ${
-                      isLast ? 'rounded-bl-2xl' : ''
-                    }`}
-                  >
-                    {result.id}
-                  </td>
-                  <td className="py-3 px-4 text-[#2C99E2] font-bold">
-                    {`${result.score}/${result.total}`}
-                  </td>
-                  <td className="py-3 px-4 text-gray-600 font-medium">
-                    {result.date}
-                  </td>
-                  <td
-                    className={`py-3 px-4 ${
-                      isLast ? 'rounded-br-2xl' : ''
-                    }`}
-                  >
-                    <Button text="Xem chi tiết" variant="primary" size="sm" />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
+      {/* Phân trang */}
+      {data.length > itemsPerPage && (
+        <div className="py-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 };
