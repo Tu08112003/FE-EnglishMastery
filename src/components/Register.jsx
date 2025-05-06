@@ -1,15 +1,14 @@
 import React, { useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "../components/Button.jsx";
-import { validateSignUp } from "../utils/validate.js";
+import Button from "./Button.jsx";
+import { validateRegister } from "../utils/validate.js";
 import { authRegister } from '../service/authService.js';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const SignUp = () => {
+const Register = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    userName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -22,23 +21,24 @@ const SignUp = () => {
     const { id, value } = e.target;
     const updatedFormData = { ...formData, [id]: value };
     setFormData(updatedFormData);
-
-    const validationErrors = validateSignUp(updatedFormData);
+    console.log("Form data updated:", updatedFormData);
+    const validationErrors = validateRegister(updatedFormData);
     setErrors(validationErrors);
   };
 
   const handleSignup = async () => {
-    const validationErrors = validateSignUp(formData);
+    console.log("Handle signup called:", formData);
+    const validationErrors = validateRegister(formData);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
       try {
         const res = await authRegister({
-          userName: formData.username,
+          userName: formData.userName,
           email: formData.email,
           password: formData.password,
         });
-
+        console.log("API response:", res);
         if (res && res.data) {
           toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
           navigate('/login');
@@ -51,7 +51,7 @@ const SignUp = () => {
         toast.error(message);
       }
     }
-};
+  };
 
   return (
     <div className="min-h-screen flex justify-center mb-10">
@@ -68,26 +68,26 @@ const SignUp = () => {
         </div>
 
         <div className="space-y-5">
-          {/* Username */}
+          {/* userName */}
           <div className="flex flex-col gap-1">
-            <label className="font-semibold" htmlFor="username">
+            <label className="font-semibold" htmlFor="userName">
               Tên người dùng
             </label>
             <input
-              id="username"
+              id="userName"
               type="text"
-              value={formData.username}
+              value={formData.userName}
               onChange={handleChange}
               placeholder="Nhập tên"
               className={`w-full text-[#49719C] font-medium px-4 py-2.5 placeholder-[#49719C] border ${
-                errors.username
+                errors.userName
                   ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   : "border-[#CEDBE8]"
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE]`}
             />
-            {errors.username && (
+            {errors.userName && (
               <div className="text-sm text-red-500 font-medium">
-                {errors.username}
+                {errors.userName}
               </div>
             )}
           </div>
@@ -191,7 +191,6 @@ const SignUp = () => {
 
         {/* Register Button */}
         <Button text="Đăng ký" variant="primary" size="lg" type="submit" />
-
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-300"></div>
@@ -225,4 +224,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Register;

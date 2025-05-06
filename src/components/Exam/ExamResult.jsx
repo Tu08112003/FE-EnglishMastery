@@ -20,23 +20,22 @@ const ExamResult = () => {
   const {
     submitResult,
     submitError,
-    selectedExam,
     loading: examLoading,
   } = useSelector((state) => state.exam || {});
+  const { userInfo } = useSelector((state) => state.user);
+  const userName = userInfo?.userName || "N/A";
 
   const result = submitResult;
   const userAnswers = location.state?.userAnswers || {};
-  console.log("Result:", result);
-  console.log("User Answers:", userAnswers);
-  const timeDoTest = location.state?.timeDoTest;
-  const dateTest = location.state?.dateTest;
-  const { userInfo } = useSelector((state) => state.user);
+  const timeDoTest = location.state?.timeDoTest || "N/A";
+  const dateTest = location.state?.dateTest || "N/A";
+  const scoreListening = result?.scoreListening || 0;
+  const scoreReading = result?.scoreReading || 0;
+  const score = result?.score || 0;
 
   useEffect(() => {
     dispatch(fetchUserInfo());
   }, [dispatch]);
-
-  console.log("User Info:", userInfo);
 
   const partData = result
     ? {
@@ -170,7 +169,7 @@ const ExamResult = () => {
   if (examLoading) {
     return (
       <div className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
-        <p className="text-gray-600 text-lg">Loading exam results...</p>
+        <p className="text-gray-600 text-lg font-semibold">Đang tải kết quả bài thi...</p>
       </div>
     );
   }
@@ -178,8 +177,8 @@ const ExamResult = () => {
   if (!result) {
     return (
       <div className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
-        <p className="text-red-600 text-lg">
-          {submitError || "No exam results available."}
+        <p className="text-red-600 text-lg font-semibold">
+          {submitError || "Không tìm thấy kết quả bài thi."}
         </p>
         <Button
           text="Go Back"
@@ -194,7 +193,7 @@ const ExamResult = () => {
     <main className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
       <div className="w-full max-w-5xl bg-white rounded-2xl border-2 border-gray-300 shadow-lg p-8 flex flex-col items-center gap-6">
         <h1 className="text-3xl font-bold text-gray-600">
-          {selectedExam?.title || `Test ${result.idTest}`}
+          {result?.nameTest || `Test ${result.idTest}`}
         </h1>
         <div className="flex flex-col md:flex-row gap-7 w-full">
           <div className="md:w-1/3 border-2 border-gray-300 rounded-2xl">
@@ -208,15 +207,15 @@ const ExamResult = () => {
             <div className="space-y-2">
               <div>
                 <p className="text-gray-600">Tên người dùng:</p>
-                <p className="font-semibold">{userInfo?.userName || "N/A"}</p>
+                <p className="font-semibold">{userName}</p>
               </div>
               <div>
                 <p className="text-gray-600">Ngày làm:</p>
-                <p className="font-semibold">{dateTest || "N/A"}</p>
+                <p className="font-semibold">{dateTest}</p>
               </div>
               <div>
                 <p className="text-gray-600">Thời gian hoàn thành:</p>
-                <p className="font-semibold">{timeDoTest || "N/A"}</p>
+                <p className="font-semibold">{timeDoTest}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -240,7 +239,7 @@ const ExamResult = () => {
                   <span className="font-semibold">{listeningCorrect}/100</span>{" "}
                   |{" "}
                   <span className="font-semibold text-[#2C99E2]">
-                    {result.scoreListening} điểm
+                    {scoreListening} điểm
                   </span>
                 </p>
               </div>
@@ -249,7 +248,7 @@ const ExamResult = () => {
                 <p>
                   <span className="font-semibold">{readingCorrect}/100</span> |{" "}
                   <span className="font-semibold text-[#2C99E2]">
-                    {result.scoreReading} điểm
+                    {scoreReading} điểm
                   </span>
                 </p>
               </div>
@@ -258,7 +257,7 @@ const ExamResult = () => {
               <div className="text-center">
                 <p className="text-gray-600">Tổng điểm</p>
                 <p className="text-4xl sm:text-5xl font-extrabold text-[#2C99E2]">
-                  {result.score}
+                  {score}
                 </p>
               </div>
             </div>
