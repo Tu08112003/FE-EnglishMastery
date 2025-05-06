@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import image_result from "../../assets/images/img-result-test.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,8 +7,9 @@ import Button from "../Button";
 import { Link } from "react-router-dom";
 import DetailExamResult from "../Exam/DetailExamResult";
 import { fetchUserInfo } from "../../redux/slice/userSlice";
+import { fetchHistoryExamById } from "../../redux/slice/examSlice";
 
-const ExamResult = () => {
+const HistoryExamResult = () => {
   const [activePart, setActivePart] = useState(1);
   const [showDetailPart, setShowDetailPart] = useState(false);
   const [showDetailResultExam, setShowDetailResultExam] = useState(false);
@@ -16,141 +17,155 @@ const ExamResult = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { idTest } = useParams();
   const {
-    submitResult,
-    submitError,
+    historyExamById,
     loading: examLoading,
+    error: examError,
   } = useSelector((state) => state.exam || {});
   const { userInfo } = useSelector((state) => state.user);
-  const userName = userInfo?.userName || "N/A";
 
-  const result = submitResult;
-  const userAnswers = location.state?.userAnswers || {};
-  const timeDoTest = location.state?.timeDoTest || "N/A";
-  const dateTest = location.state?.dateTest || "N/A";
+  useEffect(() => {
+    dispatch(fetchUserInfo());
+    if (idTest) {
+      dispatch(fetchHistoryExamById(idTest));
+    }
+  }, [dispatch, idTest]);
+
+  console.log("historyExamById:", historyExamById);
+
+  const userName = userInfo?.userName || "N/A";
+  const result = historyExamById;
+  const timeTest = result?.timeTest || "N/A";
+  const dateTest = result?.dateTest || "N/A";
   const scoreListening = result?.scoreListening || 0;
   const scoreReading = result?.scoreReading || 0;
   const score = result?.score || 0;
 
-  useEffect(() => {
-    dispatch(fetchUserInfo());
-  }, [dispatch]);
+  // Chuyển đổi userAnswer thành định dạng { idQuestion: key } bằng vòng lặp
+  const userAnswers = {};
+  if (result?.userAnswer) {
+    const parts = [
+      result.userAnswer.answersPart1 || [],
+      result.userAnswer.answersPart2 || [],
+      result.userAnswer.answersPart3 || [],
+      result.userAnswer.answersPart4 || [],
+      result.userAnswer.answersPart5 || [],
+      result.userAnswer.answersPart6 || [],
+      result.userAnswer.answersPart7 || [],
+    ];
+    parts.forEach((part) => {
+      part.forEach((item) => {
+        userAnswers[item.idQuestion] = item.key;
+      });
+    });
+  }
 
-  const partData = result
+  console.log("userAnswers:", userAnswers);
+
+  // Xử lý dữ liệu theo part
+  const partData = result?.correctAnswer
     ? {
-        1:
-          result.answersPart1?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        2:
-          result.answersPart2?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        3:
-          result.answersPart3?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        4:
-          result.answersPart4?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        5:
-          result.answersPart5?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        6:
-          result.answersPart6?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
-        7:
-          result.answersPart7?.map((item) => ({
-            id: parseInt(item.idQuestion) + 1,
-            correctAnswer: item.key || "N/A",
-            userAnswer: userAnswers[item.idQuestion] || "N/A",
-            correct:
-              userAnswers[item.idQuestion] && item.key
-                ? userAnswers[item.idQuestion] === item.key
-                : false,
-          })) || [],
+        1: (result.correctAnswer.answersPart1 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        2: (result.correctAnswer.answersPart2 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        3: (result.correctAnswer.answersPart3 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        4: (result.correctAnswer.answersPart4 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        5: (result.correctAnswer.answersPart5 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        6: (result.correctAnswer.answersPart6 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
+        7: (result.correctAnswer.answersPart7 || []).map((item) => ({
+          id: parseInt(item.idQuestion) + 1,
+          correctAnswer: item.key || "N/A",
+          userAnswer: userAnswers[item.idQuestion] || "N/A",
+          correct:
+            userAnswers[item.idQuestion] && item.key
+              ? userAnswers[item.idQuestion] === item.key
+              : false,
+        })),
       }
     : {
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-        7: [],
+        1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [],
       };
 
-  // Tính số câu trả lời đúng, sai và bỏ qua
+  console.log("partData:", partData);
+
+  // Tính số câu trả lời đúng, sai và bỏ qua bằng vòng lặp
   let totalSubmittedAnswers = 0;
   let correctAnswers = 0;
-  
-  const allParts = Object.values(partData);
-  
-  for (const part of allParts) {
-    for (const item of part) {
+
+  Object.values(partData).forEach((part) => {
+    part.forEach((item) => {
       if (item.userAnswer !== "N/A") {
         totalSubmittedAnswers++;
       }
-  
       if (item.correct) {
         correctAnswers++;
       }
-    }
-  }
+    });
+  });
+
   const skippedAnswers = 200 - totalSubmittedAnswers;
   const incorrectAnswers = totalSubmittedAnswers - correctAnswers;
 
   // Tính số câu trả lời đúng cho Listening (Parts 1–4) và Reading (Parts 5–7)
-  const listeningCorrect =
-    partData[1].filter((item) => item.correct).length +
-    partData[2].filter((item) => item.correct).length +
-    partData[3].filter((item) => item.correct).length +
-    partData[4].filter((item) => item.correct).length;
-
-  const readingCorrect =
-    partData[5].filter((item) => item.correct).length +
-    partData[6].filter((item) => item.correct).length +
-    partData[7].filter((item) => item.correct).length;
+  const listeningCorrect = result?.correctAnswer
+    ? partData[1].filter((item) => item.correct).length +
+      partData[2].filter((item) => item.correct).length +
+      partData[3].filter((item) => item.correct).length +
+      partData[4].filter((item) => item.correct).length
+    : 0;
+  const readingCorrect = result?.correctAnswer
+    ? partData[5].filter((item) => item.correct).length +
+      partData[6].filter((item) => item.correct).length +
+      partData[7].filter((item) => item.correct).length
+    : 0;
 
   const handleShowDetailPart = () => {
     setShowDetailPart(!showDetailPart);
@@ -178,10 +193,10 @@ const ExamResult = () => {
     return (
       <div className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
         <p className="text-red-600 text-lg font-semibold">
-          {submitError || "Không tìm thấy kết quả bài thi."}
+          {examError || "Không tìm thấy kết quả bài thi."}
         </p>
         <Button
-          text="Go Back"
+          text="Quay lại"
           variant="default"
           onClick={() => navigate("/exam")}
         />
@@ -215,7 +230,7 @@ const ExamResult = () => {
               </div>
               <div>
                 <p className="text-gray-600">Thời gian hoàn thành:</p>
-                <p className="font-semibold">{timeDoTest}</p>
+                <p className="font-semibold">{timeTest}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -267,9 +282,7 @@ const ExamResult = () => {
 
       <div className="flex gap-5 justify-end w-full max-w-5xl">
         <Button
-          text={`${
-            showDetailPart ? "Ẩn đáp án chi tiết" : "Hiện đáp án chi tiết"
-          }`}
+          text={`${showDetailPart ? "Ẩn đáp án chi tiết" : "Hiện đáp án chi tiết"}`}
           variant="default"
           size="sm"
           icon={<FontAwesomeIcon icon="fa-solid fa-book" />}
@@ -339,7 +352,7 @@ const ExamResult = () => {
               ))
             ) : (
               <p className="text-gray-600 col-span-full text-center">
-                No answers available for Part {activePart}
+                Không có câu trả lời cho Part {activePart}
               </p>
             )}
           </div>
@@ -357,4 +370,4 @@ const ExamResult = () => {
   );
 };
 
-export default ExamResult;
+export default HistoryExamResult;

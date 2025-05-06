@@ -1,12 +1,9 @@
 import axios from '../utils/axios-customize'
 
 
-const getUser = ({accessToken}) => {
+const getUser = () => {
     const URL_BACKEND = '/user-service/getInfo';
-    const data = {
-        accessToken: accessToken
-    }
-    return axios.post(URL_BACKEND,data)
+    return axios.post(URL_BACKEND)
 }
 
 const updateUser = ({userName}) => {
@@ -17,6 +14,15 @@ const updateUser = ({userName}) => {
     return axios.post(URL_BACKEND,data);
 }
 
+const changePassword = ({oldPassword, newPassword}) => {
+    const URL_BACKEND = '/user-service/changePassword';
+    const data = {
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+    };
+    return axios.post(URL_BACKEND,data);
+}
+
 export {
-    getUser, updateUser
+    getUser, updateUser, changePassword
 }

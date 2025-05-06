@@ -4,9 +4,8 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserInfo } from "../redux/slice/userSlice";
 import Button from "./Button";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { updateUser } from '../service/userService';
+import { toast } from "react-toastify";
+import { updateUser, changePassword } from "../service/userService";
 import formatDate from "../utils/formatDate";
 import {
   validateUpdateInforUser,
@@ -25,7 +24,9 @@ const AccountInformation = () => {
   const [userFormErrors, setUserFormErrors] = useState({});
   const [passwordFormErrors, setPasswordFormErrors] = useState({});
   const dispatch = useDispatch();
-  const { userInfo, loading, error } = useSelector((state) => state.user);
+  const { userInfo, loading, error} = useSelector(
+    (state) => state.user
+  );
 
   useEffect(() => {
     dispatch(fetchUserInfo());
@@ -70,15 +71,15 @@ const AccountInformation = () => {
       try {
         const res = await updateUser({ userName: userFormData.userName });
         if (res && res.data) {
-          toast.success('Cập nhật tên người dùng thành công!');
+          toast.success("Cập nhật tên người dùng thành công!");
           dispatch(fetchUserInfo());
           setIsCheck(false);
         } else {
-          toast.error('Cập nhật tên người dùng thất bại! Vui lòng thử lại.');
+          toast.error("Cập nhật tên người dùng thất bại! Vui lòng thử lại.");
         }
       } catch (error) {
-        console.log('Error:', error);
-        toast.error(error.message || 'Lỗi khi cập nhật tên');
+        console.log("Error:", error);
+        toast.error(error.message || "Lỗi khi cập nhật tên");
       }
     }
   };
@@ -90,21 +91,23 @@ const AccountInformation = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-        // Giả sử bạn có API updatePassword
-        // const res = await updatePassword(passwordFormData);
-        // if (res && res.data) {
-        toast.success("Đổi mật khẩu thành công!");
-        setPasswordFormData({
-          password: "",
-          newPassword: "",
-          confirmPassword: "",
+       const res = await changePassword({
+          oldPassword: passwordFormData.password, 
+          newPassword: passwordFormData.newPassword,
         });
-        // } else {
-        //   toast.error('Đổi mật khẩu thất bại! Vui lòng thử lại.');
-        // }
+        if (res.status === 200) {
+          toast.success("Đổi mật khẩu thành công!");
+          setPasswordFormData({
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        }
+        else {
+          toast.error(res.message || "Đổi mật khẩu thất bại! Vui lòng thử lại.");
+        }
       } catch (error) {
-        console.log("Error:", error);
-        toast.error(error.message || "Lỗi khi đổi mật khẩu");
+        toast.error(error.message);
       }
     }
   };
@@ -276,7 +279,7 @@ const AccountInformation = () => {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
               onClick={() => setShowPassword(!showPassword)}
             >
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
             </span>
           </div>
           {passwordFormErrors.password && (
@@ -308,7 +311,7 @@ const AccountInformation = () => {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
               onClick={() => setShowPassword(!showPassword)}
             >
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
             </span>
           </div>
           {passwordFormErrors.newPassword && (
@@ -343,7 +346,7 @@ const AccountInformation = () => {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
               onClick={() => setShowPassword(!showPassword)}
             >
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
             </span>
           </div>
           {passwordFormErrors.confirmPassword && (
@@ -362,7 +365,6 @@ const AccountInformation = () => {
           />
         </div>
       </form>
-      <ToastContainer />
     </main>
   );
 };

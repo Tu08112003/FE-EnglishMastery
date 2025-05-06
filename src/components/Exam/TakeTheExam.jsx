@@ -465,7 +465,7 @@ const TakeTheExam = () => {
                 : ` Question ${selectedQuestionId + 1} `}
             </h1>
           ) : (
-            <h1 className="text-xl font-bold text-gray-700">{selectedExam?.title || "TOEIC Practice Test"}</h1>
+            <h1 className="text-xl font-bold text-gray-700">{selectedExam?.nameTest || "TOEIC Practice Test"}</h1>
           )}
           <button
             className="text-white font-bold flex items-center justify-center w-9 h-9 border-2 border-gray-700 rounded-lg bg-gray-700 hover:bg-gray-800 hover:border-gray-800  cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
@@ -501,11 +501,10 @@ const TakeTheExam = () => {
           ) : (
             <div className="flex flex-col justify-center items-center h-full space-y-6 px-4">
               <div className="text-center space-y-2">
-                <h1 className="text-2xl font-bold">TOEIC Practice Test</h1>
-                {selectedExam?.title && <p className="text-lg text-gray-700">{selectedExam.title}</p>}
-                <p className="text-gray-600">Bài kiểm tra này gồm 200 câu hỏi và thời gian làm bài là 120 phút.</p>
-                <p className="text-gray-600">Hãy đảm bảo bạn có một môi trường yên tĩnh và kết nối ổn định trước khi bắt đầu.</p>
-                <p className="text-gray-600 font-medium">Nhấn "Bắt đầu" khi bạn đã sẵn sàng.</p>
+                <h1 className="text-2xl font-bold text-gray-700">{selectedExam?.nameTest || "TOEIC Practice Test"} </h1>
+                <p className="text-gray-700">Bài kiểm tra này gồm 200 câu hỏi và thời gian làm bài là 120 phút.</p>
+                <p className="text-gray-700">Hãy đảm bảo bạn có một môi trường yên tĩnh và kết nối ổn định trước khi bắt đầu.</p>
+                <p className="text-gray-600 font-semibold">Nhấn "Bắt đầu" khi bạn đã sẵn sàng.</p>
               </div>
               <Button
                 text="Bắt đầu làm"

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam } from '../../service/examService';
+import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam, getAllHistoryExam, getHistoryExamById } from '../../service/examService';
 
 // Lấy tất cả các năm có đề thi
 export const fetchAllExamsByYear = createAsyncThunk(
@@ -33,8 +33,8 @@ export const fetchExamById = createAsyncThunk(
   async (idTest, { rejectWithValue }) => {
     try {
       const response = await getExamById({ idTest });
-      console.log('Data tra ve: ', response.data.test);
-      return response.data.test;
+      console.log('Data tra ve: ', response.data);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Không tìm thấy thông tin đề thi');
     }
@@ -54,6 +54,32 @@ export const submitExam = createAsyncThunk(
   }
 );
 
+// Lịch sử làm bài thi
+export const fetchAllHistoryExam = createAsyncThunk(
+  'exam/fetchAllHistoryExam',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAllHistoryExam();
+      console.log('Lịch sử làm bài thi: ', response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');
+    }
+  }
+);
+
+// Lịch sử làm bài thi theo id
+export const fetchHistoryExamById = createAsyncThunk(
+  'exam/fetchHistoryExamById',
+  async (idTest, { rejectWithValue }) => {
+    try {
+      const response = await getHistoryExamById({ idTest });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');
+    }
+  }
+);
 const examSlice = createSlice({
   name: 'exam',
   initialState: {
@@ -66,6 +92,8 @@ const examSlice = createSlice({
     submitting: false, 
     submitError: null, 
     submitResult: null, 
+    historyExam: null,
+    historyExamById: null,
   },
   reducers: {
     setSelectedYear: (state, action) => {
@@ -134,6 +162,38 @@ const examSlice = createSlice({
       .addCase(submitExam.rejected, (state, action) => {
         state.submitting = false;
         state.submitError = action.payload;
+      })
+
+      // Handle fetchAllHistoryExam
+      .addCase(fetchAllHistoryExam.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.historyExam = null;
+      })
+      .addCase(fetchAllHistoryExam.fulfilled, (state, action) => {
+        state.loading = false;
+        state.historyExam = action.payload;
+      })
+      .addCase(fetchAllHistoryExam.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.historyExam = null;
+      })
+
+      // Handle fetchHistoryExamById
+      .addCase(fetchHistoryExamById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.historyExamById = null;
+      })
+      .addCase(fetchHistoryExamById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.historyExamById = action.payload;
+      })
+      .addCase(fetchHistoryExamById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.historyExamById = null;
       });
   },
 });
