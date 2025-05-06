@@ -81,9 +81,9 @@ const Exam = () => {
         <h1 className="text-3xl font-bold">Thư viện đề thi TOEIC</h1>
 
         <div className="flex gap-3 flex-wrap">
-          {examYears.map((item, index) => (
+          {examYears.map((item) => (
             <span
-              key={index}
+              key={item}
               className={`
                 flex items-center justify-center px-4 py-2
                 rounded-lg cursor-pointer select-none text-sm font-medium
@@ -121,33 +121,32 @@ const Exam = () => {
       <section className="space-y-6">
         {loading ? (
           <p className="text-lg font-semibold text-center text-gray-600 py-4">
-            Loading exams...
+            Đang tải đề thi...
           </p>
         ) : error ? (
           <p className="text-red-500">Error: {error}</p>
-        ) : filteredExams.length === 0 ? (
+        ) :  filteredExams.length === 0 && searchQuery ? (
           <p className="font-semibold text-center text-gray-600">
-            Không tìm thấy thông tin đề thi {searchQuery}.
+            Không tìm thấy thông tin đề thi "{searchQuery}".
           </p>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6">
-              {currentExams.map((exam, index) => (
+              {currentExams.map((exam) => (
                 <ExamCard
-                  key={index}
-                  title={exam.testName || `Exam ${index + 1}`}
+                  key={exam.idTest}
+                  title={exam.testName || `Exam ${exam.idTest}`}
                   onClick={() => handleShowPreviewExam(exam)}
                 />
               ))}
             </div>
-               {/* Pagination */}
-                {totalPages > 1 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={(page) => setCurrentPage(page)}
-                />
-              )}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            )}
           </>
         )}
       </section>
