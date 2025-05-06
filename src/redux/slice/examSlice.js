@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getExamByYear, getExamById, getAllExamByYear } from '../../service/examService';
+import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam } from '../../service/examService';
 
 // Lấy tất cả các năm có đề thi
 export const fetchAllExamsByYear = createAsyncThunk(
@@ -33,10 +33,23 @@ export const fetchExamById = createAsyncThunk(
   async (idTest, { rejectWithValue }) => {
     try {
       const response = await getExamById({ idTest });
-      console.log('Data tra ve: ',response.data.test);
+      console.log('Data tra ve: ', response.data.test);
       return response.data.test;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Không tìm thấy thông tin đề thi');
+    }
+  }
+);
+
+// Nộp bài thi
+export const submitExam = createAsyncThunk(
+  'exam/submitExam',
+  async (examData, { rejectWithValue }) => {
+    try {
+      const response = await resultSubmitExam({ obj: examData });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Không thể nộp bài thi. Vui lòng thử lại.');
     }
   }
 );
@@ -50,10 +63,16 @@ const examSlice = createSlice({
     selectedExam: null,
     error: null,
     selectedYear: null,
+    submitting: false, 
+    submitError: null, 
+    submitResult: null, 
   },
   reducers: {
     setSelectedYear: (state, action) => {
       state.selectedYear = action.payload;
+    },
+    clearSubmitError: (state) => {
+      state.submitError = null;
     },
   },
   extraReducers: (builder) => {
@@ -100,9 +119,24 @@ const examSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.selectedExam = null;
+      })
+
+      // Handle submitExam
+      .addCase(submitExam.pending, (state) => {
+        state.submitting = true;
+        state.submitError = null;
+        state.submitResult = null;
+      })
+      .addCase(submitExam.fulfilled, (state, action) => {
+        state.submitting = false;
+        state.submitResult = action.payload;
+      })
+      .addCase(submitExam.rejected, (state, action) => {
+        state.submitting = false;
+        state.submitError = action.payload;
       });
   },
 });
 
-export const { setSelectedYear } = examSlice.actions;
+export const { setSelectedYear, clearSubmitError } = examSlice.actions;
 export default examSlice.reducer;

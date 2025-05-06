@@ -4,9 +4,9 @@ import { getNote, addWord, updateWord, deleteWord } from '../../service/noteServ
 // Lấy danh sách từ vựng
 export const fetchNotes = createAsyncThunk(
     'note/fetchNotes',
-    async (accessToken, { rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await getNote({ accessToken });
+            const response = await getNote();
             const wordArray = response?.data?.note?.words || [];
             const vocabularies = wordArray.map(w => ({
                 ...w,

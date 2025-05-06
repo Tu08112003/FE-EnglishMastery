@@ -37,7 +37,7 @@ const Note = () => {
     if (!accessToken) {
       toast.error("Vui lòng đăng nhập để xem danh sách từ vựng.");
     } else {
-      dispatch(fetchNotes(accessToken))
+      dispatch(fetchNotes())
         .unwrap()
         .catch((err) => {
           toast.error(err || "Không thể tải danh sách từ vựng.");
