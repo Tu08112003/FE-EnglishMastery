@@ -13,12 +13,9 @@ const addWord = ({word, description, pronounce, learned, note, example}) => {
     return axios.post(URL_BACKEND, data);
     
 }
-const getNote = ({accessToken}) => {
+const getNote = () => {
     const URL_BACKEND = '/note-service/getNote';
-    const data = {
-        accessToken: accessToken
-    }
-    return axios.get(URL_BACKEND, data);
+    return axios.get(URL_BACKEND);
 }
 
 const updateWord = ({wordId, word, description, learned, pronounce, note, example}) => {

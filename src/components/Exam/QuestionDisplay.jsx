@@ -1,51 +1,83 @@
 import React from "react";
 import AudioPlayer from "./AudioPlayer";
 import AnswerOptions from "./AnswerOptions";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
-  if (!questionData) {
-    return (
-      <p className="text-red-600">Invalid question data for part {part}</p>
-    );
-  }
+  // if (!questionData) {
+  //   return (
+  //     <p className="text-red-600 font-semibold">Dữ liệu câu hỏi không hợp lệ cho phần {part}</p>
+  //   );
+  // }
 
-  if (!Number.isInteger(part) || part < 1 || part > 7) {
-    return <p className="text-red-600">Invalid part: {part}</p>;
-  }
+  // if (!Number.isInteger(part) || part < 1 || part > 7) {
+  //   return <p className="text-red-600 font-semibold">Phần không hợp lệ: {part}</p>;
+  // }
+
+  const audioSrc = questionData.audio || "";
 
   if (part === 1) {
     return (
       <div className="w-full flex flex-col gap-6 p-5">
-        <AudioPlayer audioSrc={questionData.audio} autoPlay={true} />
+        {audioSrc ? (
+          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+        ) : (
+          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+        )}
         <div className="flex gap-10 mx-3">
           <img
             src={questionData.image}
             alt="Question"
             className="mb-4 max-w-full rounded-lg"
           />
+          <div key={questionData.idQuestion} className="mb-3">
+            <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+              <FontAwesomeIcon
+                icon="fa-regular fa-bookmark"
+                style={{ color: "#2C99E2" }}
+              />{" "}
+              {parseInt(questionData.idQuestion) + 1}.
+            </p>
+            <AnswerOptions
+              options={["A", "B", "C", "D"]}
+              selected={userAnswers[questionData.idQuestion] || ""}
+              onChange={(answer) => onAnswer(questionData.idQuestion, answer)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  } else if (part === 2) {
+    return (
+      <div className="w-full h-full py-5 px-6">
+        {audioSrc ? (
+          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+        ) : (
+          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+        )}
+        <div key={questionData.idQuestion} className="mb-3">
+          <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+            <FontAwesomeIcon
+              icon="fa-regular fa-bookmark"
+              style={{ color: "#2C99E2" }}
+            />{" "}
+            {parseInt(questionData.idQuestion) + 1}.
+          </p>
           <AnswerOptions
-            options={["A", "B", "C", "D"]}
+            options={["A", "B", "C"]}
             selected={userAnswers[questionData.idQuestion] || ""}
             onChange={(answer) => onAnswer(questionData.idQuestion, answer)}
           />
         </div>
       </div>
     );
-  } else if (part === 2) {
-    return (
-      <div className="w-full p-5 mx-3">
-        <AudioPlayer audioSrc={questionData.audio} autoPlay={true} />
-        <AnswerOptions
-          options={["A", "B", "C"]}
-          selected={userAnswers[questionData.idQuestion] || ""}
-          onChange={(answer) => onAnswer(questionData.idQuestion, answer)}
-        />
-      </div>
-    );
   } else if (part === 3 || part === 4) {
     return (
       <div className="w-full h-full p-5 flex flex-col gap-4">
-        <AudioPlayer audioSrc={questionData.audio} autoPlay={true} />
+        {audioSrc ? (
+          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+        ) : (
+          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+        )}
         {questionData.image ? (
           <div className="w-full h-full flex flex-row gap-10">
             <div className="w-1/2 h-full flex items-center p-2 justify-center border-2 border-gray-300 rounded-lg">
@@ -58,10 +90,8 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
             <div className="w-1/2 flex flex-col px-3">
               {questionData.listQuestion?.length > 0 ? (
                 questionData.listQuestion.map((q) => {
-                  const currentAnswerChar = userAnswers[q.idQuestion] || ""; // Get 'A', 'B', etc.
-                  let selectedValueForOptions = ""; // Giá trị để truyền vào AnswerOptions
-
-                  // Map ký tự lại thành text đầy đủ (hoặc giá trị mà AnswerOptions hiểu)
+                  const currentAnswerChar = userAnswers[q.idQuestion] || "";
+                  let selectedValueForOptions = "";
                   if (currentAnswerChar === "A")
                     selectedValueForOptions = q.answerA;
                   else if (currentAnswerChar === "B")
@@ -73,7 +103,11 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
 
                   return (
                     <div key={q.idQuestion} className="mb-3">
-                      <p className="text-md font-bold mb-2">
+                      <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+                        <FontAwesomeIcon
+                          icon="fa-regular fa-bookmark"
+                          style={{ color: "#2C99E2" }}
+                        />
                         {parseInt(q.idQuestion) + 1}. {q.questionText}
                       </p>
                       <AnswerOptions
@@ -83,7 +117,6 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                           q.answerC,
                           q.answerD,
                         ].filter(Boolean)}
-                        // Truyền text đầy đủ tương ứng với ký tự đã lưu
                         selected={selectedValueForOptions}
                         onChange={(answer) => onAnswer(q.idQuestion, answer)}
                       />
@@ -92,7 +125,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                 })
               ) : (
                 <p className="text-red-600">
-                  No questions available for part {part}
+                  Không có câu hỏi nào cho phần {part}
                 </p>
               )}
             </div>
@@ -101,10 +134,8 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
           <div className="w-full flex flex-col px-2">
             {questionData.listQuestion?.length > 0 ? (
               questionData.listQuestion.map((q) => {
-                const currentAnswerChar = userAnswers[q.idQuestion] || ""; // Get 'A', 'B', etc.
-                let selectedValueForOptions = ""; // Giá trị để truyền vào AnswerOptions
-
-                // Map ký tự lại thành text đầy đủ (hoặc giá trị mà AnswerOptions hiểu)
+                const currentAnswerChar = userAnswers[q.idQuestion] || "";
+                let selectedValueForOptions = "";
                 if (currentAnswerChar === "A")
                   selectedValueForOptions = q.answerA;
                 else if (currentAnswerChar === "B")
@@ -116,7 +147,11 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
 
                 return (
                   <div key={q.idQuestion} className="mb-3">
-                    <p className="text-md font-bold mb-2">
+                    <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+                      <FontAwesomeIcon
+                        icon="fa-regular fa-bookmark"
+                        style={{ color: "#2C99E2" }}
+                      />
                       {parseInt(q.idQuestion) + 1}. {q.questionText}
                     </p>
                     <AnswerOptions
@@ -126,7 +161,6 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                         q.answerC,
                         q.answerD,
                       ].filter(Boolean)}
-                      // Truyền text đầy đủ tương ứng với ký tự đã lưu
                       selected={selectedValueForOptions}
                       onChange={(answer) => onAnswer(q.idQuestion, answer)}
                     />
@@ -135,7 +169,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
               })
             ) : (
               <p className="text-red-600">
-                No questions available for part {part}
+                Không có câu hỏi nào cho phần {part}
               </p>
             )}
           </div>
@@ -143,9 +177,24 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
       </div>
     );
   } else if (part === 5) {
+    const currentAnswerChar = userAnswers[questionData.idQuestion] || "";
+    let selectedValueForOptions = "";
+    if (currentAnswerChar === "A")
+      selectedValueForOptions = questionData.answerA;
+    else if (currentAnswerChar === "B")
+      selectedValueForOptions = questionData.answerB;
+    else if (currentAnswerChar === "C")
+      selectedValueForOptions = questionData.answerC;
+    else if (currentAnswerChar === "D")
+      selectedValueForOptions = questionData.answerD;
+
     return (
       <div className="w-full h-full flex flex-col mx-4 p-3">
-        <p className="text-md font-bold mb-2">
+        <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+          <FontAwesomeIcon
+            icon="fa-regular fa-bookmark"
+            style={{ color: "#2C99E2" }}
+          />
           {parseInt(questionData.idQuestion) + 1}. {questionData.questionText}
         </p>
         <AnswerOptions
@@ -155,7 +204,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
             questionData.answerC,
             questionData.answerD,
           ].filter(Boolean)}
-          selected={userAnswers[questionData.idQuestion] || ""}
+          selected={selectedValueForOptions}
           onChange={(answer) => onAnswer(questionData.idQuestion, answer)}
         />
       </div>
@@ -181,10 +230,8 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
           <div className="w-1/3 flex flex-col mx-3 overflow-y-auto max-h-[75vh]">
             {questionData.listQuestion?.length > 0 ? (
               questionData.listQuestion.map((q) => {
-                const currentAnswerChar = userAnswers[q.idQuestion] || ""; // Get 'A', 'B', etc.
-                let selectedValueForOptions = ""; // Giá trị để truyền vào AnswerOptions
-
-                // Map ký tự lại thành text đầy đủ (hoặc giá trị mà AnswerOptions hiểu)
+                const currentAnswerChar = userAnswers[q.idQuestion] || "";
+                let selectedValueForOptions = "";
                 if (currentAnswerChar === "A")
                   selectedValueForOptions = q.answerA;
                 else if (currentAnswerChar === "B")
@@ -196,7 +243,11 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
 
                 return (
                   <div key={q.idQuestion} className="mb-3">
-                    <p className="text-md font-bold mb-2">
+                    <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+                      <FontAwesomeIcon
+                        icon="fa-regular fa-bookmark"
+                        style={{ color: "#2C99E2" }}
+                      />
                       {parseInt(q.idQuestion) + 1}. {q.questionText}
                     </p>
                     <AnswerOptions
@@ -206,7 +257,6 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                         q.answerC,
                         q.answerD,
                       ].filter(Boolean)}
-                      // Truyền text đầy đủ tương ứng với ký tự đã lưu
                       selected={selectedValueForOptions}
                       onChange={(answer) => onAnswer(q.idQuestion, answer)}
                     />
@@ -243,10 +293,8 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
           <div className="w-1/3 flex flex-col mx-3 overflow-y-auto max-h-[75vh]">
             {questionData.listQuestion?.length > 0 ? (
               questionData.listQuestion.map((q) => {
-                const currentAnswerChar = userAnswers[q.idQuestion] || ""; // Get 'A', 'B', etc.
-                let selectedValueForOptions = ""; // Giá trị để truyền vào AnswerOptions
-
-                // Map ký tự lại thành text đầy đủ (hoặc giá trị mà AnswerOptions hiểu)
+                const currentAnswerChar = userAnswers[q.idQuestion] || "";
+                let selectedValueForOptions = "";
                 if (currentAnswerChar === "A")
                   selectedValueForOptions = q.answerA;
                 else if (currentAnswerChar === "B")
@@ -258,7 +306,11 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
 
                 return (
                   <div key={q.idQuestion} className="mb-3">
-                    <p className="text-md font-bold mb-2">
+                    <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+                      <FontAwesomeIcon
+                        icon="fa-regular fa-bookmark"
+                        style={{ color: "#2C99E2" }}
+                      />
                       {parseInt(q.idQuestion) + 1}. {q.questionText}
                     </p>
                     <AnswerOptions
@@ -268,7 +320,6 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                         q.answerC,
                         q.answerD,
                       ].filter(Boolean)}
-                      // Truyền text đầy đủ tương ứng với ký tự đã lưu
                       selected={selectedValueForOptions}
                       onChange={(answer) => onAnswer(q.idQuestion, answer)}
                     />
@@ -277,7 +328,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
               })
             ) : (
               <p className="text-red-600">
-                No questions available for part {part}
+                Không có câu hỏi nào cho phần {part}
               </p>
             )}
           </div>
@@ -285,7 +336,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
       </div>
     );
   }
-  return <p className="text-red-600">Invalid part: {part}</p>;
+  return <p className="text-red-600">Phần không hợp lệ: {part}</p>;
 };
 
 export default QuestionDisplay;

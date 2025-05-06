@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import image_result from "../../assets/images/img-result-test.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../Button";
 import { Link } from "react-router-dom";
 import DetailExamResult from "../Exam/DetailExamResult";
+import { fetchUserInfo } from "../../redux/slice/userSlice";
 
 const ExamResult = () => {
   const [activePart, setActivePart] = useState(1);
@@ -11,106 +14,144 @@ const ExamResult = () => {
   const [showDetailResultExam, setShowDetailResultExam] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
 
-  const partData = {
-    1: Array.from({ length: 6 }, (_, i) => ({
-      id: i + 1,
-      userAnswer: i % 2 === 0 ? "A" : "B",
-      correctAnswer: "A",
-      correct: i % 2 === 0,
-      question: `What is shown in the picture ${i + 1}?`,
-      image: "https://via.placeholder.com/150", 
-      options: {
-        A: "A person walking",
-        B: "A car on the road",
-        C: "A tree in a park",
-        D: "A building",
-      },
-    })), 
-    2: Array.from({ length: 25 }, (_, i) => ({
-      id: i + 7,
-      userAnswer: i % 3 === 0 ? "C" : "A",
-      correctAnswer: "A",
-      correct: i % 3 !== 0,
-      question: `Where are you going? (${i + 7})`,
-      image: null, 
-      options: {
-        A: "To the office",
-        B: "To the park",
-        C: "To the store",
-        D: "To the beach",
-      },
-    })), 
-    3: Array.from({ length: 39 }, (_, i) => ({
-      id: i + 32,
-      userAnswer: i % 2 === 0 ? "B" : "D",
-      correctAnswer: "B",
-      correct: i % 2 === 0,
-      question: `What time does the meeting start?`,
-      image: i % 5 === 0 ? "https://via.placeholder.com/150" : null,
-      options: {
-        A: "At 9 AM",
-        B: "At 10 AM",
-        C: "At 11 AM",
-        D: "At 12 PM",
-      },
-    })),
-    4: Array.from({ length: 30 }, (_, i) => ({
-      id: i + 71,
-      userAnswer: i % 4 === 0 ? "A" : "C",
-      correctAnswer: "C",
-      correct: i % 4 !== 0,
-      question: `What is the speaker talking about?`,
-      image: i % 6 === 0 ? "https://via.placeholder.com/150" : null, 
-      options: {
-        A: "A new product",
-        B: "A company event",
-        C: "A weather update",
-        D: "A travel plan",
-      },
-    })), 
-    5: Array.from({ length: 30 }, (_, i) => ({
-      id: i + 101,
-      userAnswer: i % 2 === 0 ? "D" : "B",
-      correctAnswer: "D",
-      correct: i % 2 === 0,
-      question: `She ___ to the meeting yesterday.`,
-      image: null, 
-      options: {
-        A: "go",
-        B: "goes",
-        C: "going",
-        D: "went",
-      },
-    })),
-    6: Array.from({ length: 16 }, (_, i) => ({
-      id: i + 131,
-      userAnswer: i % 3 === 0 ? "A" : "C",
-      correctAnswer: "C",
-      correct: i % 3 !== 0,
-      question: `The company ___ a new branch next month.`,
-      image: null,
-      options: {
-        A: "open",
-        B: "opened",
-        C: "will open",
-        D: "opens",
-      },
-    })),
-    7: Array.from({ length: 54 }, (_, i) => ({
-      id: i + 147,
-      userAnswer: i % 2 === 0 ? "B" : "A",
-      correctAnswer: "B",
-      correct: i % 2 === 0,
-      question: `What is the main topic of the passage?`,
-      image: i % 10 === 0 ? "https://via.placeholder.com/150" : null, 
-      options: {
-        A: "A new technology",
-        B: "A historical event",
-        C: "A scientific discovery",
-        D: "A cultural festival",
-      },
-    })),
-  };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {
+    submitResult,
+    submitError,
+    selectedExam,
+    loading: examLoading,
+  } = useSelector((state) => state.exam || {});
+
+  const result = submitResult;
+  const userAnswers = location.state?.userAnswers || {};
+  console.log("Result:", result);
+  console.log("User Answers:", userAnswers);
+  const timeDoTest = location.state?.timeDoTest;
+  const dateTest = location.state?.dateTest;
+  const { userInfo } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserInfo());
+  }, [dispatch]);
+
+  console.log("User Info:", userInfo);
+
+  const partData = result
+    ? {
+        1:
+          result.answersPart1?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        2:
+          result.answersPart2?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        3:
+          result.answersPart3?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        4:
+          result.answersPart4?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        5:
+          result.answersPart5?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        6:
+          result.answersPart6?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+        7:
+          result.answersPart7?.map((item) => ({
+            id: parseInt(item.idQuestion) + 1,
+            correctAnswer: item.key || "N/A",
+            userAnswer: userAnswers[item.idQuestion] || "N/A",
+            correct:
+              userAnswers[item.idQuestion] && item.key
+                ? userAnswers[item.idQuestion] === item.key
+                : false,
+          })) || [],
+      }
+    : {
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+      };
+
+  // Tính số câu trả lời đúng, sai và bỏ qua
+  let totalSubmittedAnswers = 0;
+  let correctAnswers = 0;
+  
+  const allParts = Object.values(partData);
+  
+  for (const part of allParts) {
+    for (const item of part) {
+      if (item.userAnswer !== "N/A") {
+        totalSubmittedAnswers++;
+      }
+  
+      if (item.correct) {
+        correctAnswers++;
+      }
+    }
+  }
+  const skippedAnswers = 200 - totalSubmittedAnswers;
+  const incorrectAnswers = totalSubmittedAnswers - correctAnswers;
+
+  // Tính số câu trả lời đúng cho Listening (Parts 1–4) và Reading (Parts 5–7)
+  const listeningCorrect =
+    partData[1].filter((item) => item.correct).length +
+    partData[2].filter((item) => item.correct).length +
+    partData[3].filter((item) => item.correct).length +
+    partData[4].filter((item) => item.correct).length;
+
+  const readingCorrect =
+    partData[5].filter((item) => item.correct).length +
+    partData[6].filter((item) => item.correct).length +
+    partData[7].filter((item) => item.correct).length;
 
   const handleShowDetailPart = () => {
     setShowDetailPart(!showDetailPart);
@@ -126,12 +167,34 @@ const ExamResult = () => {
     setSelectedQuestion(null);
   };
 
+  if (examLoading) {
+    return (
+      <div className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
+        <p className="text-gray-600 text-lg">Loading exam results...</p>
+      </div>
+    );
+  }
+
+  if (!result) {
+    return (
+      <div className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
+        <p className="text-red-600 text-lg">
+          {submitError || "No exam results available."}
+        </p>
+        <Button
+          text="Go Back"
+          variant="default"
+          onClick={() => navigate("/exam")}
+        />
+      </div>
+    );
+  }
+
   return (
     <main className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
-      {/* Kết quả thi */}
       <div className="w-full max-w-5xl bg-white rounded-2xl border-2 border-gray-300 shadow-lg p-8 flex flex-col items-center gap-6">
         <h1 className="text-3xl font-bold text-gray-600">
-          Test 1 Practice 2024
+          {selectedExam?.title || `Test ${result.idTest}`}
         </h1>
         <div className="flex flex-col md:flex-row gap-7 w-full">
           <div className="md:w-1/3 border-2 border-gray-300 rounded-2xl">
@@ -141,60 +204,61 @@ const ExamResult = () => {
               className="w-full h-auto rounded-xl object-cover"
             />
           </div>
-
           <div className="md:w-2/3 grid grid-cols-2 gap-6 text-sm sm:text-base">
             <div className="space-y-2">
               <div>
                 <p className="text-gray-600">Tên người dùng:</p>
-                <p className="font-semibold">Anhdaden</p>
+                <p className="font-semibold">{userInfo?.userName || "N/A"}</p>
               </div>
               <div>
                 <p className="text-gray-600">Ngày làm:</p>
-                <p className="font-semibold">16/4/2025</p>
+                <p className="font-semibold">{dateTest || "N/A"}</p>
               </div>
               <div>
                 <p className="text-gray-600">Thời gian hoàn thành:</p>
-                <p className="font-semibold">2:00:00</p>
+                <p className="font-semibold">{timeDoTest || "N/A"}</p>
               </div>
             </div>
-
             <div className="space-y-2">
               <div>
                 <p className="text-gray-600">Số câu đúng:</p>
-                <p className="font-semibold text-green-600">2</p>
+                <p className="font-semibold text-green-600">{correctAnswers}</p>
               </div>
               <div>
                 <p className="text-gray-600">Số câu sai:</p>
-                <p className="font-semibold text-red-500">3</p>
+                <p className="font-semibold text-red-500">{incorrectAnswers}</p>
               </div>
               <div>
                 <p className="text-gray-600">Số câu bỏ qua:</p>
-                <p className="font-semibold">2</p>
+                <p className="font-semibold">{skippedAnswers}</p>
               </div>
             </div>
-
             <div className="space-y-2">
               <div>
                 <p className="text-gray-600">Listening:</p>
                 <p>
-                  <span className="font-semibold ">30/100</span> |{" "}
-                  <span className="font-semibold text-[#2C99E2]">300 điểm</span>
+                  <span className="font-semibold">{listeningCorrect}/100</span>{" "}
+                  |{" "}
+                  <span className="font-semibold text-[#2C99E2]">
+                    {result.scoreListening} điểm
+                  </span>
                 </p>
               </div>
               <div>
                 <p className="text-gray-600">Reading:</p>
                 <p>
-                  <span className="font-semibold ">30/100</span> |{" "}
-                  <span className="font-semibold text-[#2C99E2]">300 điểm</span>
+                  <span className="font-semibold">{readingCorrect}/100</span> |{" "}
+                  <span className="font-semibold text-[#2C99E2]">
+                    {result.scoreReading} điểm
+                  </span>
                 </p>
               </div>
             </div>
-
             <div className="flex items-center justify-center col-span-2 sm:col-span-1">
               <div className="text-center">
                 <p className="text-gray-600">Tổng điểm</p>
                 <p className="text-4xl sm:text-5xl font-extrabold text-[#2C99E2]">
-                  600
+                  {result.score}
                 </p>
               </div>
             </div>
@@ -202,7 +266,6 @@ const ExamResult = () => {
         </div>
       </div>
 
-      {/* Button */}
       <div className="flex gap-5 justify-end w-full max-w-5xl">
         <Button
           text={`${
@@ -223,11 +286,10 @@ const ExamResult = () => {
         </Link>
       </div>
 
-      {/* Chi tiết kết quả */}
       {showDetailPart && (
         <div className="container max-w-5xl w-full border-2 border-gray-200 rounded-2xl p-6 shadow-lg">
           <div className="flex flex-row gap-5 border-b-2 border-gray-200 mb-4 items-center py-3 cursor-pointer">
-            {[1, 2, 3, 4, 5, 6, 7].map((part) => (
+            {[1, 2, 3, 4, 5, 6, 7]?.map((part) => (
               <button
                 key={part}
                 onClick={() => setActivePart(part)}
@@ -242,50 +304,49 @@ const ExamResult = () => {
             ))}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
-            {partData[activePart].map((item) => (
-              <div key={item.id} className="flex items-center gap-3">
-                <span className="w-10 h-10 flex items-center justify-center bg-[#e8f2ff] text-[#35509a] font-bold rounded-full">
-                  {item.id}
-                </span>
-                {/* Answer correct */}
-                <span className="font-bold text-[#35509a]">
-                  {item.correctAnswer === "Ø" ? "Ø" : `${item.correctAnswer}`}
-                </span>
-                {/* Answer user */}
-                <span
-                  className={`${
-                    item.correct ? "" : "line-through"
-                  }`}
-                >
-                  {item.userAnswer === "Ø" ? "Ø" : `${item.userAnswer}`}
-                </span>
-                {item.correct ? (
-                  <span className="text-green-600">
-                    <FontAwesomeIcon icon="fa-solid fa-check" />
+            {partData[activePart]?.length > 0 ? (
+              partData[activePart]?.map((item) => (
+                <div key={item.id} className="flex items-center gap-3">
+                  <span className="w-10 h-10 flex items-center justify-center bg-[#e8f2ff] text-[#35509a] font-bold rounded-full">
+                    {item.id}
                   </span>
-                ) : (
-                  <span className="text-red-600">
-                    <FontAwesomeIcon icon="fa-solid fa-xmark" />
+                  <span className="font-bold text-[#35509a]">
+                    {item.correctAnswer}
                   </span>
-                )}
-                <span className="text-[#35509a] font-semibold">
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleShowDetailResultExam(item);
-                    }}
-                  >
-                    [Chi tiết]
-                  </a>
-                </span>
-              </div>
-            ))}
+                  <span className={`${item.correct ? "" : "line-through"}`}>
+                    {item.userAnswer}
+                  </span>
+                  {item.correct ? (
+                    <span className="text-green-600">
+                      <FontAwesomeIcon icon="fa-solid fa-check" />
+                    </span>
+                  ) : (
+                    <span className="text-red-600">
+                      <FontAwesomeIcon icon="fa-solid fa-xmark" />
+                    </span>
+                  )}
+                  <span className="text-[#35509a] font-semibold">
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleShowDetailResultExam(item);
+                      }}
+                    >
+                      [Chi tiết]
+                    </a>
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600 col-span-full text-center">
+                No answers available for Part {activePart}
+              </p>
+            )}
           </div>
         </div>
       )}
 
-      {/* Popup for question details */}
       {showDetailResultExam && selectedQuestion && (
         <DetailExamResult
           show={showDetailResultExam}
