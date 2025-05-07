@@ -44,8 +44,7 @@ const AccountInformation = () => {
     }
   }, [userInfo]);
 
-  const inputStyle =
-    "w-full px-3 py-1.5 text-[#49719C] font-medium placeholder-[#49719C] border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]";
+  const inputStyle = "w-full px-3 py-1.5 text-[#49719C] font-medium placeholder-[#49719C] border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]";
 
   const handleUserChange = (e) => {
     const { name, value } = e.target;
