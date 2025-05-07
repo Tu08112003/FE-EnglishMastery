@@ -108,6 +108,28 @@ const validateUpdateInforUser = ({userName}) => {
     return error;    
 }
 
+const validateForgotPassword = ({ email, otpCode, newPassword }) => {
+  const errors = {};
+  if(!email) {
+    errors.email = 'Email không được để trống';
+  }else if (!emailRegex.test(email)) {
+    errors.email = 'Email không hợp lệ';
+  }
+
+  if(!otpCode) {
+    errors.otpCode = 'Mã OTP không được để trống';
+  }else if (otpCode.length < 6) {
+    errors.otpCode = 'Mã OTP phải có ít nhất 6 ký tự';
+  }
+  
+  if(!newPassword) {
+    errors.newPassword = 'Mật khẩu mới không được để trống';
+  }else if (newPassword.length < 8) {
+    errors.newPassword = 'Mật khẩu mới phải có ít nhất 8 ký tự';
+  }
+  return errors;
+}
+
 export {
-    validateLogin, validateRegister, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser
+    validateLogin, validateRegister, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser, validateForgotPassword
 }

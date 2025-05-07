@@ -79,8 +79,8 @@ instance.interceptors.response.use(
             } catch (storeError) {
               console.error("Failed to access Redux store:", storeError.message);
             }
-            toast.info("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
             window.location.href = "/login";
+            toast.info("Phiên đăng nhập đã hết hạn! Vui lòng đăng nhập lại.");
           }
           return Promise.reject(refreshError);
         }
