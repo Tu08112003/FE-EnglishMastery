@@ -47,7 +47,7 @@ const Button = ({
   const textClass = textColor ? textColor : current.text;
   const hoverClass = disabled ? "" : hoverBg ? hoverBg : current.hover;
   const disabledClass = disabled
-    ? "cursor-not-allowed"
+    ? "disabled:cursor-not-allowed"
     : "";
 
   return (
