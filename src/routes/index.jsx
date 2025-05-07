@@ -6,7 +6,7 @@ import Login from "../components/Login";
 import Register from "../components/Register";
 import ForgotPassword from "../components/ForgotPassword";
 import TakeTheExam from "../components/Exam/TakeTheExam";
-import ExamResult from "../components/Exam/ExamResult";
+import SubmitExamResult from "../components/Exam/SubmitExamResult";
 import AccountInformation from "../components/AccountInformation";
 import HistoryExamResult from "../components/Exam/HistoryExamResult";
 import AdminLayout from "../layout/AdminLayout";
@@ -56,7 +56,7 @@ const routes = [
         path: "/exam/result",
         component: (
           <PrivateRoute>
-            <ExamResult />
+            <SubmitExamResult />
           </PrivateRoute>
         ),
         protected: true,
