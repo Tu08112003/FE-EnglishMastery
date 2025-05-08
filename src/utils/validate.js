@@ -110,6 +110,8 @@ const validateUpdateInforUser = ({userName}) => {
 
 const validateForgotPassword = ({ email, otpCode, newPassword }) => {
   const errors = {};
+  const numberRegex = /^\d+$/;
+  
   if(!email) {
     errors.email = 'Email không được để trống';
   }else if (!emailRegex.test(email)) {
@@ -120,6 +122,8 @@ const validateForgotPassword = ({ email, otpCode, newPassword }) => {
     errors.otpCode = 'Mã OTP không được để trống';
   }else if (otpCode.length < 6) {
     errors.otpCode = 'Mã OTP phải có ít nhất 6 ký tự';
+  }else if (!numberRegex.test(otpCode)) {
+    errors.otpCode = 'Mã OTP phải là số';
   }
   
   if(!newPassword) {
