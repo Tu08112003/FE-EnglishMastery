@@ -124,7 +124,7 @@ const Exam = () => {
             Đang tải đề thi...
           </p>
         ) : error ? (
-          <p className="text-red-500">Error: {error}</p>
+          <p className="text-red-500 text-center font-semibold text-lg">{error}</p>
         ) :  filteredExams.length === 0 && searchQuery ? (
           <p className="font-semibold text-center text-gray-600">
             Không tìm thấy thông tin đề thi "{searchQuery}".
