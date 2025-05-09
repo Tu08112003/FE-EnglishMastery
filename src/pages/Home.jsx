@@ -224,7 +224,7 @@ const Home = () => {
               </div>
             ) : error ? (
               <div className="text-red-600 text-center font-semibold text-lg">
-                Error: {error}
+                {error}
               </div>
             ) : recentResults.length === 0 ? (
               <div className="text-gray-600 font-semibold text-center text-lg">

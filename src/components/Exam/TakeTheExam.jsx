@@ -108,7 +108,7 @@ const TakeTheExam = () => {
       console.log("Starting exam");
       setIsStarted(true);
     } else {
-      console.warn("Cannot start exam, data not loaded yet.");
+      console.log("Cannot start exam, data not loaded yet.");
     }
   };
 
