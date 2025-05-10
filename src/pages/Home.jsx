@@ -182,11 +182,13 @@ const Home = () => {
                 <p className="text-gray-600">
                   {sectionData.userWelcome.message}
                 </p>
-                <Button
-                  text={sectionData.userWelcome.buttonText}
-                  variant="primary"
-                  size="md"
-                />
+                <Link to="/exam">
+                  <Button
+                    text={sectionData.userWelcome.buttonText}
+                    variant="primary"
+                    size="md"
+                  />
+                </Link>
               </div>
             </div>
             <div className="container mx-auto px-4 mt-20">
