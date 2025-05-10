@@ -38,6 +38,7 @@ const Header = () => {
     if (res.status === 200) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('role');
       dispatch(logout());
       dispatch(clearUserInfo());
       

@@ -35,8 +35,8 @@ const getExamById = ({ idTest }) => {
 };
 
 // Lấy ra lịch sử làm bài thi
-const getAllHistoryExam = () => {
-    const URL_BACKEND = 'exam-service/getAllHistoryTest';
+const getHistoryExam = () => {
+    const URL_BACKEND = 'exam-service/getHistoryTest';
     return axios.get(URL_BACKEND);
 }
 
@@ -45,4 +45,4 @@ const getHistoryExamById = ({ idTest }) => {
     const URL_BACKEND = `exam-service/getTestHistory?idTestHistory=${idTest}`;
     return axios.get(URL_BACKEND);
 }
-export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getAllHistoryExam, getHistoryExamById };
+export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getHistoryExam, getHistoryExamById };

@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import { NavLink } from 'react-router-dom';
+import { NavLink ,useNavigate} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Logo from "../assets/images/logo-bg_white.png";
+import { authLogout } from '../service/authService';
+import { useDispatch} from 'react-redux';
+import { toast } from 'react-toastify';
+import { logout } from '../redux/slice/authSlice';
 
 const AdminLayout = ({ children }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const linkClass = ({ isActive }) =>
     `px-4 py-2 rounded transition-all duration-200 transform ${
       isActive
@@ -18,6 +23,22 @@ const AdminLayout = ({ children }) => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  const handleLogout = async () => {
+    const refresh_token = localStorage.getItem('refresh_token');
+    const res = await authLogout({ refreshToken: refresh_token });
+    if (res.status === 200) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('role');
+      dispatch(logout());
+      
+      toast.success('Đăng xuất thành công!');
+      navigate('/');
+      setDropdownOpen(false);
+    } else {
+      toast.error('Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.');
+    }
+};
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-row">
@@ -75,14 +96,14 @@ const AdminLayout = ({ children }) => {
               />
             </div>
 
-            <div
+            <ul
               className={`absolute left-0 w-full bg-white rounded shadow mt-2 z-10 transition-all duration-300 ease-in-out transform ${
                 dropdownOpen
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 -translate-y-2 pointer-events-none'
               }`}
             >
-              <NavLink
+              {/* <NavLink
                 to="/account-info"
                 className="flex gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 transition duration-200"
               >
@@ -90,19 +111,17 @@ const AdminLayout = ({ children }) => {
                   <FontAwesomeIcon icon="fa-solid fa-user" />
                 </span>
                 <span>Hồ sơ</span>
-              </NavLink>
-              <button
-                className="flex gap-2 w-full text-left px-4 py-2 text-sm font-semibold text-red-600 hover:bg-gray-100 transition duration-200"
-                onClick={() => {
-                  console.log('Đăng xuất');
-                }}
+              </NavLink> */}
+              <li
+                className="flex gap-2 w-full cursor-pointer text-left px-4 py-2 text-sm font-semibold text-red-600 hover:bg-gray-100 transition duration-200"
+                onClick={handleLogout}
               >
                 <span className="flex items-center justify-center w-5 h-5">
                   <FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" />
                 </span>
                 <span>Đăng xuất</span>
-              </button>
-            </div>
+              </li>
+            </ul>
           </div>
         </aside>
 

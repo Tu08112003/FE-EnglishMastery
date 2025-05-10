@@ -4,6 +4,7 @@ import noteReducer from '../redux/slice/noteSlice';
 import userReducer from '../redux/slice/userSlice';
 import dictionaryReducer from '../redux/slice/dictionarySlice';
 import examReducer from '../redux/slice/examSlice'
+import adminReducer from '../redux/slice/adminSlice'
 import { setStore } from './storeAccessor';
 
 export const store = configureStore({
@@ -12,7 +13,8 @@ export const store = configureStore({
     note: noteReducer,
     user: userReducer,
     dictionary: dictionaryReducer, 
-    exam: examReducer
+    exam: examReducer,
+    admin: adminReducer
   },
 });
 
