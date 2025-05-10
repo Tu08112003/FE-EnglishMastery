@@ -2,7 +2,6 @@
 import { Routes, Route } from "react-router-dom";
 import routes from "./routes/index.jsx";
 import "./plugins/font-awesome.js";
-import PrivateRoute from "./routes/PrivateRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,11 +14,11 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (token) {
-      dispatch(loginSuccess());
-    } else {
-      dispatch(finishLoading());
+    const role = localStorage.getItem("role");
+    if (token && role) {
+      dispatch(loginSuccess({ role }));
     }
+    dispatch(finishLoading());
   }, [dispatch]);
 
   if (loading) return <div className="text-center font-semibold text-gray-600">Loading...</div>;
