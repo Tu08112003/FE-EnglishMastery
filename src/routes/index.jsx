@@ -62,7 +62,7 @@ const routes = [
         protected: true,
       },
       {
-        path:"exam/result/:idTest",
+        path: "exam/result/:idTest",
         component: (
           <PrivateRoute>
             <HistoryExamResult />
@@ -119,13 +119,41 @@ const routes = [
   {
     layout: AdminLayout,
     children: [
-      { path: "/admin", component: <Dashboard />, protected: false },
-      { path: "/admin/exam", component: <ManageExam />, protected: false },
-      { path: "/admin/user", component: <ManageUser />, protected: false },
+      {
+        path: "/admin",
+        component: (
+          <PrivateRoute requiredRole="ADMIN">
+            <Dashboard />
+          </PrivateRoute>
+        ),
+        protected: true,
+      },
+      {
+        path: "/admin/exam",
+        component: (
+          <PrivateRoute requiredRole="ADMIN">
+            <ManageExam />
+          </PrivateRoute>
+        ),
+        protected: true,
+      },
+      {
+        path: "/admin/user",
+        component: (
+          <PrivateRoute requiredRole="ADMIN">
+            <ManageUser />
+          </PrivateRoute>
+        ),
+        protected: true,
+      },
       {
         path: "/admin/payment",
-        component: <ManagePayment />,
-        protected: false,
+        component: (
+          <PrivateRoute requiredRole="ADMIN">
+            <ManagePayment />
+          </PrivateRoute>
+        ),
+        protected: true,
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam, getAllHistoryExam, getHistoryExamById } from '../../service/examService';
+import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam, getHistoryExam, getHistoryExamById } from '../../service/examService';
 
 // Lấy tất cả các năm có đề thi
 export const fetchAllExamsByYear = createAsyncThunk(
@@ -59,7 +59,7 @@ export const fetchAllHistoryExam = createAsyncThunk(
   'exam/fetchAllHistoryExam',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getAllHistoryExam();
+      const response = await getHistoryExam();
       console.log('Lịch sử làm bài thi: ', response.data);
       return response.data;
     } catch (error) {

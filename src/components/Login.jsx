@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button.jsx";
 import { validateLogin } from "../utils/validate.js";
 import { authLogin } from "../service/authService.js";
-import { useDispatch } from "react-redux";
+import { useDispatch} from "react-redux";
 import { loginSuccess } from "../redux/slice/authSlice";
 import {toast } from "react-toastify";
 
@@ -40,20 +40,26 @@ const Login = () => {
         console.log("API Response:", res);
 
         if (res && res.data) {
-          const { accessToken, refreshToken } = res.data;
+          const { accessToken, refreshToken, role } = res.data;
+
           localStorage.setItem("access_token", accessToken);
           localStorage.setItem("refresh_token", refreshToken);
-          dispatch(loginSuccess());
+          localStorage.setItem("role", role);
+          dispatch(loginSuccess({ role }));
+          console.log(role)
           toast.success("Đăng nhập thành công");
-          navigate("/");
+          if (role === "ADMIN") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
         } else {
-          toast.error(res.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+          const errorMessage = res?.data?.message || res?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+          toast.error(errorMessage);
         }
       } catch (error) {
         console.error("Login Error:", error);
-        const message =
-          error.response?.data?.message ||
-          "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.";
+        const message = error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.";
         toast.error(message);
       }
     }
