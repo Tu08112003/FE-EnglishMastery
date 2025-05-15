@@ -56,7 +56,7 @@ instance.interceptors.response.use(
           const response = await checkRefreshToken({ refreshToken });
 
           // Lưu access_token mới (giả sử API trả về accessToken trong response.data)
-          const newAccessToken = response.accessToken; // Điều chỉnh key dựa trên API thực tế
+          const newAccessToken = response.data.accessToken;
           localStorage.setItem("access_token", newAccessToken);
 
           // Cập nhật header cho originalRequest
