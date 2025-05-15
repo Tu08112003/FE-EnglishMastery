@@ -62,7 +62,7 @@ const addPermissionForUser = ({ namePermission }) => {
 const detelePermissionOfUser = ({ permissionId }) => {
   const URL_BACKEND = "user-service/removePermission";
   const data = {
-    permisstonId: permissionId,
+    permissionId: permissionId,
   };
   return axios.post(URL_BACKEND, data);
 };

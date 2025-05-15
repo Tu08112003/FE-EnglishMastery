@@ -106,7 +106,6 @@ export const fetchPermissionOfUser = createAsyncThunk(
   async ({idUser}, { rejectWithValue }) => {
     try {
       const response = await getPermissionOfUser({ idUser: idUser });
-      console.log(response.data.permissions);
       return response.data.permissions;
     } catch (error) {
       return rejectWithValue(
@@ -233,7 +232,12 @@ const initialState = {
   tests: [],
   loading: false,
   loadingUser: false,
+  loadingHistoryTest: false,
+  loadingTest: false,
   error: null,
+  errorUser:null,
+  errorHistoryTest: false,
+  errorTest: false,
   permissionOfUser: [],
 };
 
@@ -246,7 +250,7 @@ const adminSlice = createSlice({
     builder
       .addCase(fetchAllUsers.pending, (state) => {
         state.loadingUser = true;
-        state.error = null;
+        state.errorUser = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loadingUser = false;
@@ -254,7 +258,7 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loadingUser = false;
-        state.error = action.payload;
+        state.errorUser = action.payload;
       })
       // fetchNumberOfUsers
       .addCase(fetchNumberOfUsers.pending, (state) => {
@@ -284,29 +288,29 @@ const adminSlice = createSlice({
       })
       // fetchAllHistoryTests
       .addCase(fetchAllHistoryTests.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingHistoryTest = true;
+        state.errorHistoryTest = null;
       })
       .addCase(fetchAllHistoryTests.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingHistoryTest = false;
         state.historyTests = action.payload;
       })
       .addCase(fetchAllHistoryTests.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.loadingHistoryTest = false;
+        state.errorHistoryTest = action.payload;
       })
       // fetchAllTests
       .addCase(fetchAllTests.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingTest = true;
+        state.errorTest = null;
       })
       .addCase(fetchAllTests.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingTest = false;
         state.tests = action.payload;
       })
       .addCase(fetchAllTests.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.loadingTest = false;
+        state.errorTest = action.payload;
       })
       // fetchPermissionOfUser
       .addCase(fetchPermissionOfUser.pending, (state) => {
@@ -360,31 +364,19 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // // fetchAddUser
-      // .addCase(fetchAddUser.pending, (state) => {
-      //   state.loadingUser = true;
-      //   state.error = null;
-      // })
-      // .addCase(fetchAddUser.fulfilled, (state, action) => {
-      //   state.loading= false;
-      //   state.users.push(action.payload);
-      // })
-      // .addCase(fetchAddUser.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload;
-      // })
-      // // fetchDeleteUser
-      // .addCase(fetchDeleteUser.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
-      // .addCase(fetchDeleteUser.fulfilled, (state) => {
-      //   state.loading = false;
-      // })
-      // .addCase(fetchDeleteUser.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload;
-      // })
+
+      // fetchDeleteUser
+      .addCase(fetchDeleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDeleteUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchDeleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

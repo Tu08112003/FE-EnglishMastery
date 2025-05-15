@@ -13,7 +13,7 @@ import {
 } from "../../redux/slice/adminSlice.js";
 import { toast } from "react-toastify";
 const EditUser = ({ show, onClose, user }) => {
-  const { permissionOfUser, loading, error } = useSelector(
+  const { permissionOfUser, loading } = useSelector(
     (state) => state.admin
   );
   const dispatch = useDispatch();
@@ -79,6 +79,7 @@ const EditUser = ({ show, onClose, user }) => {
       toast.success("Xóa quyền thành công!");
       setShowModal(false);
       setSelectedPermission(null);
+      setCurrentPage(1);
     } catch (err) {
       toast.error(err || "Xóa quyền thất bại");
     }
@@ -156,11 +157,13 @@ const EditUser = ({ show, onClose, user }) => {
                 <div className="text-center py-4 text-gray-600 font-semibold text-lg">
                   Đang tải...
                 </div>
-              ) : error ? (
-                <div className="text-center py-4 text-red-600 font-semibold text-lg">
-                  {error}
-                </div>
-              ) : permissionOfUser?.length > 0 ? (
+              ) 
+              // : error ? (
+              //   <div className="text-center py-4 text-red-600 font-semibold text-lg">
+              //     {error}
+              //   </div>
+              // ) 
+              : permissionOfUser?.length > 0 ? (
                 <>
                   <table className="w-full text-center border-2 border-gray-200 shadow-lg rounded-2xl border-separate border-spacing-0 overflow-hidden">
                     <thead>
@@ -274,11 +277,11 @@ const EditUser = ({ show, onClose, user }) => {
               <ModalConfirm
                 show={showModal}
                 title="Xác nhận xóa quyền"
-                description={`Bạn có chắc chắn muốn xóa quyền '${permissionOfUser.namePermission}'? Hành động này không thể hoàn tác.`}
+                description={`Bạn có chắc chắn muốn xóa quyền '${selectedPermission.name}'? Hành động này không thể hoàn tác.`}
                 hoverBgConfirm="hover:bg-red-700"
                 onCancel={() => setShowModal(false)}
                 onConfirm={() =>
-                  handleDeletePermissionUser(permissionOfUser.id)
+                  handleDeletePermissionUser(selectedPermission.id)
                 }
               />
             )}
