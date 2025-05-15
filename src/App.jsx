@@ -1,27 +1,24 @@
-// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import routes from "./routes/index.jsx";
 import "./plugins/font-awesome.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginSuccess, finishLoading } from "./redux/slice/authSlice";
 import { useEffect } from "react";
 
 function App() {
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.auth.loading);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const role = localStorage.getItem("role");
     if (token && role) {
-      dispatch(loginSuccess({ role }));
+      dispatch(loginSuccess({role}));
     }
     dispatch(finishLoading());
   }, [dispatch]);
 
-  if (loading) return <div className="text-center font-semibold text-gray-600">Loading...</div>;
 
   return (
     <>
