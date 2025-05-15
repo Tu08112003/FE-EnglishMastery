@@ -108,6 +108,7 @@ const validateUpdateInforUser = ({userName}) => {
     return error;    
 }
 
+// Hàm validate cho quên mật khẩu
 const validateForgotPassword = ({ email, otpCode, newPassword }) => {
   const errors = {};
   const numberRegex = /^\d+$/;
@@ -134,6 +135,30 @@ const validateForgotPassword = ({ email, otpCode, newPassword }) => {
   return errors;
 }
 
+// Hàm validate thêm user 
+const validateAddUser = ({ userName, email, password }) => {
+  const errors = {};
+
+  if (!userName || userName.trim().length < 2) {
+    errors.userName = 'Tên người dùng phải có ít nhất 2 ký tự';
+  }
+
+  if (!email) {
+    errors.email = 'Email không được để trống';
+  } else if (!emailRegex.test(email)) {
+    errors.email = 'Email không hợp lệ';
+  }
+
+  if (!password) {
+    errors.password = 'Mật khẩu không được để trống';
+  } else if (password.length < 8) {
+    errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
+  }
+
+
+
+  return errors;
+};
 export {
-    validateLogin, validateRegister, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser, validateForgotPassword
+    validateLogin, validateRegister, validateAddUpdateVocabulary, validateChangePassword, validateUpdateInforUser, validateForgotPassword,validateAddUser
 }

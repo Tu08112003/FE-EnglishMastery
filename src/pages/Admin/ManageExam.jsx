@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllHistoryTests, fetchNumberOfTests, fetchAllTests } from '../../redux/slice/adminSlice';
+import { fetchAllHistoryTests, fetchAllTests } from '../../redux/slice/adminSlice';
 import Button from '../../components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SearchBar from '../../components/SearchBar';
@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 
 const ManageExam = () => {
   const dispatch = useDispatch();
-  const { tests, numberOfTests, historyTests, loading, error } = useSelector((state) => state.admin);
+  const { tests, historyTests, loading, error } = useSelector((state) => state.admin);
 
   const [currentPageExams, setCurrentPageExams] = useState(1);
   const [currentPageResults, setCurrentPageResults] = useState(1);
@@ -33,7 +33,6 @@ const ManageExam = () => {
 
   useEffect(() => {
     dispatch(fetchAllTests());
-    dispatch(fetchNumberOfTests());
     dispatch(fetchAllHistoryTests());
   }, [dispatch]);
 
@@ -120,35 +119,10 @@ const ManageExam = () => {
     setSelectedExam(null);
   };
 
-  const handleViewResultClick = (result) => {
-    setSelectedResult(result);
-    setShowDetailResult(true);
-  };
 
   return (
     <main className="max-w-6xl w-full mx-auto space-y-6 p-4">
       <h1 className="text-2xl font-bold">Quản lý đề thi</h1>
-      <section className="mx-auto max-w-4xl flex flex-col space-y-3">
-      { loading? (
-        <div className="text-center py-4 text-gray-600 font-semibold text-lg">Đang tải...</div>
-      ):(
-        <>
-          <div className="flex border-2 border-gray-200 rounded-xl space-x-5 shadow-md p-5 items-center justify-around">
-            <div className="flex gap-2 items-center justify-center text-md text-gray-600 font-semibold">
-              <span>Tổng số đề thi:</span>
-              <span className="font-bold text-[#2C99E2]">{numberOfTests || 0}</span>
-            </div>
-            <div className="flex gap-2 items-center text-md justify-center text-gray-600 font-semibold">
-              <span>Số đề đã được làm:</span>
-              <span className="font-bold text-[#2C99E2]">{historyTests.length || 0}</span>
-            </div>
-          </div>
-        </>
-      )
-
-      }
-      </section>
-
       {/* Danh sách đề thi */}
       <section className="flex flex-col py-5 px-8 gap-5 border-2 border-gray-200 rounded-xl shadow-md">
         <h1 className="text-2xl font-bold">Danh sách đề thi</h1>
@@ -260,7 +234,6 @@ const ManageExam = () => {
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Điểm số</th>
                   <th className="py-3 px-4">Ngày nộp bài</th>
-                  <th className="py-3 px-4">Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -270,15 +243,6 @@ const ManageExam = () => {
                     <td className="px-4 py-4 text-gray-600 font-semibold">{result.email}</td>
                     <td className="px-4 py-4 font-bold text-[#2C99E2]">{result.score || 'N/A'} / 990</td>
                     <td className="px-4 py-4 text-gray-600 font-semibold">{result.dateTest || 'N/A'}</td>
-                    <td className="px-4 py-4 flex items-center justify-center">
-                      <Button
-                        text="Xem Chi tiết"
-                        variant="primary"
-                        size="sm"
-                        icon={<FontAwesomeIcon icon="fa-solid fa-eye" />}
-                        onClick={() => handleViewResultClick(result)}
-                      />
-                    </td>
                   </tr>
                 ))}
                 {currentResults.length === 0 && (

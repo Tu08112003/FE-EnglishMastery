@@ -1,68 +1,229 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAllUser, getNumberOfUser, getNumberOfTest, getAllHistoryTest, getAllTest } from '../../service/adminService'; // Điều chỉnh đường dẫn
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  getAllUser,
+  getNumberOfUser,
+  getNumberOfTest,
+  getAllHistoryTest,
+  getAllTest,
+  getPermissionOfUser,
+  updatePermissionOfUser,
+  addPermissionForUser,
+  detelePermissionOfUser,
+  addUser,
+  deleteUser,
+} from "../../service/adminService";
 
 // Lấy tất cả thông tin user
-export const fetchAllUsers = createAsyncThunk('admin/fetchAllUsers', async (_, { rejectWithValue }) => {
-  try {
-    const response = await getAllUser();
-    return response.data.users;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Lỗi khi lấy danh sách người dùng');
+export const fetchAllUsers = createAsyncThunk(
+  "admin/fetchAllUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAllUser();
+      return response.data.users;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy danh sách người dùng"
+      );
+    }
   }
-});
+);
 
 // Lấy số lượng user
-export const fetchNumberOfUsers = createAsyncThunk('admin/fetchNumberOfUsers', async (_, { rejectWithValue }) => {
-  try {
-    const response = await getNumberOfUser();
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Lỗi khi lấy số lượng người dùng');
+export const fetchNumberOfUsers = createAsyncThunk(
+  "admin/fetchNumberOfUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getNumberOfUser();
+      return response.data.numberOfUser;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy số lượng người dùng"
+      );
+    }
   }
-});
+);
 
 // Lấy số lượng bài test
-export const fetchNumberOfTests = createAsyncThunk('admin/fetchNumberOfTests', async (_, { rejectWithValue }) => {
-  try {
-    const response = await getNumberOfTest();
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || 'Lỗi khi lấy số lượng bài test');
+export const fetchNumberOfTests = createAsyncThunk(
+  "admin/fetchNumberOfTests",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getNumberOfTest();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy số lượng bài test"
+      );
+    }
   }
-});
+);
 
 // Lấy lịch sử làm bài
-export const fetchAllHistoryTests = createAsyncThunk('admin/fetchAllHistoryTests', async (_, { rejectWithValue }) => {
+export const fetchAllHistoryTests = createAsyncThunk(
+  "admin/fetchAllHistoryTests",
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getAllHistoryTest();
       const historyTests = Array.isArray(response.data) ? response.data : [];
-      // Chuẩn hóa dữ liệu
-      return historyTests.map((result, index) => ({
-        id: result.id || `result-${index + 1}`, 
+      return historyTests.map((result) => ({
+        id: result.idTestHistory,
         testName: result.testName,
         email: result.email,
         score: result.score,
         dateTest: result.dateTest,
       }));
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Lỗi khi lấy lịch sử bài thi');
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy lịch sử bài thi"
+      );
     }
-  });
-  
-  // Lấy tất cả bài thi
-  export const fetchAllTests = createAsyncThunk('admin/fetchAllTests', async (_, { rejectWithValue }) => {
+  }
+);
+
+// Lấy tất cả bài thi
+export const fetchAllTests = createAsyncThunk(
+  "admin/fetchAllTests",
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getAllTest();
       const tests = Array.isArray(response.data) ? response.data : [];
-      return tests.map((test, index) => ({
-        id: test.id || `test-${index + 1}`, 
+      return tests.map((test) => ({
+        id: test.idTest,
         testName: test.testName,
-        numberOfQuestion: parseInt(test.numberOfQuestion, 10), 
+        numberOfQuestion: parseInt(test.numberOfQuestion, 10),
       }));
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Lỗi khi lấy danh sách bài test');
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy danh sách bài test"
+      );
     }
-  });
+  }
+);
+
+// Lấy quyền của user
+export const fetchPermissionOfUser = createAsyncThunk(
+  "admin/fetchPermissionOfUser",
+  async ({idUser}, { rejectWithValue }) => {
+    try {
+      const response = await getPermissionOfUser({ idUser: idUser });
+      console.log(response.data.permissions);
+      return response.data.permissions;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy quyền của người dùng"
+      );
+    }
+  }
+);
+
+// Cập nhật quyền của user
+export const fetchUpdatePermissionOfUser = createAsyncThunk(
+  "admin/fetchUpdatePermissionOfUser",
+  async ({ idUser, namePermission, typeUpdate }, { rejectWithValue }) => {
+    try {
+      const response = await updatePermissionOfUser({
+        idUser,
+        namePermission,
+        typeUpdate,
+      });
+      if(response.status == 200) {
+        return response.data;
+      }else{
+        return rejectWithValue(
+          "Lỗi khi cập nhật quyền của người dùng! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi cập nhật quyền của người dùng"
+      );
+    }
+  }
+);
+// Thêm quyền cho user
+export const fetchAddPermissionForUser = createAsyncThunk(
+  "admin/fetchAddPermissionForUser",
+  async ({namePermission}, { rejectWithValue }) => {
+    try {
+      const response = await addPermissionForUser({ namePermission });
+      if (response.status == 200) {
+        return response.data;
+      }
+      return rejectWithValue(
+        "Lỗi khi thêm quyền cho người dùng! Vui lòng thử lại."
+      );
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi thêm quyền cho người dùng"
+      );
+    }
+  }
+);  
+
+// Xóa quyền của user
+export const fetchDeletePermissionOfUser = createAsyncThunk(
+  "admin/fetchDeletePermissionOfUser",
+  async ({ permissionId }, { rejectWithValue }) => {
+    try {
+      const response = await detelePermissionOfUser({
+        permissionId,
+      });
+      if (response.status == 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          "Lỗi khi xóa quyền của người dùng! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi xóa quyền của người dùng"
+      );
+    }
+  }
+);
+// Thêm mới user 
+export const fetchAddUser = createAsyncThunk(
+  "admin/fetchAddUser",
+  async ({ userName, email, password, role }, { rejectWithValue }) => {
+    try {
+      const response = await addUser({ userName, email, password, role });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          "Lỗi khi thêm người dùng! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi thêm người dùng"
+      );
+    }
+  }
+);
+
+// Xóa user
+export const fetchDeleteUser = createAsyncThunk(
+  "admin/fetchDeleteUser",
+  async ({ userId }, { rejectWithValue }) => {
+    try {
+      const response = await deleteUser({ userId });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          "Lỗi khi xóa người dùng! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi xóa người dùng"
+      );
+    }
+  }
+);
+
 
 const initialState = {
   users: [],
@@ -71,27 +232,28 @@ const initialState = {
   historyTests: [],
   tests: [],
   loading: false,
+  loadingUser: false,
   error: null,
+  permissionOfUser: [],
 };
 
 const adminSlice = createSlice({
-  name: 'admin',
+  name: "admin",
   initialState,
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // fetchAllUsers
     builder
       .addCase(fetchAllUsers.pending, (state) => {
-        state.loading = true;
+        state.loadingUser = true;
         state.error = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingUser = false;
         state.users = action.payload;
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingUser = false;
         state.error = action.payload;
       })
       // fetchNumberOfUsers
@@ -145,7 +307,84 @@ const adminSlice = createSlice({
       .addCase(fetchAllTests.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      // fetchPermissionOfUser
+      .addCase(fetchPermissionOfUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPermissionOfUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.permissionOfUser = action.payload;
+      })
+      .addCase(fetchPermissionOfUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // fetchAddPermissionForUser
+      .addCase(fetchAddPermissionForUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAddPermissionForUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchAddPermissionForUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // fetchDeletePermissionOfUser
+      .addCase(fetchDeletePermissionOfUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDeletePermissionOfUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchDeletePermissionOfUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // fetchUpdatePermissionOfUser
+      .addCase(fetchUpdatePermissionOfUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUpdatePermissionOfUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchUpdatePermissionOfUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // // fetchAddUser
+      // .addCase(fetchAddUser.pending, (state) => {
+      //   state.loadingUser = true;
+      //   state.error = null;
+      // })
+      // .addCase(fetchAddUser.fulfilled, (state, action) => {
+      //   state.loading= false;
+      //   state.users.push(action.payload);
+      // })
+      // .addCase(fetchAddUser.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload;
+      // })
+      // // fetchDeleteUser
+      // .addCase(fetchDeleteUser.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(fetchDeleteUser.fulfilled, (state) => {
+      //   state.loading = false;
+      // })
+      // .addCase(fetchDeleteUser.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload;
+      // })
   },
 });
 
