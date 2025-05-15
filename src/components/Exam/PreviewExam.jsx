@@ -20,7 +20,7 @@ const testStructure = {
 const PreviewExam = ({ title, onClose, examId}) => {
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black/30 z-10 p-4">
-      <div className="container mx-auto w-full max-w-3xl bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 py-6 max-h-[95vh] overflow-y-auto custom-scrollbar">
+      <div className="mx-auto w-full max-w-3xl bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 py-6 max-h-[95vh] overflow-y-auto custom-scrollbar">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-semibold">{title}</h1>

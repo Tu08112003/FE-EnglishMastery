@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 
 const ManageUser = () => {
   const dispatch = useDispatch();
-  const { users, loadingUser, error } = useSelector((state) => state.admin);
+  const { users, loadingUser, errorUser } = useSelector((state) => state.admin);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [filterType, setFilterType] = useState("all");
@@ -31,10 +31,10 @@ const ManageUser = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (errorUser) {
+      toast.error(errorUser);
     }
-  }, [error]);
+  }, [errorUser]);
 
   const filteredUsers = users.filter((user) => {
     const query = searchQuery.toLowerCase();

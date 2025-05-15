@@ -196,6 +196,10 @@ const Home = () => {
                 <div className="text-gray-600 font-semibold text-center text-lg">
                   Đang tải thống kê...
                 </div>
+              ) : !historyExam || historyExam.numberOfTest === 0 ? (
+                <div className="text-gray-600 font-semibold text-center text-lg">
+                  Chưa có thống kê
+                </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center items-center">
                   {statistics.map((stat, index) => (

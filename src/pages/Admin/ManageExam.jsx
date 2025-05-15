@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 
 const ManageExam = () => {
   const dispatch = useDispatch();
-  const { tests, historyTests, loading, error } = useSelector((state) => state.admin);
+  const { tests, historyTests, loadingTest,loadingHistoryTest, errorHistoryTest, errorTest } = useSelector((state) => state.admin);
 
   const [currentPageExams, setCurrentPageExams] = useState(1);
   const [currentPageResults, setCurrentPageResults] = useState(1);
@@ -37,10 +37,13 @@ const ManageExam = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (errorTest) {
+      toast.error(errorTest);
     }
-  }, [error]);
+    if (errorHistoryTest) {
+      toast.error(errorHistoryTest);
+    }
+  }, [errorTest, errorHistoryTest]);
 
   const filteredExams = tests.filter((exam) => {
         const query = searchExamQuery.toLowerCase();
@@ -144,7 +147,7 @@ const ManageExam = () => {
             onClick={() => setShowAddExam(true)}
           />
         </div>
-        {loading ? (
+        {loadingTest ? (
           <div className="text-center py-4 text-gray-600 font-semibold text-lg">Đang tải...</div>
         ) : (
           <>
@@ -223,7 +226,7 @@ const ManageExam = () => {
             />
           </div>
         </div>
-        {loading ? (
+        {loadingHistoryTest ? (
           <div className="text-center py-4 text-gray-600 font-semibold text-lg">Đang tải...</div>
         ) : (
           <>
