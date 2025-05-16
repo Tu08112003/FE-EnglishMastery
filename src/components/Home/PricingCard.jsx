@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../Button.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import Payment from '../Payment.jsx';
 const PricingCard = () => {
-  const handleRedirectPayment = () => {
-    window.timer = null;
-    const paymentUrl = 'https://sandbox.vnpayment.vn/paymentv2/Transaction/PaymentMethod.html?token=f2d61eb8bb3d43d49a8aebdd2f3b7903';
-    window.location.href = paymentUrl;
-  };
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
+  const [showPayment, setShowPayment] = useState(false);
 
+  const handleShowPayment =  () => {
+    setShowPayment(true)
+  }
+  const handleClosePayment = () => {
+    setShowPayment(false)
+  }
   return (
     <div className="container mx-auto px-4">
       <h2 className="text-3xl font-bold text-center mb-12">Gói học nâng cấp</h2>
@@ -30,9 +35,24 @@ const PricingCard = () => {
               <span className="text-gray-600 font-semibold">Được cấp bộ tài liệu ngữ pháp</span>
             </li>
           </ul>
-          <Button text="Đăng ký ngay" variant="primary" size="lg" onClick={handleRedirectPayment} />
+          {
+            isLoggedIn ? (
+              <Button text="Đăng ký ngay" variant="primary" size="lg" onClick={()=>{
+                console.log("In ra button")
+                handleShowPayment();
+              }}/>
+            ):(
+              <Link to="/login"><Button text="Đăng ký ngay" variant="primary" size="lg" /></Link>
+            )
+          }
         </div>
       </div>
+      {showPayment && (
+        <Payment
+          onClose={handleClosePayment}
+          show={showPayment}
+        /> 
+      )}
     </div>
   );
 };
