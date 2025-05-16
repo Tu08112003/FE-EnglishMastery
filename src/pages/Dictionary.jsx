@@ -41,7 +41,7 @@ const Dictionary = () => {
         setHasSearched(false);
         setShowSuggestion(false);
       }
-    }, 400),
+    }, 300),
     [dispatch]
   );
 
