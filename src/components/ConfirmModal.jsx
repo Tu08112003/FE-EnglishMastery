@@ -19,7 +19,7 @@ const ConfirmModal = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 w-full h-full flex items-center justify-center bg-black/30 z-10 py-4 px-4 sm:px-6"
+      className="fixed inset-0 w-full h-full flex items-center justify-center bg-black/30 z-100 py-4 px-4 sm:px-6"
     >
       <div
         className="bg-white w-full max-w-xl flex flex-col gap-3 border-2 border-gray-200 rounded-lg p-6 sm:p-8 shadow-xl"

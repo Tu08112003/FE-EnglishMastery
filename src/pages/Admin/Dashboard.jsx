@@ -41,7 +41,7 @@ const Dashboard = () => {
 
   const [currentPagePayments, setCurrentPagePayments] = useState(1);
   const [currentPageExams, setCurrentPageExams] = useState(1);
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
 
   const totalPayments = recentPayments.length;
   const totalPaymentPages = Math.ceil(totalPayments / itemsPerPage);

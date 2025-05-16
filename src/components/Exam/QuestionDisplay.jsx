@@ -19,7 +19,9 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
     return (
       <div className="w-full flex flex-col gap-6 p-5">
         {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          <div className="hidden">
+            <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          </div>
         ) : (
           <p className="text-red-600 font-semibold">Không có âm thanh</p>
         )}
@@ -50,7 +52,9 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
     return (
       <div className="w-full h-full py-5 px-6">
         {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          <div className="hidden">
+            <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          </div>
         ) : (
           <p className="text-red-600 font-semibold">Không có âm thanh</p>
         )}
@@ -74,7 +78,9 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
     return (
       <div className="w-full h-full p-5 flex flex-col gap-4">
         {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          <div className="hidden">
+            <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
+          </div>
         ) : (
           <p className="text-red-600 font-semibold">Không có âm thanh</p>
         )}
