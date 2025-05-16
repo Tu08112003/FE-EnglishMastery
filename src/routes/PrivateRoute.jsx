@@ -14,7 +14,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   } else if (requiredRole && role !== requiredRole) {
-    toast.info('Bạn không có quyền truy cập trang này!');
+    toast.info("Chỉ quản trị viên mới có thể truy cập trang này!");
     setTimeout(() => {
       navigate('/', { replace: true }); 
     }, 500); 
