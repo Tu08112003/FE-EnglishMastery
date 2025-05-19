@@ -43,6 +43,9 @@ const dictionarySlice = createSlice({
         clearCurrentWord: (state) => {
             state.currentWord = null;
         },
+        clearWord: (state) => {
+            state.words = [];
+        },
     },
     extraReducers: (builder) => {
         // Handle searchVocabulary
@@ -79,6 +82,6 @@ const dictionarySlice = createSlice({
     },
 });
 
-export const { clearError, clearCurrentWord } = dictionarySlice.actions;
+export const { clearError, clearCurrentWord, clearWord } = dictionarySlice.actions;
 
 export default dictionarySlice.reducer;
