@@ -43,12 +43,12 @@ const ResultCard = ({ wordData, query }) => {
               {wordData.description?.example || "Không có ví dụ"}
             </p>
           </div>
-          <div className="flex gap-5 items-center">
+          {/* <div className="flex gap-5 items-center">
             <h3 className="text-md font-medium">Từ đồng nghĩa:</h3>
             <p className=" text-gray-600 font-medium list-disc space-y-1">
               {wordData.description?.synonyms || "Không có từ đồng nghĩa"}
             </p>
-          </div>
+          </div> */}
           <div className="flex gap-5 items-center">
             <h3 className="text-md font-medium">Từ trái nghĩa:</h3>
             <p className=" text-gray-600 font-medium list-disc space-y-1">
