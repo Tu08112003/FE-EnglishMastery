@@ -87,6 +87,17 @@ const deleteUser = ({ userId }) => {
   return axios.post(URL_BACKEND, data);
 };
 
+// Lấy tất cả thông tin thanh toán
+const getAllPayment = () => {
+  const URL_BACKEND = 'payment-service/getAllPaymentInfo';
+  return axios.get(URL_BACKEND);
+}
+
+// Lấy doanht thu
+const getRevenue = () => {
+  const URL_BACKEND = 'payment-service/getRevenue'
+  return axios.get(URL_BACKEND);
+}
 export {
   getAllUser,
   addUser,
@@ -99,4 +110,6 @@ export {
   updatePermissionOfUser,
   addPermissionForUser,
   detelePermissionOfUser,
+  getAllPayment,
+  getRevenue
 };
