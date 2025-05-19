@@ -11,6 +11,8 @@ import {
   detelePermissionOfUser,
   addUser,
   deleteUser,
+  getRevenue,
+  getAllPayment
 } from "../../service/adminService";
 
 // Lấy tất cả thông tin user
@@ -223,6 +225,43 @@ export const fetchDeleteUser = createAsyncThunk(
   }
 );
 
+// Doanh thu
+export const fetchRevenue = createAsyncThunk(
+  "admin/fetchRevenue", 
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getRevenue();
+      if (response.status === 200) {
+        return response.data; 
+      } else {
+        return rejectWithValue("Lỗi khi lấy doanh thu");
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy doanh thu"
+      );
+    }
+  }
+);
+
+// Lấy tất cả giao dịch
+export const fetchTransaction = createAsyncThunk(
+  "admin/fetchTransaction",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAllPayment();
+      if (response.status === 200) {
+        return response.data.paymentInfoList;
+      } else {
+        return rejectWithValue("Lỗi khi lấy danh sách giao dịch");
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi lấy danh sách giao dịch"
+      );
+    }
+  }
+);
 
 const initialState = {
   users: [],
@@ -230,15 +269,21 @@ const initialState = {
   numberOfTests: 0,
   historyTests: [],
   tests: [],
+  permissionOfUser: [],
+  revenue: {},
+  transactions: [],
   loading: false,
   loadingUser: false,
   loadingHistoryTest: false,
   loadingTest: false,
+  loadingRevenue: false,
+  loadingTransaction: false,
   error: null,
   errorUser:null,
-  errorHistoryTest: false,
-  errorTest: false,
-  permissionOfUser: [],
+  errorHistoryTest: null,
+  errorTest: null,
+  errorRevenue: null,
+  errorTransaction: null
 };
 
 const adminSlice = createSlice({
@@ -377,6 +422,34 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // fetchRevenue
+      .addCase(fetchRevenue.pending, (state) => {
+        state.loadingRevenue = true;
+        state.errorRevenue = null;
+      })
+      .addCase(fetchRevenue.fulfilled, (state, action) => {
+        state.loadingRevenue = false;
+        state.revenue = action.payload;
+      })
+      .addCase(fetchRevenue.rejected, (state, action) => {
+        state.loadingRevenue = false;
+        state.errorRevenue = action.payload;
+      })
+
+      // fetchTransaction
+      .addCase(fetchTransaction.pending, (state) => {
+        state.loadingTransaction = true;
+        state.errorTransaction = null;
+      })
+      .addCase(fetchTransaction.fulfilled, (state, action) => {
+        state.loadingTransaction = false;
+        state.transactions = action.payload;
+      })
+      .addCase(fetchTransaction.rejected, (state, action) => {
+        state.loadingTransaction = false;
+        state.errorTransaction = action.payload;
+      });
   },
 });
 
