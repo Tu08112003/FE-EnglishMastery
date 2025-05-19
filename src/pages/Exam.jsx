@@ -25,6 +25,7 @@ const Exam = () => {
     error,
     selectedYear,
   } = useSelector((state) => state.exam || {});
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   useEffect(() => {
     dispatch(fetchAllExamsByYear());
@@ -53,11 +54,22 @@ const Exam = () => {
   const totalPages = Math.ceil(totalExams / examsPerPage);
   const startIndex = (currentPage - 1) * examsPerPage;
   const endIndex = startIndex + examsPerPage;
-  const currentExams = filteredExams.slice(startIndex, endIndex);
+
+  // Giới hạn 4 đề thi cho người dùng miễn phí
+  const isFreeUser = userInfo?.typeUser === 0;
+  const maxFreeExams = 4;
+  const displayExams = isFreeUser
+    ? filteredExams.map((exam, index) => ({
+        ...exam,
+        locked: index >= maxFreeExams,
+      })).slice(startIndex, endIndex)
+    : filteredExams.slice(startIndex, endIndex).map((exam) => ({ ...exam, locked: false }));
 
   const handleShowPreviewExam = (exam) => {
-    setSelectedExam(exam);
-    setPreviewExam(true);
+    if (!exam.locked) {
+      setSelectedExam(exam);
+      setPreviewExam(true);
+    }
   };
 
   const handleClosePreviewExam = () => {
@@ -125,18 +137,19 @@ const Exam = () => {
           </p>
         ) : error ? (
           <p className="text-red-500 text-center font-semibold text-lg">{error}</p>
-        ) :  filteredExams.length === 0 && searchQuery ? (
+        ) : filteredExams.length === 0 && searchQuery ? (
           <p className="font-semibold text-center text-gray-600">
             Không tìm thấy thông tin đề thi "{searchQuery}".
           </p>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6">
-              {currentExams.map((exam) => (
+              {displayExams.map((exam) => (
                 <ExamCard
                   key={exam.idTest}
                   title={exam.testName || `Exam ${exam.idTest}`}
                   onClick={() => handleShowPreviewExam(exam)}
+                  locked={exam.locked}
                 />
               ))}
             </div>
