@@ -138,7 +138,7 @@ const Home = () => {
           style={{ color: "#2C99E2" }}
         />
       ),
-      value: "Lifetime",
+      value: userInfo?.typeUser === 0 ? "Chưa mua gói học!" : "Lifetime",
       description: "Gói học đã mua",
     },
   ];
