@@ -44,7 +44,6 @@ const ManagePayment = () => {
   const [showForm, setShowForm] = useState(false);
   const [currentPackage, setCurrentPackage] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showDetailPayment, setShowDetailPayment] = useState(false);
   const [packageToDelete, setPackageToDelete] = useState(null);
 
   const handleEditPackage = (packageData) => {
@@ -177,7 +176,6 @@ const ManagePayment = () => {
                   <th className="py-3 px-4">Tên người dùng</th>
                   <th className="py-3 px-4">Số tiền</th>
                   <th className="py-3 px-4">Ngày giao dịch</th>
-                  <th className="py-3 px-4">Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,19 +193,6 @@ const ManagePayment = () => {
                       </td>
                       <td className="px-4 py-4 text-gray-600 font-semibold">
                         {formatDate(payment.date)}
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <Button
-                          text="Xem Chi tiết"
-                          variant="primary"
-                          size="sm"
-                          icon={<FontAwesomeIcon icon="fa-solid fa-eye" />}
-                          onClick={() => setShowDetailPayment(true)}
-                        />
-                        <DetailPayment
-                          show={showDetailPayment}
-                          onClose={() => setShowDetailPayment(false)}
-                        />
                       </td>
                     </tr>
                   ))
