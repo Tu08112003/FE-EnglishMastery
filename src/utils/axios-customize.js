@@ -15,7 +15,6 @@ const excludedEndpoints = [
   "/auth-service/register",
   "/auth-service/refresh",
   "/auth-service/forgot-password",
-  '/auth-service/refresh'
 ];
 
 // Interceptor cho request
