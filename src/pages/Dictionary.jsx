@@ -9,7 +9,7 @@ import {
   getVocabulary as getWord,
   clearError,
   clearCurrentWord,
-  clearWord,
+  clearListWord,
 } from "../redux/slice/dictionarySlice";
 import { toast } from "react-toastify";
 
@@ -39,6 +39,7 @@ const Dictionary = () => {
         setShowSuggestion(true);
       } else {
         dispatch(clearCurrentWord());
+        dispatch(clearListWord())
         setHasSearched(false);
         setShowSuggestion(false);
       }
@@ -66,7 +67,7 @@ const Dictionary = () => {
     setHasSearched(false);
     dispatch(clearCurrentWord());
     dispatch(clearError());
-    dispatch(clearWord());
+    dispatch(clearListWord());
     setShowSuggestion(false);
   };
 
