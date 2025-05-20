@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ModalConfirm from "../components/ConfirmModal";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchQRCode, fetchCheckPayment } from "../redux/slice/paymentSlice";
+import { fetchUserInfo } from "../redux/slice/userSlice";
 import { toast } from "react-toastify";
 
 const Payment = ({ show, onClose }) => {
@@ -32,6 +33,7 @@ const Payment = ({ show, onClose }) => {
     try {
       await dispatch(fetchCheckPayment({ code: qrCode.code })).unwrap();
       toast.success("Thanh toán thành công");
+      await dispatch(fetchUserInfo()).unwrap();
       setTimeout(onClose, 2000);
     } catch (err) {
       toast.error(err || "Thanh toán thất bại! Vui lòng thử lại");
@@ -49,7 +51,7 @@ const Payment = ({ show, onClose }) => {
           className="w-full max-w-2xl max-h-[100vh] border-2 border-gray-200 shadow-md rounded-2xl p-3 bg-white overflow-y-auto custom-scrollbar relative"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Overlay spinner cho loadingPayment */}
+          {/* Spinner */}
           {loadingPayment && (
             <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
               <div className="w-10 h-10 border-5 border-t-5 border-gray-200 border-t-[#2C99E2] rounded-full animate-spin"></div>

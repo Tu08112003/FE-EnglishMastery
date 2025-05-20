@@ -5,6 +5,8 @@ const getExamByYear = ({ year }) => {
   const URL_BACKEND = `exam-service/getTestInfo?year=${year}`;
   return axios.get(URL_BACKEND);
 };
+
+// Lấy đề thi các năm
 const getAllExamByYear = () => {
     const URL_BACKEND = 'exam-service/getYears';
     return axios.get(URL_BACKEND);
