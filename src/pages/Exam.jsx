@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "../components/Button.jsx";
 import SearchBar from "../components/SearchBar.jsx";
@@ -40,30 +40,49 @@ const Exam = () => {
   }, [examYears, selectedYear, dispatch]);
 
   const handleYearClick = (year) => {
-    dispatch(setSelectedYear(year));
-    dispatch(fetchExamsByYear(year));
-    setCurrentPage(1);
-    setSearchQuery("");
+    if (year !== selectedYear) {
+      dispatch(setSelectedYear(year));
+      dispatch(fetchExamsByYear(year));
+      setCurrentPage(1);
+      setSearchQuery("");
+    }
   };
 
-  const filteredExams = exams.filter((exam) =>
-    exam.testName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Sử dụng useMemo để các giá trị được tính toán chỉ khi dependencies thay đổi
+  const sortedExams = useMemo(() => {
+    return [...exams].sort((a, b) => a.idTest - b.idTest);
+  }, [exams]);
 
-  const totalExams = filteredExams.length;
-  const totalPages = Math.ceil(totalExams / examsPerPage);
-  const startIndex = (currentPage - 1) * examsPerPage;
-  const endIndex = startIndex + examsPerPage;
+  const filteredExams = useMemo(() => {
+    return sortedExams.filter((exam) =>
+      exam.testName?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [sortedExams, searchQuery]);
 
-  // Giới hạn 4 đề thi cho người dùng miễn phí
-  const isFreeUser = userInfo?.typeUser === 0;
-  const maxFreeExams = 4;
-  const displayExams = isFreeUser
-    ? filteredExams.map((exam, index) => ({
-        ...exam,
-        locked: index >= maxFreeExams,
-      })).slice(startIndex, endIndex)
-    : filteredExams.slice(startIndex, endIndex).map((exam) => ({ ...exam, locked: false }));
+  // Tính toán tổng số trang và danh sách đề thi đã đánh dấu
+  const { totalPages, markedExams } = useMemo(() => {
+    const totalExams = filteredExams.length;
+    const totalPages = Math.ceil(totalExams / examsPerPage);
+    
+    // Đánh dấu đề thi khóa cho người dùng miễn phí
+    const isFreeUser = userInfo?.typeUser === 0;
+    const maxFreeExams = 4;
+    const markedExams = isFreeUser
+      ? filteredExams.map((exam, index) => ({
+          ...exam,
+          locked: index >= maxFreeExams,
+        }))
+      : filteredExams.map((exam) => ({ ...exam, locked: false }));
+      
+    return { totalPages, markedExams };
+  }, [filteredExams, userInfo, examsPerPage]);
+
+  // Tính toán danh sách đề thi hiển thị cho trang hiện tại
+  const displayExams = useMemo(() => {
+    const startIndex = (currentPage - 1) * examsPerPage;
+    const endIndex = startIndex + examsPerPage;
+    return markedExams.slice(startIndex, endIndex);
+  }, [markedExams, currentPage, examsPerPage]);
 
   const handleShowPreviewExam = (exam) => {
     if (!exam.locked) {
@@ -84,6 +103,12 @@ const Exam = () => {
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -144,9 +169,9 @@ const Exam = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6">
-              {displayExams.map((exam) => (
+              {displayExams.map((exam, index) => (
                 <ExamCard
-                  key={exam.idTest}
+                  key={`${exam.idTest}-${currentPage}-${index}`}
                   title={exam.testName || `Exam ${exam.idTest}`}
                   onClick={() => handleShowPreviewExam(exam)}
                   locked={exam.locked}
@@ -157,7 +182,7 @@ const Exam = () => {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={(page) => setCurrentPage(page)}
+                onPageChange={handlePageChange}
               />
             )}
           </>
