@@ -43,7 +43,7 @@ const dictionarySlice = createSlice({
         clearCurrentWord: (state) => {
             state.currentWord = null;
         },
-        clearWord: (state) => {
+        clearListWord: (state) => {
             state.words = [];
         },
     },
@@ -82,6 +82,6 @@ const dictionarySlice = createSlice({
     },
 });
 
-export const { clearError, clearCurrentWord, clearWord } = dictionarySlice.actions;
+export const { clearError, clearCurrentWord, clearListWord } = dictionarySlice.actions;
 
 export default dictionarySlice.reducer;
