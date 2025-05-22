@@ -2,36 +2,31 @@ import React from "react";
 import AudioPlayer from "./AudioPlayer";
 import AnswerOptions from "./AnswerOptions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
-  // if (!questionData) {
-  //   return (
-  //     <p className="text-red-600 font-semibold">Dữ liệu câu hỏi không hợp lệ cho phần {part}</p>
-  //   );
-  // }
-
-  // if (!Number.isInteger(part) || part < 1 || part > 7) {
-  //   return <p className="text-red-600 font-semibold">Phần không hợp lệ: {part}</p>;
-  // }
-
   const audioSrc = questionData.audio || "";
 
   if (part === 1) {
     return (
-      <div className="w-full flex flex-col gap-6 p-5">
+      <div className="w-full h-full flex flex-col gap-6 p-4 lg:p-5">
         {audioSrc ? (
           <div className="hidden">
             <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
           </div>
         ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+          <p className="text-red-600 font-semibold text-md">
+            Không có âm thanh
+          </p>
         )}
-        <div className="flex gap-10 mx-3">
-          <img
-            src={questionData.image}
-            alt="Question"
-            className="mb-4 max-w-full rounded-lg"
-          />
-          <div key={questionData.idQuestion} className="mb-3">
+        <div className="w-full h-full flex flex-col lg:flex-row gap-8 lg:gap-10 mx-2 lg:mx-3">
+          <div className="w-full h-full max-h-[55vh] lg:max-h-[75vh] lg:w-1/2 border-2 border-gray-300 p-3 lg:p-4 rounded-lg">
+            <img
+              src={questionData.image}
+              alt="Question"
+              className="mb-4 w-full h-full object-contain"
+            />
+          </div>
+          <div key={questionData.idQuestion} className="w-full h-full lg:w-1/2">
             <p className="text-md font-bold mb-2 flex items-center gap-1.5">
               <FontAwesomeIcon
                 icon="fa-regular fa-bookmark"
@@ -50,13 +45,15 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
     );
   } else if (part === 2) {
     return (
-      <div className="w-full h-full py-5 px-6">
+      <div className="w-full h-full py-4 lg:py-5 px-4 lg:px-6">
         {audioSrc ? (
           <div className="hidden">
             <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
           </div>
         ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+          <p className="text-red-600 font-semibold text-md">
+            Không có âm thanh
+          </p>
         )}
         <div key={questionData.idQuestion} className="mb-3">
           <p className="text-md font-bold mb-2 flex items-center gap-1.5">
@@ -76,24 +73,26 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
     );
   } else if (part === 3 || part === 4) {
     return (
-      <div className="w-full h-full p-5 flex flex-col gap-4">
+      <div className="w-full h-full p-4 lg:p-5 flex flex-col gap-4">
         {audioSrc ? (
           <div className="hidden">
             <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
           </div>
         ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
+          <p className="text-red-600 font-semibold text-md">
+            Không có âm thanh
+          </p>
         )}
         {questionData.image ? (
-          <div className="w-full h-full flex flex-row gap-10">
-            <div className="w-1/2 h-full flex items-center p-2 justify-center border-2 border-gray-300 rounded-lg">
+          <div className="w-full h-full flex flex-col lg:flex-row xl:flex-row gap-8 lg:gap-10 max-h-[75vh]">
+            <div className="w-full lg:w-1/2 xl:w-1/2 h-full max-h-[70vh] lg:max-h-[75vh] flex items-center p-2 justify-center border-2 border-gray-300 rounded-lg">
               <img
                 src={questionData.image}
                 alt="Question"
-                className="h-full w-auto object-contain"
+                className="h-full w-full object-contain"
               />
             </div>
-            <div className="w-1/2 flex flex-col px-3">
+            <div className="w-full lg:w-1/2 xl:w-1/2 flex flex-col px-2 max-h-[70vh] lg:max-h-[75vh] overflow-y-auto lg:px-3">
               {questionData.listQuestion?.length > 0 ? (
                 questionData.listQuestion.map((q) => {
                   const currentAnswerChar = userAnswers[q.idQuestion] || "";
@@ -130,7 +129,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                   );
                 })
               ) : (
-                <p className="text-red-600">
+                <p className="text-red-600 text-md">
                   Không có câu hỏi nào cho phần {part}
                 </p>
               )}
@@ -174,7 +173,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                 );
               })
             ) : (
-              <p className="text-red-600">
+              <p className="text-red-600 text-md">
                 Không có câu hỏi nào cho phần {part}
               </p>
             )}
@@ -195,7 +194,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
       selectedValueForOptions = questionData.answerD;
 
     return (
-      <div className="w-full h-full flex flex-col mx-4 p-3">
+      <div className="w-full h-full flex flex-col mx-3 lg:mx-4 p-3 lg:p-4">
         <p className="text-md font-bold mb-2 flex items-center gap-1.5">
           <FontAwesomeIcon
             icon="fa-regular fa-bookmark"
@@ -226,14 +225,16 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
       : "";
     return (
       <div className="w-full max-h-screen flex flex-col px-2">
-        <h2 className="text-lg font-semibold mb-2">
+        <h2 className="text-lg lg:text-lg font-semibold mb-2">
           Questions {questionRange} refer to the following text.
         </h2>
-        <div className="w-full flex gap-5 max-h-screen">
-          <div className="w-2/3 mb-6 p-4 border-2 border-gray-300 rounded-lg hide-scrollbar overflow-y-auto max-h-[75vh]">
-            <p className="whitespace-pre-line">{questionData.questionText}</p>
+        <div className="w-full flex flex-col lg:flex-row xl:flex-row gap-4 lg:gap-5 max-h-[75vh]">
+          <div className="w-full lg:w-2/3 xl:w-2/3 mb-4 lg:mb-6 p-3 lg:p-4 border-2 border-gray-300 rounded-lg hide-scrollbar overflow-y-auto max-h-[65vh] lg:max-h-[75vh]">
+            <p className="whitespace-pre-line text-md">
+              {questionData.questionText}
+            </p>
           </div>
-          <div className="w-1/3 flex flex-col mx-3 overflow-y-auto max-h-[75vh]">
+          <div className="w-full lg:w-1/3 xl:w-1/3 flex flex-col mx-2 lg:mx-3 overflow-y-auto max-h-[70vh] lg:max-h-[75vh]">
             {questionData.listQuestion?.length > 0 ? (
               questionData.listQuestion.map((q) => {
                 const currentAnswerChar = userAnswers[q.idQuestion] || "";
@@ -270,7 +271,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                 );
               })
             ) : (
-              <p className="text-red-600">
+              <p className="text-red-600 text-md">
                 No questions available for part {part}
               </p>
             )}
@@ -288,15 +289,17 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
         }`
       : "";
     return (
-      <div className="w-full max-h-screen flex flex-col px-2">
-        <h2 className="text-lg font-semibold mb-2">
+      <div className="w-full h-full flex flex-col px-2">
+        <h2 className="text-lg lg:text-lg font-semibold mb-2">
           Questions {questionRange} refer to the following text.
         </h2>
-        <div className="w-full flex gap-5 max-h-screen">
-          <div className="w-2/3 mb-6 p-4 border-2 border-gray-300 rounded-lg hide-scrollbar overflow-y-auto max-h-[75vh]">
-            <p className="whitespace-pre-line">{questionData.questionText}</p>
+        <div className="w-full h-full flex flex-col lg:flex-row xl:flex-row gap-4 lg:gap-5 max-h-[75vh]">
+          <div className="w-full lg:w-2/3 xl:w-2/3 mb-4 lg:mb-6 p-3 lg:p-4 border-2 border-gray-300 rounded-lg hide-scrollbar overflow-y-auto max-h-[65vh] lg:max-h-[75vh]">
+            <p className="whitespace-pre-line text-md">
+              {questionData.questionText}
+            </p>
           </div>
-          <div className="w-1/3 flex flex-col mx-3 overflow-y-auto max-h-[75vh]">
+          <div className="w-full lg:w-1/3 xl:w-1/3 flex flex-col mx-2 lg:mx-3 overflow-y-auto max-h-[70vh] lg:max-h-[75vh]">
             {questionData.listQuestion?.length > 0 ? (
               questionData.listQuestion.map((q) => {
                 const currentAnswerChar = userAnswers[q.idQuestion] || "";
@@ -333,7 +336,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
                 );
               })
             ) : (
-              <p className="text-red-600">
+              <p className="text-red-600 text-md">
                 Không có câu hỏi nào cho phần {part}
               </p>
             )}
@@ -342,7 +345,7 @@ const QuestionDisplay = ({ part, questionData, userAnswers, onAnswer }) => {
       </div>
     );
   }
-  return <p className="text-red-600">Phần không hợp lệ: {part}</p>;
+  return <p className="text-red-600 text-md">Phần không hợp lệ: {part}</p>;
 };
 
 export default QuestionDisplay;
