@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Logo from '../assets/images/logo-bg_white.png';
-import { Link, useNavigate, NavLink } from 'react-router-dom';
-import Button from '../components/Button.jsx';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/slice/authSlice';
-import { clearUserInfo } from '../redux/slice/userSlice';
-import { fetchUserInfo } from '../redux/slice/userSlice';
-import { authLogout } from '../service/authService';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import Logo from "../assets/images/logo-bg_white.png";
+import { Link, useNavigate, NavLink } from "react-router-dom";
+import Button from "../components/Button.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/slice/authSlice";
+import { clearUserInfo } from "../redux/slice/userSlice";
+import { fetchUserInfo } from "../redux/slice/userSlice";
+import { authLogout } from "../service/authService";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -33,23 +33,23 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
-    const refresh_token = localStorage.getItem('refresh_token');
+    const refresh_token = localStorage.getItem("refresh_token");
     const res = await authLogout({ refreshToken: refresh_token });
     if (res.status === 200) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('role');
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("role");
       dispatch(logout());
       dispatch(clearUserInfo());
-      
-      toast.success('Đăng xuất thành công!');
-      navigate('/');
+
+      toast.success("Đăng xuất thành công!");
+      navigate("/");
       setDropdownOpen(false);
       setIsMobileMenuOpen(false);
     } else {
-      toast.error('Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.');
+      toast.error("Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.");
     }
-};
+  };
   return (
     <>
       <header className="border-b border-gray-200">
@@ -110,7 +110,7 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-600 focus:outline-none"
+              className="text-gray-600 flex items-center w-10 h-10 justify-center p-2 hover:bg-gray-200 rounded-full focus:outline-none cursor-pointer"
             >
               <FontAwesomeIcon icon="fa-solid fa-bars" size="lg" />
             </button>
@@ -144,24 +144,23 @@ const Header = () => {
                 <span className="font-bold">{userInfo?.userName || ""}</span>
                 <FontAwesomeIcon
                   icon="fa-solid fa-caret-down"
-                  className={`ml-auto text-gray-600 transform transition-transform duration-300 ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`ml-auto text-gray-600 transform transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </div>
 
               {dropdownOpen && (
                 <ul
-                  className={`absolute top-10 left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${
-                    dropdownOpen
+                  className={`absolute top-10 left-1 w-full border-2 border-gray-200 bg-white rounded-lg shadow-md mt-2 z-10 transition-all duration-300 ease-in-out transform ${dropdownOpen
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 -translate-y-2"
-                  }`}
+                    }`}
                 >
-                  <Link to="/account-info" onClick={() => setDropdownOpen(false)}>
-                    <li 
-                      className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer"
-                    >
+                  <Link
+                    to="/account-info"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <li className="flex text-gray-600 items-center gap-3 px-4 py-2 hover:bg-gray-100 text-sm font-semibold cursor-pointer">
                       <FontAwesomeIcon
                         icon="fa-solid fa-user"
                         className="w-4 h-4"
@@ -188,14 +187,25 @@ const Header = () => {
 
       {/* Navbar mobile */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/40 z-50">
+        <div
+          className={`
+            fixed inset-0 z-50 bg-black/40 transition-opacity duration-500 ease-in-out
+            ${isMobileMenuOpen? "opacity-100": "opacity-0 pointer-events-none"}
+          `}
+          onClick={toggleMobileMenu}
+        >
           <div
-            className={`absolute right-0 top-0 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 rounded-l-xl p-4 ${
-              isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-            }`}
+            className={`
+              absolute right-0 w-64 h-full bg-white shadow-md transform transition-transform ease-in-out duration-300 rounded-l-xl p-4
+              ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
+            `}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end mb-4">
-              <button onClick={toggleMobileMenu} className="text-gray-600">
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-600 flex items-center justify-center cursor-pointer w-10 h-10 p-2 rounded-full hover:bg-gray-200"
+              >
                 <FontAwesomeIcon icon="fa-solid fa-xmark" size="lg" />
               </button>
             </div>
@@ -256,12 +266,13 @@ const Header = () => {
                   <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-600">
                     <FontAwesomeIcon icon="fa-solid fa-user" size="lg" />
                   </div>
-                  <span className="font-bold">{userInfo?.userName || "User"}</span>
+                  <span className="font-bold">
+                    {userInfo?.userName || "User"}
+                  </span>
                   <FontAwesomeIcon
                     icon="fa-solid fa-caret-down"
-                    className={`text-gray-600 transform transition-transform duration-300 ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`text-gray-600 transform transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </div>
 
@@ -295,7 +306,10 @@ const Header = () => {
                   text="Đăng nhập"
                   variant="primary"
                   size="sm"
-                  onClick={() => navigate("/login")}
+                  onClick={() => {
+                    navigate("/login");
+                    toggleMobileMenu();
+                  }}
                 />
               </div>
             )}
