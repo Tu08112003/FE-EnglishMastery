@@ -1,31 +1,62 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const AudioPlayer = ({ audioSrc, autoPlay }) => {
-  const audioRef = useRef(null); 
+const AudioPlayer = ({ audioSrc, autoPlay, handleNext, part }) => {
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const currentAudioSrcRef = useRef(audioSrc);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause(); 
-      audioRef.current.currentTime = 0; 
-      audioRef.current.src = audioSrc; 
-      if (autoPlay) {
-        audioRef.current.play().catch((error) => {
-          console.error("Error playing audio:", error);
-        });
-      }
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audioSrc !== currentAudioSrcRef.current) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = audioSrc || "";
+      currentAudioSrcRef.current = audioSrc;
     }
+
+    if (autoPlay && audioSrc && !isPlaying) {
+      setIsPlaying(true);
+      const playTimeout = setTimeout(() => {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {})
+            .catch((error) => {
+              console.error("Error playing audio:", error);
+              setIsPlaying(false);
+            });
+        }
+      }, 100);
+
+      return () => clearTimeout(playTimeout);
+    }
+
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
+      if (audio && isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
       }
     };
   }, [audioSrc, autoPlay]);
 
+  const onAudioEnded = () => {
+    setIsPlaying(false);
+    if ([1, 2, 3, 4].includes(part) && handleNext) {
+      handleNext();
+    }
+  };
+
   return (
     <div className="w-full flex justify-center">
-      <audio ref={audioRef} controls autoPlay={autoPlay}>
-        <source src={audioSrc} type="audio/mpeg" />
+      <audio
+        ref={audioRef}
+        controls
+        autoPlay={autoPlay && !!audioSrc}
+        onEnded={onAudioEnded}
+      >
+        {audioSrc && <source src={audioSrc} type="audio/mpeg" />}
         Your browser does not support the audio element.
       </audio>
     </div>
