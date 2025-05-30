@@ -522,11 +522,12 @@ const TakeTheExam = () => {
           {isStarted ? (
             questionData && currentPartConfig ? (
               <QuestionDisplay
-                part={currentPartConfig.part}
-                questionData={questionData}
-                userAnswers={userAnswers}
-                onAnswer={handleAnswer}
-              />
+                    part={currentPartConfig.part}
+                    questionData={questionData}
+                    userAnswers={userAnswers}
+                    onAnswer={handleAnswer}
+                    handleNext={handleNext}
+                  />
             ) : selectedExam ? (
               <div className="flex flex-col justify-center items-center h-full">
                 <p className="text-red-600 font-semibold text-center px-4">
