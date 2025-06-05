@@ -7,9 +7,11 @@ import {
   fetchNumberOfTests,
   fetchNumberOfUsers,
   fetchAllHistoryTests,
+  fetchTransaction,
 } from "../../redux/slice/adminSlice";
+import formatDate from "../../utils/formatDate";
 const Dashboard = () => {
-  const { numberOfUsers, numberOfTests, historyTests, loading } = useSelector(
+  const { numberOfUsers, numberOfTests, historyTests, loading, transactions } = useSelector(
     (state) => state.admin
   );
   const dispatch = useDispatch();
@@ -17,37 +19,19 @@ const Dashboard = () => {
     dispatch(fetchNumberOfTests()).unwrap();
     dispatch(fetchNumberOfUsers()).unwrap();
     dispatch(fetchAllHistoryTests());
+    dispatch(fetchTransaction());
   }, [dispatch]);
-  const recentPayments = [
-    {
-      id: "PAY001",
-      name: "Nguyễn Văn A",
-      amount: "1.000.000 VNĐ",
-      date: "2025-04-01",
-    },
-    {
-      id: "PAY002",
-      name: "Trần Thị B",
-      amount: "500.000 VNĐ",
-      date: "2025-04-05",
-    },
-    {
-      id: "PAY003",
-      name: "Lê Văn C",
-      amount: "750.000 VNĐ",
-      date: "2025-04-10",
-    },
-  ];
+
 
   const [currentPagePayments, setCurrentPagePayments] = useState(1);
   const [currentPageExams, setCurrentPageExams] = useState(1);
   const itemsPerPage = 5;
 
-  const totalPayments = recentPayments.length;
+  const totalPayments = transactions.length;
   const totalPaymentPages = Math.ceil(totalPayments / itemsPerPage);
   const startIndexPayments = (currentPagePayments - 1) * itemsPerPage;
   const endIndexPayments = startIndexPayments + itemsPerPage;
-  const currentPayments = recentPayments.slice(
+  const currentPayments = transactions.slice(
     startIndexPayments,
     endIndexPayments
   );
@@ -115,7 +99,7 @@ const Dashboard = () => {
                 <thead className="bg-gray-200">
                   <tr className="text-black font-bold">
                     <th className="py-3 px-4">Payment ID</th>
-                    <th className="py-3 px-4">Tên người dùng</th>
+                    <th className="py-3 px-4">Email</th>
                     <th className="py-3 px-4">Số tiền</th>
                     <th className="py-3 px-4">Ngày giao dịch</th>
                   </tr>
@@ -127,13 +111,13 @@ const Dashboard = () => {
                         {payment.id}
                       </td>
                       <td className="px-4 py-2 text-gray-600 font-semibold">
-                        {payment.name}
+                        {payment.userName}
                       </td>
                       <td className="px-4 py-2 font-bold text-[#2C99E2]">
                         {payment.amount}
                       </td>
                       <td className="px-4 py-2 text-gray-600 font-semibold">
-                        {payment.date}
+                        {formatDate(payment.date)}
                       </td>
                     </tr>
                   ))}

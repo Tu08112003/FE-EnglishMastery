@@ -26,68 +26,68 @@ const ManagePayment = () => {
     dispatch(fetchTransaction());
   }, [dispatch]);
 
-  const [packages, setPackages] = useState([
-    {
-      id: "PG001",
-      name: "Lifetime",
-      description: "Full bộ đề TOEIC các năm",
-      cost: "500.000 VNĐ",
-      duration: "Trọn đời",
-    },
-  ]);
+  // const [packages, setPackages] = useState([
+  //   {
+  //     id: "PG001",
+  //     name: "Lifetime",
+  //     description: "Full bộ đề TOEIC các năm",
+  //     cost: "500.000 VNĐ",
+  //     duration: "Trọn đời",
+  //   },
+  // ]);
 
   const [currentPagePayments, setCurrentPagePayments] = useState(1);
-  const [currentPagePackages, setCurrentPagePackages] = useState(1);
   const [searchQueryPayments, setSearchQueryPayments] = useState("");
   const itemsPerPage = 4;
+  // const [currentPagePackages, setCurrentPagePackages] = useState(1);
 
-  const [showForm, setShowForm] = useState(false);
-  const [currentPackage, setCurrentPackage] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [packageToDelete, setPackageToDelete] = useState(null);
+  // const [showForm, setShowForm] = useState(false);
+  // const [currentPackage, setCurrentPackage] = useState(null);
+  // const [showModal, setShowModal] = useState(false);
+  // const [packageToDelete, setPackageToDelete] = useState(null);
 
-  const handleEditPackage = (packageData) => {
-    console.log("Editing package:", packageData);
-    setCurrentPackage(packageData);
-  };
+  // const handleEditPackage = (packageData) => {
+  //   console.log("Editing package:", packageData);
+  //   setCurrentPackage(packageData);
+  // };
 
-  useEffect(() => {
-    if (currentPackage) {
-      setShowForm(true);
-    }
-  }, [currentPackage]);
+  // useEffect(() => {
+  //   if (currentPackage) {
+  //     setShowForm(true);
+  //   }
+  // }, [currentPackage]);
 
-  const handleAddOrUpdatePackage = (formData) => {
-    if (currentPackage) {
-      setPackages(
-        packages.map((pkg) => (pkg.id === formData.id ? formData : pkg))
-      );
-    } else {
-      const newPackage = {
-        ...formData,
-        id: `PG${(packages.length + 1).toString().padStart(3, "0")}`,
-      };
-      setPackages([...packages, newPackage]);
-    }
-    setShowForm(false);
-    setCurrentPackage(null);
-  };
+  // const handleAddOrUpdatePackage = (formData) => {
+  //   if (currentPackage) {
+  //     setPackages(
+  //       packages.map((pkg) => (pkg.id === formData.id ? formData : pkg))
+  //     );
+  //   } else {
+  //     const newPackage = {
+  //       ...formData,
+  //       id: `PG${(packages.length + 1).toString().padStart(3, "0")}`,
+  //     };
+  //     setPackages([...packages, newPackage]);
+  //   }
+  //   setShowForm(false);
+  //   setCurrentPackage(null);
+  // };
 
-  const handleDeletePackage = (packageData) => {
-    setPackageToDelete(packageData);
-    setShowModal(true);
-  };
+  // const handleDeletePackage = (packageData) => {
+  //   setPackageToDelete(packageData);
+  //   setShowModal(true);
+  // };
 
-  const handleConfirmDelete = () => {
-    setPackages(packages.filter((pkg) => pkg.id !== packageToDelete.id));
-    setShowModal(false);
-    setPackageToDelete(null);
-  };
+  // const handleConfirmDelete = () => {
+  //   setPackages(packages.filter((pkg) => pkg.id !== packageToDelete.id));
+  //   setShowModal(false);
+  //   setPackageToDelete(null);
+  // };
 
-  const handleCancel = () => {
-    setShowModal(false);
-    setPackageToDelete(null);
-  };
+  // const handleCancel = () => {
+  //   setShowModal(false);
+  //   setPackageToDelete(null);
+  // };
   // Search payment
   const filteredPayments = transactions.filter((payment) => {
     const id = payment.id || "";
@@ -111,11 +111,11 @@ const ManagePayment = () => {
     endIndexPayments
   );
 
-  const totalPackages = packages.length;
-  const totalPackagePages = Math.ceil(totalPackages / itemsPerPage);
-  const startIndexPackages = (currentPagePackages - 1) * itemsPerPage;
-  const endIndexPackages = startIndexPackages + itemsPerPage;
-  const currentPackages = packages.slice(startIndexPackages, endIndexPackages);
+  // const totalPackages = packages.length;
+  // const totalPackagePages = Math.ceil(totalPackages / itemsPerPage);
+  // const startIndexPackages = (currentPagePackages - 1) * itemsPerPage;
+  // const endIndexPackages = startIndexPackages + itemsPerPage;
+  // const currentPackages = packages.slice(startIndexPackages, endIndexPackages);
 
   return (
     <main className="max-w-6xl w-full mx-auto space-y-6 p-4">
@@ -173,7 +173,7 @@ const ManagePayment = () => {
               <thead className="bg-gray-200">
                 <tr className="text-black font-bold">
                   <th className="py-3 px-4">Payment ID</th>
-                  <th className="py-3 px-4">Tên người dùng</th>
+                  <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Số tiền</th>
                   <th className="py-3 px-4">Ngày giao dịch</th>
                 </tr>
@@ -226,7 +226,7 @@ const ManagePayment = () => {
         )}
       </section>
 
-      <section className="flex flex-col py-5 px-8 gap-5 border-2 border-gray-200 rounded-xl shadow-md">
+      {/* <section className="flex flex-col py-5 px-8 gap-5 border-2 border-gray-200 rounded-xl shadow-md">
         <h1 className="text-2xl font-bold">Danh sách gói học</h1>
         <div className="flex flex-row gap-4 w-full px-6 py-3">
           <SearchBar
@@ -329,7 +329,7 @@ const ManagePayment = () => {
           onCancel={handleCancel}
           onConfirm={handleConfirmDelete}
         />
-      )}
+      )} */}
     </main>
   );
 };
