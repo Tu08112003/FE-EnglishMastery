@@ -87,7 +87,7 @@ instance.interceptors.response.use(
     }
 
     if(error.response && error.response.status === 403){
-      toast.warning("Bạn không có quyền truy cập vào tài nguyên này! Hành động này của bạn đã bị chặn")
+      window.location.href = "/forbidden";
     }
 
     if (error.response && error.response.data) {
