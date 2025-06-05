@@ -16,7 +16,7 @@ import Dashboard from "../pages/Admin/Dashboard";
 import ManageExam from "../pages/Admin/ManageExam";
 import ManageUser from "../pages/Admin/ManageUser";
 import ManagePayment from "../pages/Admin/ManagePayment";
-
+import ForbiddenPage from "../components/ForbiddenPage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 
@@ -114,6 +114,15 @@ const routes = [
         ),
         protected: true,
       },
+      {
+        path: "/forbidden",
+        component: (
+          <PrivateRoute>
+            <ForbiddenPage />
+          </PrivateRoute>
+        ),
+        protected: true,
+      }
     ],
   },
   {

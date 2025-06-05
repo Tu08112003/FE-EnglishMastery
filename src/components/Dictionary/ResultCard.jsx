@@ -68,9 +68,9 @@ const ResultCard = ({ wordData, query }) => {
           Những từ có nghĩa tương tự
         </h2>
         <div className="rounded-lg border-2 border-gray-200 bg-white p-4 sm:p-6 shadow-md">
-          {/* <p className="text-sm sm:text-base text-gray-600 font-medium">
+          <p className="text-sm sm:text-base text-gray-600 font-medium">
             {wordData.description?.synonyms || "Không có từ đồng nghĩa"}
-          </p> */}
+          </p>
         </div>
       </div>
     </div>
