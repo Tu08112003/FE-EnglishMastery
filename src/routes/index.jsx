@@ -44,7 +44,7 @@ const routes = [
         protected: true,
       },
       {
-        path: "/exam/take/:idTest",
+        path: "/exam/take/:testId",
         component: (
           <PrivateRoute>
             <TakeTheExam />
@@ -62,7 +62,7 @@ const routes = [
         protected: true,
       },
       {
-        path: "exam/result/:idTest",
+        path: "exam/result/:testId",
         component: (
           <PrivateRoute>
             <HistoryExamResult />

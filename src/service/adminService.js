@@ -93,10 +93,30 @@ const getAllPayment = () => {
   return axios.get(URL_BACKEND);
 }
 
-// Lấy doanht thu
+// Lấy doanh thu
 const getRevenue = () => {
   const URL_BACKEND = 'payment-service/getRevenue'
   return axios.get(URL_BACKEND);
+}
+
+// Xóa đề thi
+const deleteTest = ({ testId }) => {
+  const URL_BACKEND = `exam-service/deleteTest?testId=${testId}`;
+  return axios.delete(URL_BACKEND);
+}
+
+// Thêm đề thi
+const createTest = ({ testName, testDescription, testDate, testTime, testDuration, questions }) => {
+  const URL_BACKEND = "exam-service/createTest";
+  const data = {
+    testName: testName,
+    testDescription: testDescription,
+    testDate: testDate,
+    testTime: testTime,
+    testDuration: testDuration,
+    questions: questions,
+  };
+  return axios.post(URL_BACKEND, data);
 }
 export {
   getAllUser,
@@ -111,5 +131,7 @@ export {
   addPermissionForUser,
   detelePermissionOfUser,
   getAllPayment,
-  getRevenue
+  getRevenue,
+  deleteTest,
+  createTest
 };

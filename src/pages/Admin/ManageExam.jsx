@@ -1,35 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllHistoryTests, fetchAllTests } from '../../redux/slice/adminSlice';
-import Button from '../../components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SearchBar from '../../components/SearchBar';
-import DetailExamResult from '../../components/Admin/DetailExamResult';
-import AddExam from '../../components/Admin/AddExam';
-import ModalConfirm from '../../components/ConfirmModal';
-import EditExam from '../../components/Admin/EditExam';
-import Pagination from '../../components/Pagination';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchAllHistoryTests,
+  fetchAllTests,
+  fetchDeleteTest,
+} from "../../redux/slice/adminSlice";
+import Button from "../../components/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SearchBar from "../../components/SearchBar";
+import DetailExamResult from "../../components/Admin/DetailExamResult";
+import AddExam from "../../components/Admin/AddExam";
+import ModalConfirm from "../../components/ConfirmModal";
+import EditExam from "../../components/Admin/EditExam";
+import Pagination from "../../components/Pagination";
+import { toast } from "react-toastify";
 
 const ManageExam = () => {
   const dispatch = useDispatch();
-  const { tests, historyTests, loadingTest,loadingHistoryTest, errorHistoryTest, errorTest } = useSelector((state) => state.admin);
+  const {
+    tests,
+    historyTests,
+    loadingTest,
+    loadingHistoryTest,
+    errorHistoryTest,
+    errorTest,
+  } = useSelector((state) => state.admin);
 
   const [currentPageExams, setCurrentPageExams] = useState(1);
   const [currentPageResults, setCurrentPageResults] = useState(1);
-  const [searchExamQuery, setSearchExamQuery] = useState('');
-  const [searchResultQuery, setSearchResultQuery] = useState('');
+  const [searchExamQuery, setSearchExamQuery] = useState("");
+  const [searchResultQuery, setSearchResultQuery] = useState("");
   const [showDetailResult, setShowDetailResult] = useState(false);
   const [showAddExam, setShowAddExam] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [examToDelete, setExamToDelete] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
-  const [selectedResult, setSelectedResult] = useState(null); 
+  const [selectedResult, setSelectedResult] = useState(null);
 
-  const itemsPerPageExams = 10; 
-  const itemsPerPageResults = 5; 
-
+  const itemsPerPageExams = 10;
+  const itemsPerPageResults = 5;
 
   useEffect(() => {
     dispatch(fetchAllTests());
@@ -46,20 +55,20 @@ const ManageExam = () => {
   }, [errorTest, errorHistoryTest]);
 
   const filteredExams = tests.filter((exam) => {
-        const query = searchExamQuery.toLowerCase();
-        return (
-          exam.id?.toLowerCase().includes(query) ||
-          exam.testName?.toLowerCase().includes(query) 
-        );
-    })
+    const query = searchExamQuery.toLowerCase();
+    return (
+      exam.idTest?.toLowerCase().includes(query) ||
+      exam.testName?.toLowerCase().includes(query)
+    );
+  });
 
   const filteredResults = historyTests.filter((result) => {
-        const query = searchResultQuery.toLowerCase();
-        return (
-          result.id?.toLowerCase().includes(query) ||
-          result.email?.toLowerCase().includes(query) 
-        );
-      })
+    const query = searchResultQuery.toLowerCase();
+    return (
+      result.idTestHistory?.toLowerCase().includes(query) ||
+      result.email?.toLowerCase().includes(query)
+    );
+  });
 
   // Pagination for exams
   const totalExams = filteredExams.length;
@@ -73,29 +82,34 @@ const ManageExam = () => {
   const totalResultPages = Math.ceil(totalResults / itemsPerPageResults);
   const startIndexResults = (currentPageResults - 1) * itemsPerPageResults;
   const endIndexResults = startIndexResults + itemsPerPageResults;
-  const currentResults = filteredResults.slice(startIndexResults, endIndexResults);
+  const currentResults = filteredResults.slice(
+    startIndexResults,
+    endIndexResults
+  );
 
   const handleImportFile = (file) => {
-    console.log('File selected:', file);
-  };
-
-  const handleDeleteClick = (exam) => {
-    setExamToDelete(exam);
-    setShowModal(true);
+    console.log("File selected:", file);
   };
 
   const handleCancel = () => {
     setShowModal(false);
-    setExamToDelete(null);
   };
 
-  const handleConfirmDelete = () => {
-    if (examToDelete) {
-      toast.success(`Xóa đề thi ${examToDelete.testName} thành công`); 
-      dispatch(fetchAllTests());
+  const handleDelete = async (exam) => {
+    if (!exam.idTest) {
+      toast.error("Không tìm thấy ID đề thi");
+      return;
     }
-    setShowModal(false);
-    setExamToDelete(null);
+    try {
+      await dispatch(fetchDeleteTest({ testId: exam.idTest})).unwrap();
+      toast.success(`Xóa đề thi thành công!`);
+      dispatch(fetchAllTests());
+      setSelectedExam(null);
+      setShowModal(false);
+    } catch (error) {
+      toast.error(error || "Lỗi khi xóa đề thi");
+      return;
+    }
   };
 
   const handleEditClick = (exam) => {
@@ -113,15 +127,16 @@ const ManageExam = () => {
     const updatedExam = {
       ...selectedExam,
       questions: selectedExam.questions
-        ? selectedExam.questions.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
+        ? selectedExam.questions.map((q) =>
+            q.id === updatedQuestion.id ? updatedQuestion : q
+          )
         : [updatedQuestion],
     };
-    toast.success(`Cập nhật đề thi ${updatedExam.testName} thành công`); 
+    toast.success(`Cập nhật đề thi ${updatedExam.testName} thành công`);
     dispatch(fetchAllTests());
     setShowEditModal(false);
     setSelectedExam(null);
   };
-
 
   return (
     <main className="max-w-6xl w-full mx-auto space-y-6 p-4">
@@ -148,7 +163,9 @@ const ManageExam = () => {
           />
         </div>
         {loadingTest ? (
-          <div className="text-center py-4 text-gray-600 font-semibold text-lg">Đang tải...</div>
+          <div className="text-center py-4 text-gray-600 font-semibold text-lg">
+            Đang tải...
+          </div>
         ) : (
           <>
             <table className="w-full min-w-[600px] text-center border-2 border-gray-300 rounded-2xl overflow-hidden border-separate border-spacing-0">
@@ -162,10 +179,16 @@ const ManageExam = () => {
               </thead>
               <tbody>
                 {currentExams.map((exam) => (
-                  <tr key={exam.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-4 text-gray-600 font-semibold">{exam.id}</td>
-                    <td className="px-4 py-4 font-bold text-[#2C99E2]">{exam.testName}</td>
-                    <td className="px-4 py-4 text-gray-600 font-semibold">{exam.numberOfQuestion}</td>
+                  <tr key={exam.idTest} className="hover:bg-gray-100">
+                    <td className="px-4 py-4 text-gray-600 font-semibold">
+                      {exam.idTest}
+                    </td>
+                    <td className="px-4 py-4 font-bold text-[#2C99E2]">
+                      {exam.testName}
+                    </td>
+                    <td className="px-4 py-4 text-gray-600 font-semibold">
+                      {exam.numberOfQuestion}
+                    </td>
                     <td className="px-4 py-4 flex gap-2 items-center justify-center">
                       <Button
                         text="Chỉnh sửa"
@@ -180,14 +203,22 @@ const ManageExam = () => {
                         size="sm"
                         hoverBg="hover:bg-red-700"
                         icon={<FontAwesomeIcon icon="fa-solid fa-trash" />}
-                        onClick={() => handleDeleteClick(exam)}
+                        onClick={() =>{
+                          setSelectedExam(exam);
+                          console.log("Selected exam for deletion:", exam);
+                          console.log("Exam ID:", exam.idTest);
+                          setShowModal(true);
+                        }}
                       />
                     </td>
                   </tr>
                 ))}
                 {currentExams.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="text-center text-gray-600 font-semibold py-4">
+                    <td
+                      colSpan="4"
+                      className="text-center text-gray-600 font-semibold py-4"
+                    >
                       Không tìm thấy đề thi.
                     </td>
                   </tr>
@@ -197,7 +228,9 @@ const ManageExam = () => {
             {totalExams > 0 && (
               <div className="flex justify-between items-center p-4">
                 <span className="text-sm text-gray-600 font-semibold">
-                  Hiển thị từ {startIndexExams + 1} đến {Math.min(endIndexExams, totalExams)} trong số {totalExams} đề thi
+                  Hiển thị từ {startIndexExams + 1} đến{" "}
+                  {Math.min(endIndexExams, totalExams)} trong số {totalExams} đề
+                  thi
                 </span>
                 <Pagination
                   currentPage={currentPageExams}
@@ -227,7 +260,9 @@ const ManageExam = () => {
           </div>
         </div>
         {loadingHistoryTest ? (
-          <div className="text-center py-4 text-gray-600 font-semibold text-lg">Đang tải...</div>
+          <div className="text-center py-4 text-gray-600 font-semibold text-lg">
+            Đang tải...
+          </div>
         ) : (
           <>
             <table className="w-full min-w-[600px] text-center border-2 border-gray-300 rounded-2xl overflow-hidden border-separate border-spacing-0">
@@ -241,16 +276,27 @@ const ManageExam = () => {
               </thead>
               <tbody>
                 {currentResults.map((result) => (
-                  <tr key={result.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-4 text-gray-600 font-semibold">{result.id}</td>
-                    <td className="px-4 py-4 text-gray-600 font-semibold">{result.email}</td>
-                    <td className="px-4 py-4 font-bold text-[#2C99E2]">{result.score || 'N/A'} / 990</td>
-                    <td className="px-4 py-4 text-gray-600 font-semibold">{result.dateTest || 'N/A'}</td>
+                  <tr key={result.idTestHistory} className="hover:bg-gray-100">
+                    <td className="px-4 py-4 text-gray-600 font-semibold">
+                      {result.idTestHistory}
+                    </td>
+                    <td className="px-4 py-4 text-gray-600 font-semibold">
+                      {result.email}
+                    </td>
+                    <td className="px-4 py-4 font-bold text-[#2C99E2]">
+                      {result.score || "N/A"} / 990
+                    </td>
+                    <td className="px-4 py-4 text-gray-600 font-semibold">
+                      {result.dateTest || "N/A"}
+                    </td>
                   </tr>
                 ))}
                 {currentResults.length === 0 && (
                   <tr>
-                    <td colSpan="5" className="text-center text-gray-600 font-semibold py-4">
+                    <td
+                      colSpan="5"
+                      className="text-center text-gray-600 font-semibold py-4"
+                    >
                       Không tìm thấy kết quả.
                     </td>
                   </tr>
@@ -260,7 +306,9 @@ const ManageExam = () => {
             {totalResults > 0 && (
               <div className="flex justify-between items-center p-4">
                 <span className="text-sm text-gray-600 font-semibold">
-                  Hiển thị từ {startIndexResults + 1} đến {Math.min(endIndexResults, totalResults)} trong số {totalResults} kết quả
+                  Hiển thị từ {startIndexResults + 1} đến{" "}
+                  {Math.min(endIndexResults, totalResults)} trong số{" "}
+                  {totalResults} kết quả
                 </span>
                 <Pagination
                   currentPage={currentPageResults}
@@ -284,10 +332,12 @@ const ManageExam = () => {
       <ModalConfirm
         show={showModal}
         title="Xác nhận xóa đề thi"
-        description={`Bạn có chắc chắn muốn xóa đề thi '${examToDelete?.testName || 'N/A'}'? Hành động này không thể hoàn tác.`}
+        description={`Bạn có chắc chắn muốn xóa đề thi '${
+          selectedExam?.testName || "N/A"
+        }'? Hành động này không thể hoàn tác.`}
         hoverBgConfirm="hover:bg-red-700"
         onCancel={handleCancel}
-        onConfirm={handleConfirmDelete}
+        onConfirm={() => handleDelete(selectedExam)}
       />
 
       {/* Chỉnh sửa đề thi */}

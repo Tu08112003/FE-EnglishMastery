@@ -25,7 +25,8 @@ const AdminLayout = ({ children }) => {
 
   const handleLogout = async () => {
     const refresh_token = localStorage.getItem('refresh_token');
-    const res = await authLogout({ refreshToken: refresh_token });
+    const access_token = localStorage.getItem('access_token');
+    const res = await authLogout({accessToken: access_token , refreshToken: refresh_token });
     if (res.status === 200) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');

@@ -52,7 +52,7 @@ const AddUser = ({ show, onClose }) => {
       dispatch(fetchAllUsers());
       onClose();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi thêm người dùng");
+      toast.error(error || "Lỗi khi thêm người dùng");
     }
   };
   return (

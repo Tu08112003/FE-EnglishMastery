@@ -50,15 +50,17 @@ const AudioPlayer = ({ audioSrc, autoPlay, handleNext, part }) => {
 
   return (
     <div className="w-full flex justify-center">
-      <audio
-        ref={audioRef}
-        controls
-        autoPlay={autoPlay && !!audioSrc}
-        onEnded={onAudioEnded}
-      >
-        {audioSrc && <source src={audioSrc} type="audio/mpeg" />}
-        Your browser does not support the audio element.
-      </audio>
+      <div className="border-3 border-gray-500 rounded-4xl">
+        <audio
+          ref={audioRef}
+          controls
+          autoPlay={autoPlay && !!audioSrc}
+          onEnded={onAudioEnded}
+        >
+          {audioSrc && <source src={audioSrc} type="audio/mpeg" />}
+          Your browser does not support the audio element.
+        </audio>
+      </div>
     </div>
   );
 };
