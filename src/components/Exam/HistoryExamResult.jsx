@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import DetailExamResult from "../Exam/DetailExamResult";
 import { fetchUserInfo } from "../../redux/slice/userSlice";
 import { fetchHistoryExamById } from "../../redux/slice/examSlice";
+import formatDate from "../../utils/formatDate";
 
 const HistoryExamResult = () => {
   const [activePart, setActivePart] = useState(1);
@@ -17,9 +18,9 @@ const HistoryExamResult = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { idTest } = useParams();
+  const { testId } = useParams();
   const {
-    historyExamById,
+    historyExamById: result,
     loading: examLoading,
     error: examError,
   } = useSelector((state) => state.exam || {});
@@ -27,145 +28,70 @@ const HistoryExamResult = () => {
 
   useEffect(() => {
     dispatch(fetchUserInfo());
-    if (idTest) {
-      dispatch(fetchHistoryExamById(idTest));
+    if (testId) {
+      dispatch(fetchHistoryExamById(testId));
     }
-  }, [dispatch, idTest]);
-
-  console.log("historyExamById:", historyExamById);
+  }, [dispatch, testId]);
 
   const userName = userInfo?.userName || "N/A";
-  const result = historyExamById;
-  const timeTest = result?.timeTest || "N/A";
-  const dateTest = result?.dateTest || "N/A";
-  const scoreListening = result?.scoreListening || 0;
-  const scoreReading = result?.scoreReading || 0;
-  const score = result?.score || 0;
+  const timeSpent = result?.timeSpent || "N/A";
+  const completedDate = result?.completedAt || "N/A";
+  const listeningScore = result?.listeningScore || 0;
+  const readingScore = result?.readingScore || 0;
+  const totalScore = result?.totalScore || 0;
+  const totalQuestions = 200;
+  let correctAnswers = 0;
+  let totalSubmittedAnswers = 0;
+  
+  const partData = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
 
-  // Chuyển đổi userAnswer thành định dạng { idQuestion: key } bằng vòng lặp
-  const userAnswers = {};
   if (result?.userAnswer) {
-    const parts = [
-      result.userAnswer.answersPart1 || [],
-      result.userAnswer.answersPart2 || [],
-      result.userAnswer.answersPart3 || [],
-      result.userAnswer.answersPart4 || [],
-      result.userAnswer.answersPart5 || [],
-      result.userAnswer.answersPart6 || [],
-      result.userAnswer.answersPart7 || [],
-    ];
-    parts.forEach((part) => {
-      part.forEach((item) => {
-        userAnswers[item.idQuestion] = item.key;
-      });
+    result.userAnswer.forEach((item) => {
+      const part = item.partNumber;
+      const userAnswer = item.userAnswer || "N/A";
+      const correctAnswer = item.correctAnswer || "N/A";
+      const isCorrect = userAnswer !== "N/A" && userAnswer === correctAnswer;
+
+      if (userAnswer !== "N/A") {
+        totalSubmittedAnswers++;
+        if (isCorrect) {
+          correctAnswers++;
+        }
+      }
+      const questionForDetail = {
+        id: item.questionNumber + 1,
+        testName: result.testName,
+        part: part, 
+        userAnswer,
+        correctAnswer,
+        correct: isCorrect,
+        questionData: {
+          idQuestion: item.questionNumber,
+          questionText: item.questionText || "",
+          options: item.options || [],
+          transcript: item.transcript || "",
+          image: item.mediaFiles.image || null,
+          audio: item.mediaFiles.audio || null,
+          passageText: item.mediaFiles.text || null,
+        },
+      };
+
+      partData[part].push(questionForDetail);
     });
   }
 
-  console.log("userAnswers:", userAnswers);
-
-  // Xử lý dữ liệu theo part
-  const partData = result?.correctAnswer
-    ? {
-        1: (result.correctAnswer.answersPart1 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        2: (result.correctAnswer.answersPart2 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        3: (result.correctAnswer.answersPart3 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        4: (result.correctAnswer.answersPart4 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        5: (result.correctAnswer.answersPart5 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        6: (result.correctAnswer.answersPart6 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-        7: (result.correctAnswer.answersPart7 || []).map((item) => ({
-          id: parseInt(item.idQuestion) + 1,
-          correctAnswer: item.key || "N/A",
-          userAnswer: userAnswers[item.idQuestion] || "N/A",
-          correct:
-            userAnswers[item.idQuestion] && item.key
-              ? userAnswers[item.idQuestion] === item.key
-              : false,
-        })),
-      }
-    : {
-        1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [],
-      };
-
-  console.log("partData:", partData);
-
-  // Tính số câu trả lời đúng, sai và bỏ qua bằng vòng lặp
-  let totalSubmittedAnswers = 0;
-  let correctAnswers = 0;
-
-  Object.values(partData).forEach((part) => {
-    part.forEach((item) => {
-      if (item.userAnswer !== "N/A") {
-        totalSubmittedAnswers++;
-      }
-      if (item.correct) {
-        correctAnswers++;
-      }
-    });
-  });
-
-  const skippedAnswers = 200 - totalSubmittedAnswers;
   const incorrectAnswers = totalSubmittedAnswers - correctAnswers;
+  const skippedAnswers = totalQuestions - totalSubmittedAnswers;
 
-  // Tính số câu trả lời đúng cho Listening (Parts 1–4) và Reading (Parts 5–7)
-  const listeningCorrect = result?.correctAnswer
-    ? partData[1].filter((item) => item.correct).length +
-      partData[2].filter((item) => item.correct).length +
-      partData[3].filter((item) => item.correct).length +
-      partData[4].filter((item) => item.correct).length
-    : 0;
-  const readingCorrect = result?.correctAnswer
-    ? partData[5].filter((item) => item.correct).length +
-      partData[6].filter((item) => item.correct).length +
-      partData[7].filter((item) => item.correct).length
-    : 0;
+  const listeningCorrect =
+    (partData[1]?.filter((item) => item.correct).length || 0) +
+    (partData[2]?.filter((item) => item.correct).length || 0) +
+    (partData[3]?.filter((item) => item.correct).length || 0) +
+    (partData[4]?.filter((item) => item.correct).length || 0);
+  const readingCorrect =
+    (partData[5]?.filter((item) => item.correct).length || 0) +
+    (partData[6]?.filter((item) => item.correct).length || 0) +
+    (partData[7]?.filter((item) => item.correct).length || 0);
 
   const handleShowDetailPart = () => {
     setShowDetailPart(!showDetailPart);
@@ -208,7 +134,7 @@ const HistoryExamResult = () => {
     <main className="container mx-auto py-10 flex flex-col items-center justify-center gap-5">
       <div className="w-full max-w-5xl bg-white rounded-2xl border-2 border-gray-300 shadow-lg p-8 flex flex-col items-center gap-6">
         <h1 className="text-3xl font-bold text-gray-600">
-          {result?.nameTest || `Test ${result.idTest}`}
+          {result?.testName || `Test ${result?.idTestHistory}`}
         </h1>
         <div className="flex flex-col md:flex-row gap-7 w-full">
           <div className="md:w-1/3 border-2 border-gray-300 rounded-2xl">
@@ -226,11 +152,11 @@ const HistoryExamResult = () => {
               </div>
               <div>
                 <p className="text-gray-600">Ngày làm:</p>
-                <p className="font-semibold">{dateTest}</p>
+                <p className="font-semibold">{formatDate(completedDate)}</p>
               </div>
               <div>
                 <p className="text-gray-600">Thời gian hoàn thành:</p>
-                <p className="font-semibold">{timeTest}</p>
+                <p className="font-semibold">{timeSpent}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -254,7 +180,7 @@ const HistoryExamResult = () => {
                   <span className="font-semibold">{listeningCorrect}/100</span>{" "}
                   |{" "}
                   <span className="font-semibold text-[#2C99E2]">
-                    {scoreListening} điểm
+                    {listeningScore} điểm
                   </span>
                 </p>
               </div>
@@ -263,7 +189,7 @@ const HistoryExamResult = () => {
                 <p>
                   <span className="font-semibold">{readingCorrect}/100</span> |{" "}
                   <span className="font-semibold text-[#2C99E2]">
-                    {scoreReading} điểm
+                    {readingScore} điểm
                   </span>
                 </p>
               </div>
@@ -272,7 +198,7 @@ const HistoryExamResult = () => {
               <div className="text-center">
                 <p className="text-gray-600">Tổng điểm</p>
                 <p className="text-4xl sm:text-5xl font-extrabold text-[#2C99E2]">
-                  {score}
+                  {totalScore}
                 </p>
               </div>
             </div>
@@ -315,7 +241,7 @@ const HistoryExamResult = () => {
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 max-w-5xl gap-4 mx-auto">
             {partData[activePart]?.length > 0 ? (
               partData[activePart]?.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
@@ -325,7 +251,9 @@ const HistoryExamResult = () => {
                   <span className="font-bold text-[#35509a]">
                     {item.correctAnswer}
                   </span>
-                  <span className={`${item.correct ? "" : "line-through"}`}>
+                  <span className={`${
+                    item.correct? "": `${item.userAnswer ==="N/A"? "": "line-through"}`
+                    }`}>
                     {item.userAnswer}
                   </span>
                   {item.correct ? (

@@ -7,13 +7,13 @@ const DetailExamResult = ({ show, onClose, item }) => {
   return (
     <ModalWrapper show={show} onClose={onClose}>
       <div
-        className="w-full max-w-2xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 sm:px-4 pt-6 pb-6"
+        className="w-full max-w-4xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-4 sm:px-5 pt-5 pb-5"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col items-center p-3 gap-4">
-          <div className="flex items-center justify-between w-full">
-            <h2 className="text-xl font-medium sm:text-2xl">
-              Question {item.id}
+        <div className="flex flex-col items-center p-3 gap-1 overflow-y-auto max-h-[80vh]">
+          <div className="flex items-center justify-between w-full border-b-2 border-gray-300 pb-3 mb-3">
+            <h2 className="text-base font-medium sm:text-xl">
+              {item.testName} | Part {item.part} | Đáp án #{item.id}
             </h2>
             <button
               onClick={onClose}

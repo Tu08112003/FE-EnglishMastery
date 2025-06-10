@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../Button.jsx";
 import Pagination from "../Pagination.jsx";
 import { Link } from "react-router-dom";
+import formatDate from "../../utils/formatDate.js";
 const RecentResultsCard = ({ data }) => {
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +38,7 @@ const RecentResultsCard = ({ data }) => {
                 {`${result.score}/${result.total}`}
               </td>
               <td className="py-3 px-4 text-gray-600 font-medium">
-                {result.date}
+                {formatDate(result.date)}
               </td>
               <td className="py-3 px-4">
                 <Link to={`/exam/result/${result.idTestHistory}`}>

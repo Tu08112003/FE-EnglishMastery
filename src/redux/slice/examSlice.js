@@ -30,10 +30,9 @@ export const fetchExamsByYear = createAsyncThunk(
 // Lấy thông tin đề thi bằng id
 export const fetchExamById = createAsyncThunk(
   'exam/fetchExamById',
-  async (idTest, { rejectWithValue }) => {
+  async (testId, { rejectWithValue }) => {
     try {
-      const response = await getExamById({ idTest });
-      console.log('Data tra ve: ', response.data);
+      const response = await getExamById({ testId });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Không tìm thấy thông tin đề thi');
@@ -60,7 +59,6 @@ export const fetchAllHistoryExam = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await getHistoryExam();
-      console.log('Lịch sử làm bài thi: ', response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');
@@ -71,9 +69,9 @@ export const fetchAllHistoryExam = createAsyncThunk(
 // Lịch sử làm bài thi theo id
 export const fetchHistoryExamById = createAsyncThunk(
   'exam/fetchHistoryExamById',
-  async (idTest, { rejectWithValue }) => {
+  async (testId, { rejectWithValue }) => {
     try {
-      const response = await getHistoryExamById({ idTest });
+      const response = await getHistoryExamById({ testId });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');

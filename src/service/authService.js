@@ -18,9 +18,10 @@ const authRegister = ({userName, email, password}) => {
     };
     return axios.post(URL_BACKEND,data);
 }
-const authLogout = ({refreshToken}) => {
+const authLogout = ({accessToken,refreshToken}) => {
     const URL_BACKEND = '/auth-service/logout';
     const data = {
+        accessToken: accessToken,
         refreshToken: refreshToken
     }
     return axios.post(URL_BACKEND, data);

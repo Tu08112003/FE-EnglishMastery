@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import AudioPlayer from "./AudioPlayer";
-import AnswerOptions from "./AnswerOptions";
+import DetailAnswerOptions from "./DetailAnswerOptions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const DetailQuestionDisplay = ({
@@ -9,101 +9,110 @@ const DetailQuestionDisplay = ({
   userAnswer,
   correctAnswer,
 }) => {
+  const [showTranscript, setShowTranscript] = useState(false);
+  const toggleTranscript = () => {
+    setShowTranscript(!showTranscript);
+  };
   const audioSrc = questionData.audio || "";
+  const renderAnswerOptions = () => (
+    <DetailAnswerOptions
+      options={questionData.options}
+      userAnswer={userAnswer}
+      correctAnswer={correctAnswer}
+    />
+  );
+
+  const renderTranscriptToggle = () =>
+    questionData.transcript && (
+      <div className="mt-4">
+        <button
+          onClick={toggleTranscript}
+          className="w-full flex justify-between items-center text-left text-gray-800 font-semibold cursor-pointer p-2 rounded-md hover:bg-gray-100"
+        >
+          <span>Giải thích đáp án</span>
+          <FontAwesomeIcon
+            icon="fa-solid fa-caret-down"
+            className={`transform transition-transform duration-300 ${
+              showTranscript ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        {showTranscript && (
+          <div className="p-3 rounded-lg mt-2 border border-gray-200 text-sm text-gray-800 whitespace-pre-line">
+            {questionData.transcript}
+          </div>
+        )}
+      </div>
+    );
 
   if (part === 1) {
     return (
-      <div className="w-full flex flex-col gap-6 p-5">
-        {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
-        ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
-        )}
-        <div className="flex gap-10 mx-3">
-          <img
-            src={questionData.image}
-            alt="Question"
-            className="mb-4 max-w-full rounded-lg"
-          />
-          <div key={questionData.idQuestion} className="mb-3">
-            <p className="text-md font-bold mb-2 flex items-center gap-1.5">
-              <FontAwesomeIcon
-                icon="fa-regular fa-bookmark"
-                style={{ color: "#2C99E2" }}
-              />{" "}
-              {parseInt(questionData.idQuestion) + 1}.
-            </p>
-            <AnswerOptions
-              options={questionData.options}
-              userAnswer={userAnswer}
-              correctAnswer={correctAnswer}
+      <div className="w-full h-full flex flex-col lg:flex-row gap-6 px-2 lg:px-3 overflow-x-hidden">
+        <div className="w-full lg:w-4/6 flex flex-col gap-2 border-2 border-gray-300 p-3 rounded-lg">
+          {audioSrc && <AudioPlayer audioSrc={audioSrc} autoPlay={false} />}
+          <p className="text-gray-600 text-center">
+            Refer to the following conversation
+          </p>
+          <div className="w-full border-2 border-gray-300 p-3 rounded-lg">
+            <img
+              src={questionData.image || ""}
+              alt="Question"
+              className="w-full max-h-[300px] object-contain rounded-lg shadow-md"
             />
           </div>
         </div>
-      </div>
-    );
-  } else if (part === 2) {
-    return (
-      <div className="w-full h-full py-5 px-6">
-        {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
-        ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
-        )}
-        <div key={questionData.idQuestion} className="mb-3">
+
+        <div className="w-full lg:w-2/6 flex flex-col gap-2">
           <p className="text-md font-bold mb-2 flex items-center gap-1.5">
             <FontAwesomeIcon
               icon="fa-regular fa-bookmark"
               style={{ color: "#2C99E2" }}
-            />{" "}
+            />
             {parseInt(questionData.idQuestion) + 1}.
           </p>
-          <AnswerOptions
-            options={questionData.options}
-            userAnswer={userAnswer}
-            correctAnswer={correctAnswer}
-          />
+          {renderAnswerOptions()}
+          {renderTranscriptToggle()}
         </div>
       </div>
     );
-  } else if (part === 3 || part === 4) {
+  }
+
+  if (part === 2) {
     return (
-      <div className="w-full h-full p-5 flex flex-col gap-4">
-        {audioSrc ? (
-          <AudioPlayer audioSrc={audioSrc} autoPlay={true} />
-        ) : (
-          <p className="text-red-600 font-semibold">Không có âm thanh</p>
-        )}
+      <div className="w-full max-w-xl mx-auto flex flex-col gap-2">
+        {audioSrc && <AudioPlayer audioSrc={audioSrc} autoPlay={false} />}
+        <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+          <FontAwesomeIcon
+            icon="fa-regular fa-bookmark"
+            style={{ color: "#2C99E2" }}
+          />
+          {parseInt(questionData.idQuestion) + 1}.
+        </p>
+        {renderAnswerOptions()}
+        {renderTranscriptToggle()}
+      </div>
+    );
+  }
+
+  if (part === 3 || part === 4) {
+    return (
+      <div className="w-full p-4 flex flex-col gap-4">
         {questionData.image ? (
-          <div className="w-full h-full flex flex-col gap-5">
-            <div className="w-full flex items-center p-2 justify-center border-2 border-gray-300 rounded-lg">
-              <img
-                src={questionData.image}
-                alt="Question"
-                className="h-full w-auto object-contain"
-              />
-            </div>
-            <div className="w-full px-3">
-              <div className="mb-3">
-                <p className="text-md font-bold mb-2 flex items-center gap-1.5">
-                  <FontAwesomeIcon
-                    icon="fa-regular fa-bookmark"
-                    style={{ color: "#2C99E2" }}
-                  />
-                  {parseInt(questionData.idQuestion) + 1}.{" "}
-                  {questionData.questionText}
-                </p>
-                <AnswerOptions
-                  // options={q.options}
-                  userAnswer={userAnswer}
-                  correctAnswer={correctAnswer}
+          <div className="w-full flex gap-4">
+            <div className="w-full flex flex-col items-center justify-center gap-2">
+              {audioSrc && <AudioPlayer audioSrc={audioSrc} autoPlay={false} />}
+              <p className="text-gray-600 text-center">
+                Refer to the following conversation
+              </p>
+              <div className="w-full flex items-center p-2 justify-center border border-gray-300 rounded-lg bg-gray-50">
+                <img
+                  src={questionData.image}
+                  alt="Question Graphic"
+                  className="max-h-48 w-auto object-contain"
                 />
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="w-full flex flex-col px-2">
-            <div className="mb-3">
+            <div className="w-full flex flex-col justify-center">
               <p className="text-md font-bold mb-2 flex items-center gap-1.5">
                 <FontAwesomeIcon
                   icon="fa-regular fa-bookmark"
@@ -112,19 +121,32 @@ const DetailQuestionDisplay = ({
                 {parseInt(questionData.idQuestion) + 1}.{" "}
                 {questionData.questionText}
               </p>
-              <AnswerOptions
-                // options={q.options}
-                userAnswer={userAnswer}
-                correctAnswer={correctAnswer}
-              />
+              {renderAnswerOptions()}
+              {renderTranscriptToggle()}
             </div>
+          </div>
+        ) : (
+          <div className="w-full mx-auto max-w-2xl flex flex-col justify-center gap-2">
+            {audioSrc && <AudioPlayer audioSrc={audioSrc} autoPlay={false} />}
+            <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+              <FontAwesomeIcon
+                icon="fa-regular fa-bookmark"
+                style={{ color: "#2C99E2" }}
+              />
+              {parseInt(questionData.idQuestion) + 1}.{" "}
+              {questionData.questionText}
+            </p>
+            {renderAnswerOptions()}
+            {renderTranscriptToggle()}
           </div>
         )}
       </div>
     );
-  } else if (part === 5) {
+  }
+
+  if (part === 5) {
     return (
-      <div className="w-full h-full flex flex-col mx-4 p-3">
+      <div className="w-full flex flex-col gap-1 p-4">
         <p className="text-md font-bold mb-2 flex items-center gap-1.5">
           <FontAwesomeIcon
             icon="fa-regular fa-bookmark"
@@ -132,58 +154,34 @@ const DetailQuestionDisplay = ({
           />
           {parseInt(questionData.idQuestion) + 1}. {questionData.questionText}
         </p>
-        <AnswerOptions
-          options={questionData.options}
-          userAnswer={userAnswer}
-          correctAnswer={correctAnswer}
-        />
+        {renderAnswerOptions()}
       </div>
     );
-  } else if (part === 6 || part === 7) {
-  
-    const passageToDisplay = questionData.passageText || "";
-    let htmlPassage = passageToDisplay;
+  }
 
-    if (part === 6 && passageToDisplay && typeof passageToDisplay === 'string') {
-        const questionDisplayNumber = questionData.idQuestion + 1;
-        const placeholderRegex = /_____\((\d+)\)/g; 
-
-        htmlPassage = passageToDisplay.replace(placeholderRegex, (match, p1) => {
-            if (parseInt(p1) === questionDisplayNumber) {
-                return `<strong class="text-gray-700">(${questionDisplayNumber})</strong>`;
-            }
-            return match; 
-        });
-    }
-
+  if (part === 6 || part === 7) {
     return (
-      <div className="w-full flex flex-col p-4 gap-4"> 
-        {passageToDisplay && (
-             <div className="w-full p-3 border border-gray-300 rounded-lg hide-scrollbar overflow-y-auto max-h-[45vh] bg-gray-50">
-                <h2 className="text-sm font-semibold mb-2 text-gray-700">
-                  {part === 6 ? "Complete the following text." : "Read the following text."}
-                </h2>
-                <div className="whitespace-pre-line text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: htmlPassage }} />
-            </div>
-        )}
-        <div className="w-full"> 
-            <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+      <div className="w-full flex flex-col lg:flex-row p-4 gap-4">
+        <div className="w-full lg:w-2/3 h-full flex items-center justify-center p-3 border border-gray-300 rounded-lg bg-gray-50 overflow-auto">
+          <div className="text-sm text-gray-700 whitespace-pre-wrap">
+            {questionData.passageText}
+          </div>
+        </div>
+        <div className="w-full lg:w-1/3 flex flex-col gap-2">
+          <p className="text-md font-bold mb-2 flex items-center gap-1.5">
             <FontAwesomeIcon
-                icon="fa-regular fa-bookmark"
-                style={{ color: "#2C99E2" }}
+              icon="fa-regular fa-bookmark"
+              style={{ color: "#2C99E2" }}
             />
             {questionData.idQuestion + 1}. {questionData.questionText}
-            </p>
-            <AnswerOptions
-                // options={displayOptions}
-                userAnswer={userAnswer}
-                correctAnswer={correctAnswer}
-                part={part}
-            />
+          </p>
+          {renderAnswerOptions()}
+          {renderTranscriptToggle()}
         </div>
       </div>
     );
   }
+
 };
 
 export default DetailQuestionDisplay;
