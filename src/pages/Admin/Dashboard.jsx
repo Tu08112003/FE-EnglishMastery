@@ -2,26 +2,34 @@ import React, { useState, useEffect } from "react";
 import StatisticsCard from "../../components/StatisticsCard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Pagination from "../../components/Pagination";
+import formatCurrency from "../../utils/formatCurrency";
+import formatDate from "../../utils/formatDate";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchNumberOfTests,
   fetchNumberOfUsers,
   fetchAllHistoryTests,
   fetchTransaction,
+  fetchRevenue
 } from "../../redux/slice/adminSlice";
-import formatDate from "../../utils/formatDate";
 const Dashboard = () => {
-  const { numberOfUsers, numberOfTests, historyTests, loading, transactions } = useSelector(
-    (state) => state.admin
-  );
+  const {
+    numberOfUsers,
+    numberOfTests,
+    historyTests,
+    revenue,
+    loading,
+    transactions,
+    errorHistoryTest,
+  } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchNumberOfTests()).unwrap();
     dispatch(fetchNumberOfUsers()).unwrap();
     dispatch(fetchAllHistoryTests());
     dispatch(fetchTransaction());
+    dispatch(fetchRevenue());
   }, [dispatch]);
-
 
   const [currentPagePayments, setCurrentPagePayments] = useState(1);
   const [currentPageExams, setCurrentPageExams] = useState(1);
@@ -41,7 +49,6 @@ const Dashboard = () => {
   const startIndexExams = (currentPageExams - 1) * itemsPerPage;
   const endIndexExams = startIndexExams + itemsPerPage;
   const currentExams = historyTests.slice(startIndexExams, endIndexExams);
-
   return (
     <main className="max-w-6xl w-full mx-auto space-y-6 p-4">
       <section className="flex flex-col space-y-3">
@@ -71,7 +78,7 @@ const Dashboard = () => {
                   style={{ color: "#2C99E2" }}
                 />
               }
-              value="5.000.000 VNĐ"
+              value={formatCurrency(revenue.totalAmount)}
               description="Doanh thu"
             />
             <StatisticsCard
@@ -114,7 +121,7 @@ const Dashboard = () => {
                         {payment.userName}
                       </td>
                       <td className="px-4 py-2 font-bold text-[#2C99E2]">
-                        {payment.amount}
+                        {formatCurrency(payment.amount)}
                       </td>
                       <td className="px-4 py-2 text-gray-600 font-semibold">
                         {formatDate(payment.date)}
@@ -148,6 +155,10 @@ const Dashboard = () => {
               <div className="text-lg text-center font-semibold text-gray-600">
                 Đang tải dữ liệu...
               </div>
+            ) : errorHistoryTest ? (
+              <div className="text-lg text-center font-semibold text-red-600">
+                Lỗi khi tải lịch sử làm đề
+              </div>
             ) : (
               <>
                 <div className="overflow-x-auto">
@@ -162,9 +173,9 @@ const Dashboard = () => {
                     </thead>
                     <tbody>
                       {currentExams.map((exam) => (
-                        <tr key={exam.id} className="hover:bg-gray-100">
+                        <tr key={exam.idTestHistory} className="hover:bg-gray-100">
                           <td className="px-4 py-2 font-semibold text-gray-600">
-                            {exam.id}
+                            {exam.idTestHistory}
                           </td>
                           <td className="px-4 py-2 font-semibold text-gray-600">
                             {exam.email}
@@ -173,7 +184,7 @@ const Dashboard = () => {
                             {exam.score}/990
                           </td>
                           <td className="px-4 py-2 font-semibold text-gray-600">
-                            {exam.dateTest}
+                            {formatDate(exam.dateTest)}
                           </td>
                         </tr>
                       ))}

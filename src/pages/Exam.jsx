@@ -25,7 +25,6 @@ const Exam = () => {
     error,
     selectedYear,
   } = useSelector((state) => state.exam || {});
-  const userInfo = useSelector((state) => state.user.userInfo);
 
   useEffect(() => {
     dispatch(fetchAllExamsByYear());
@@ -50,7 +49,7 @@ const Exam = () => {
 
   // Sử dụng useMemo để các giá trị được tính toán chỉ khi dependencies thay đổi
   const sortedExams = useMemo(() => {
-    return [...exams].sort((a, b) => a.idTest - b.idTest);
+    return [...exams].sort((a, b) => a.testId - b.testId);
   }, [exams]);
 
   const filteredExams = useMemo(() => {
@@ -63,19 +62,15 @@ const Exam = () => {
   const { totalPages, markedExams } = useMemo(() => {
     const totalExams = filteredExams.length;
     const totalPages = Math.ceil(totalExams / examsPerPage);
-    
+
     // Đánh dấu đề thi khóa cho người dùng miễn phí
-    const isFreeUser = userInfo?.typeUser === 0;
-    const maxFreeExams = 4;
-    const markedExams = isFreeUser
-      ? filteredExams.map((exam, index) => ({
-          ...exam,
-          locked: index >= maxFreeExams,
-        }))
-      : filteredExams.map((exam) => ({ ...exam, locked: false }));
-      
+    const markedExams = filteredExams.map((exam) => ({
+      ...exam,
+      locked: exam.testId === null,
+    }));
+
     return { totalPages, markedExams };
-  }, [filteredExams, userInfo, examsPerPage]);
+  }, [filteredExams, examsPerPage]);
 
   // Tính toán danh sách đề thi hiển thị cho trang hiện tại
   const displayExams = useMemo(() => {
@@ -161,7 +156,9 @@ const Exam = () => {
             Đang tải đề thi...
           </p>
         ) : error ? (
-          <p className="text-red-500 text-center font-semibold text-lg">{error}</p>
+          <p className="text-red-500 text-center font-semibold text-lg">
+            {error}
+          </p>
         ) : filteredExams.length === 0 && searchQuery ? (
           <p className="font-semibold text-center text-gray-600">
             Không tìm thấy thông tin đề thi "{searchQuery}".
@@ -171,8 +168,8 @@ const Exam = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 justify-items-center items-center gap-6">
               {displayExams.map((exam, index) => (
                 <ExamCard
-                  key={`${exam.idTest}-${currentPage}-${index}`}
-                  title={exam.testName || `Exam ${exam.idTest}`}
+                  key={`${exam.testId}-${currentPage}-${index}`}
+                  title={exam.testName || `Exam ${exam.testId}`}
                   onClick={() => handleShowPreviewExam(exam)}
                   locked={exam.locked}
                 />
@@ -193,7 +190,7 @@ const Exam = () => {
       {previewExam && selectedExam && (
         <PreviewExam
           title={selectedExam.testName || "Không tìm thấy đề thi"}
-          examId={selectedExam.idTest}
+          examId={selectedExam.testId}
           onClose={handleClosePreviewExam}
         />
       )}
