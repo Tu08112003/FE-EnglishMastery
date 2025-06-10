@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useNavigate } from 'react-router-dom'; 
-import { toast } from 'react-toastify';
 
 const PrivateRoute = ({ children, requiredRole }) => {
   const { isAuthenticated, loading, role } = useSelector((state) => state.auth);
@@ -14,11 +13,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   } else if (requiredRole && role !== requiredRole) {
-    toast.info("Chỉ quản trị viên mới có thể truy cập trang này!");
-    setTimeout(() => {
-      navigate('/', { replace: true }); 
-    }, 500); 
-    return <div className='text-center font-semibold text-gray-600'>Đang kiểm tra quyền...</div>; 
+    navigate("/forbidden");
   }
   return children;
 };
