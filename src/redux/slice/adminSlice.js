@@ -12,7 +12,8 @@ import {
   addUser,
   deleteUser,
   getRevenue,
-  getAllPayment
+  getAllPayment,
+  deleteTest
 } from "../../service/adminService";
 
 // Lấy tất cả thông tin user
@@ -68,9 +69,9 @@ export const fetchAllHistoryTests = createAsyncThunk(
       const response = await getAllHistoryTest();
       const historyTests = Array.isArray(response.data) ? response.data : [];
       return historyTests.map((result) => ({
-        id: result.idTestHistory,
+        idTestHistory: result.idTestHistory,
         testName: result.testName,
-        email: result.email,
+        email: result.userName,
         score: result.score,
         dateTest: result.dateTest,
       }));
@@ -90,7 +91,7 @@ export const fetchAllTests = createAsyncThunk(
       const response = await getAllTest();
       const tests = Array.isArray(response.data) ? response.data : [];
       return tests.map((test) => ({
-        id: test.idTest,
+        idTest: test.idTest,
         testName: test.testName,
         numberOfQuestion: parseInt(test.numberOfQuestion, 10),
       }));
@@ -193,7 +194,7 @@ export const fetchAddUser = createAsyncThunk(
         return response.data;
       } else {
         return rejectWithValue(
-          "Lỗi khi thêm người dùng! Vui lòng thử lại."
+          response.message || "Lỗi khi thêm người dùng! Vui lòng thử lại."
         );
       }
     } catch (error) {
@@ -262,7 +263,23 @@ export const fetchTransaction = createAsyncThunk(
     }
   }
 );
-
+// Xóa đề thi 
+export const fetchDeleteTest = createAsyncThunk(
+  "admin/fetchDeleteTest",
+  async ({ testId }, { rejectWithValue }) => {
+  try {
+    const response = await deleteTest({testId});
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      return rejectWithValue(response?.message || "Lỗi khi xóa đề thi! Vui lòng thử lại.");
+    }
+  } catch (error) {
+    return rejectWithValue(
+      error.response?.message || "Lỗi khi xóa đề thi"
+    );
+  }
+});
 const initialState = {
   users: [],
   numberOfUsers: 0,
@@ -449,6 +466,18 @@ const adminSlice = createSlice({
       .addCase(fetchTransaction.rejected, (state, action) => {
         state.loadingTransaction = false;
         state.errorTransaction = action.payload;
+      })
+      //fetchDeleteTest
+      .addCase(fetchDeleteTest.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDeleteTest.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchDeleteTest.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
