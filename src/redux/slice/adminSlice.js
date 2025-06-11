@@ -13,7 +13,11 @@ import {
   deleteUser,
   getRevenue,
   getAllPayment,
-  deleteTest
+  deleteTest,
+  createTest,
+  updateTest,
+  uploadImage,
+  uploadAudio,
 } from "../../service/adminService";
 
 // Lấy tất cả thông tin user
@@ -106,7 +110,7 @@ export const fetchAllTests = createAsyncThunk(
 // Lấy quyền của user
 export const fetchPermissionOfUser = createAsyncThunk(
   "admin/fetchPermissionOfUser",
-  async ({idUser}, { rejectWithValue }) => {
+  async ({ idUser }, { rejectWithValue }) => {
     try {
       const response = await getPermissionOfUser({ idUser: idUser });
       return response.data.permissions;
@@ -128,9 +132,9 @@ export const fetchUpdatePermissionOfUser = createAsyncThunk(
         namePermission,
         typeUpdate,
       });
-      if(response.status == 200) {
+      if (response.status == 200) {
         return response.data;
-      }else{
+      } else {
         return rejectWithValue(
           "Lỗi khi cập nhật quyền của người dùng! Vui lòng thử lại."
         );
@@ -145,7 +149,7 @@ export const fetchUpdatePermissionOfUser = createAsyncThunk(
 // Thêm quyền cho user
 export const fetchAddPermissionForUser = createAsyncThunk(
   "admin/fetchAddPermissionForUser",
-  async ({namePermission}, { rejectWithValue }) => {
+  async ({ namePermission }, { rejectWithValue }) => {
     try {
       const response = await addPermissionForUser({ namePermission });
       if (response.status == 200) {
@@ -160,7 +164,7 @@ export const fetchAddPermissionForUser = createAsyncThunk(
       );
     }
   }
-);  
+);
 
 // Xóa quyền của user
 export const fetchDeletePermissionOfUser = createAsyncThunk(
@@ -184,7 +188,7 @@ export const fetchDeletePermissionOfUser = createAsyncThunk(
     }
   }
 );
-// Thêm mới user 
+// Thêm mới user
 export const fetchAddUser = createAsyncThunk(
   "admin/fetchAddUser",
   async ({ userName, email, password, role }, { rejectWithValue }) => {
@@ -214,9 +218,7 @@ export const fetchDeleteUser = createAsyncThunk(
       if (response.status === 200) {
         return response.data;
       } else {
-        return rejectWithValue(
-          "Lỗi khi xóa người dùng! Vui lòng thử lại."
-        );
+        return rejectWithValue("Lỗi khi xóa người dùng! Vui lòng thử lại.");
       }
     } catch (error) {
       return rejectWithValue(
@@ -228,12 +230,12 @@ export const fetchDeleteUser = createAsyncThunk(
 
 // Doanh thu
 export const fetchRevenue = createAsyncThunk(
-  "admin/fetchRevenue", 
+  "admin/fetchRevenue",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getRevenue();
       if (response.status === 200) {
-        return response.data; 
+        return response.data;
       } else {
         return rejectWithValue("Lỗi khi lấy doanh thu");
       }
@@ -263,23 +265,124 @@ export const fetchTransaction = createAsyncThunk(
     }
   }
 );
-// Xóa đề thi 
+// Xóa đề thi
 export const fetchDeleteTest = createAsyncThunk(
   "admin/fetchDeleteTest",
   async ({ testId }, { rejectWithValue }) => {
-  try {
-    const response = await deleteTest({testId});
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      return rejectWithValue(response?.message || "Lỗi khi xóa đề thi! Vui lòng thử lại.");
+    try {
+      const response = await deleteTest({ testId });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi xóa đề thi! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.message || "Lỗi khi xóa đề thi");
     }
-  } catch (error) {
-    return rejectWithValue(
-      error.response?.message || "Lỗi khi xóa đề thi"
-    );
   }
-});
+);
+
+// Thêm đề thi
+export const fetchCreateTest = createAsyncThunk(
+  "admin/fetchCreateTest",
+  async (
+    { testName, year, duration, parts, questions },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await createTest({
+        testName,
+        year,
+        duration,
+        parts,
+        questions,
+      });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi thêm đề thi! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.message || "Lỗi khi thêm đề thi");
+    }
+  }
+);
+
+// Cập nhật đề thi
+export const fetchUpdateTest = createAsyncThunk(
+  "admin/fetchUpdateTest",
+  async (
+    { testId, testName, year, duration, parts, questions },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await updateTest({
+        testId,
+        testName,
+        year,
+        duration,
+        parts,
+        questions,
+      });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi cập nhật đề thi! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Lỗi khi cập nhật đề thi"
+      );
+    }
+  }
+);
+
+// Tải ảnh lên
+export const fetchUploadImage = createAsyncThunk(
+  "admin/fetchUploadImage",
+  async ({ fileImage }, { rejectWithValue }) => {
+    try {
+      const response = await uploadImage({ fileImage });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi tải ảnh lên! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.message || "Lỗi khi tải ảnh lên");
+    }
+  }
+);
+
+// Tải audio lên
+export const fetchUploadAudio = createAsyncThunk(
+  "admin/fetchUploadAudio",
+  async ({ fileAudio }, { rejectWithValue }) => {
+    try {
+      const response = await uploadAudio({ fileAudio });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi tải audio lên! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || "Lỗi khi tải audio lên"
+      );
+    }
+  }
+);
+
 const initialState = {
   users: [],
   numberOfUsers: 0,
@@ -289,24 +392,78 @@ const initialState = {
   permissionOfUser: [],
   revenue: {},
   transactions: [],
+  tempExam: {
+    idTest: "",
+    testName: "",
+    year: "",
+    duration: "",
+    parts: [],
+    questions: [],
+  },
   loading: false,
   loadingUser: false,
   loadingHistoryTest: false,
   loadingTest: false,
   loadingRevenue: false,
   loadingTransaction: false,
+  loadingUpdateExam: false,
+  loadingEditExam: false,
   error: null,
-  errorUser:null,
+  errorUser: null,
   errorHistoryTest: null,
   errorTest: null,
   errorRevenue: null,
-  errorTransaction: null
+  errorTransaction: null,
 };
 
 const adminSlice = createSlice({
   name: "admin",
   initialState,
-  reducers: {},
+  reducers: {
+    setTempExam(state, action) {
+      state.tempExam = action.payload;
+    },
+    updateTempExamDetails(state, action) {
+      const { testName, year, duration } = action.payload;
+      if (testName !== undefined) state.tempExam.testName = testName;
+      if (year !== undefined) state.tempExam.year = year;
+      if (duration !== undefined) state.tempExam.duration = duration;
+    },
+    addOrUpdateTempPart(state, action) {
+      const part = action.payload;
+      const existingPartIndex = state.tempExam.parts.findIndex(
+        (p) => p.partNumber === part.partNumber
+      );
+      if (existingPartIndex >= 0) {
+        state.tempExam.parts[existingPartIndex] = part;
+      } else {
+        state.tempExam.parts.push(part);
+      }
+    },
+    addOrUpdateTempQuestion(state, action) {
+      const question = action.payload;
+      const existingQuestionIndex = state.tempExam.questions.findIndex(
+        (q) =>
+          q.partNumber === question.partNumber &&
+          q.questionNumber === question.questionNumber
+      );
+      if (existingQuestionIndex >= 0) {
+        state.tempExam.questions[existingQuestionIndex] = question;
+      } else {
+        state.tempExam.questions.push(question);
+      }
+    },
+    resetTempExam(state) {
+      state.tempExam = initialState.tempExam;
+    },
+    removeTempQuestion(state, action) {
+      const { partNumber, questionNumber } = action.payload;
+      state.tempExam.questions = state.tempExam.questions.filter(
+        (q) =>
+          !(q.partNumber === partNumber && q.questionNumber === questionNumber)
+      );
+    },
+  },
   extraReducers: (builder) => {
     // fetchAllUsers
     builder
@@ -322,6 +479,7 @@ const adminSlice = createSlice({
         state.loadingUser = false;
         state.errorUser = action.payload;
       })
+
       // fetchNumberOfUsers
       .addCase(fetchNumberOfUsers.pending, (state) => {
         state.loading = true;
@@ -335,6 +493,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
       // fetchNumberOfTests
       .addCase(fetchNumberOfTests.pending, (state) => {
         state.loading = true;
@@ -348,6 +507,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
       // fetchAllHistoryTests
       .addCase(fetchAllHistoryTests.pending, (state) => {
         state.loadingHistoryTest = true;
@@ -361,6 +521,7 @@ const adminSlice = createSlice({
         state.loadingHistoryTest = false;
         state.errorHistoryTest = action.payload;
       })
+
       // fetchAllTests
       .addCase(fetchAllTests.pending, (state) => {
         state.loadingTest = true;
@@ -374,6 +535,7 @@ const adminSlice = createSlice({
         state.loadingTest = false;
         state.errorTest = action.payload;
       })
+
       // fetchPermissionOfUser
       .addCase(fetchPermissionOfUser.pending, (state) => {
         state.loading = true;
@@ -427,6 +589,19 @@ const adminSlice = createSlice({
         state.error = action.payload;
       })
 
+      // fetchAddUser
+      .addCase(fetchAddUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAddUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(fetchAddUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       // fetchDeleteUser
       .addCase(fetchDeleteUser.pending, (state) => {
         state.loading = true;
@@ -467,7 +642,8 @@ const adminSlice = createSlice({
         state.loadingTransaction = false;
         state.errorTransaction = action.payload;
       })
-      //fetchDeleteTest
+
+      // fetchDeleteTest
       .addCase(fetchDeleteTest.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -478,8 +654,71 @@ const adminSlice = createSlice({
       .addCase(fetchDeleteTest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // fetchCreateTest
+      .addCase(fetchCreateTest.pending, (state) => {
+        state.loadingUpdateExam = true;
+        state.error = null;
+      })
+      .addCase(fetchCreateTest.fulfilled, (state) => {
+        state.loadingUpdateExam = false;
+        state.tempExam = initialState.tempExam;
+      })
+      .addCase(fetchCreateTest.rejected, (state, action) => {
+        state.loadingUpdateExam = false;
+        state.error = action.payload;
+      })
+
+      // fetchUpdateTest
+      .addCase(fetchUpdateTest.pending, (state) => {
+        state.loadingEditExam = true;
+        state.error = null;
+      })
+      .addCase(fetchUpdateTest.fulfilled, (state) => {
+        state.loadingEditExam = false;
+        state.tempExam = initialState.tempExam;
+      })
+      .addCase(fetchUpdateTest.rejected, (state, action) => {
+        state.loadingEditExam = false;
+        state.error = action.payload;
       });
+
+    // // fetchUploadImage
+    // .addCase(fetchUploadImage.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(fetchUploadImage.fulfilled, (state) => {
+    //   state.loading = false;
+    // })
+    // .addCase(fetchUploadImage.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // })
+
+    // // fetchUploadAudio
+    // .addCase(fetchUploadAudio.pending, (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // })
+    // .addCase(fetchUploadAudio.fulfilled, (state) => {
+    //   state.loading = false;
+    // })
+    // .addCase(fetchUploadAudio.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // });
   },
 });
+
+export const {
+  setTempExam,
+  updateTempExamDetails,
+  addOrUpdateTempPart,
+  addOrUpdateTempQuestion,
+  resetTempExam,
+  removeTempQuestion,
+} = adminSlice.actions;
 
 export default adminSlice.reducer;

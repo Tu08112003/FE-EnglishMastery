@@ -105,19 +105,66 @@ const deleteTest = ({ testId }) => {
   return axios.delete(URL_BACKEND);
 }
 
+// Lấy chi tiết đề thi
+
+const getTestDetail = ({ testId }) => {
+  const URL_BACKEND = `exam-service/getTestForEdit?testId=${testId}`;
+  return axios.get(URL_BACKEND);
+}
+
 // Thêm đề thi
-const createTest = ({ testName, testDescription, testDate, testTime, testDuration, questions }) => {
+const createTest = ({testName, year,duration,parts, questions }) => {
   const URL_BACKEND = "exam-service/createTest";
   const data = {
     testName: testName,
-    testDescription: testDescription,
-    testDate: testDate,
-    testTime: testTime,
-    testDuration: testDuration,
+    year: year,
+    duration: duration,
+    parts: parts,
     questions: questions,
   };
   return axios.post(URL_BACKEND, data);
 }
+// Cập nhật đề thi
+const updateTest = ({ testId, testName, year,duration,parts, questions }) => {
+  const URL_BACKEND = "exam-service/updateTest";
+  const data = {
+    testId: testId,
+    testName: testName,
+    year: year,
+    duration: duration,
+    parts: parts,
+    questions: questions,
+  };
+  return axios.post(URL_BACKEND, data);
+}
+
+// Tải ảnh lên
+const uploadImage = async ({ file }) => {
+  const URL_BACKEND = "exam-service/files/upload/image";
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axios.post(URL_BACKEND, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+// Tải audio lên
+const uploadAudio = async ({ file }) => {
+  const URL_BACKEND = "exam-service/files/upload/audio";
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axios.post(URL_BACKEND, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+
 export {
   getAllUser,
   addUser,
@@ -133,5 +180,9 @@ export {
   getAllPayment,
   getRevenue,
   deleteTest,
-  createTest
+  getTestDetail,
+  createTest,
+  updateTest,
+  uploadImage,
+  uploadAudio
 };
