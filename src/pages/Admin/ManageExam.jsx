@@ -5,13 +5,13 @@ import {
   fetchAllTests,
   fetchDeleteTest,
 } from "../../redux/slice/adminSlice";
+import { getTestDetail } from "../../service/adminService";
 import Button from "../../components/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SearchBar from "../../components/SearchBar";
 import DetailExamResult from "../../components/Admin/DetailExamResult";
-import AddExam from "../../components/Admin/AddExam";
+import AddOrEditExam from "../../components/Admin/AddOrEditExam";
 import ModalConfirm from "../../components/ConfirmModal";
-import EditExam from "../../components/Admin/EditExam";
 import Pagination from "../../components/Pagination";
 import { toast } from "react-toastify";
 
@@ -25,15 +25,14 @@ const ManageExam = () => {
     errorHistoryTest,
     errorTest,
   } = useSelector((state) => state.admin);
-
   const [currentPageExams, setCurrentPageExams] = useState(1);
   const [currentPageResults, setCurrentPageResults] = useState(1);
   const [searchExamQuery, setSearchExamQuery] = useState("");
   const [searchResultQuery, setSearchResultQuery] = useState("");
   const [showDetailResult, setShowDetailResult] = useState(false);
   const [showAddExam, setShowAddExam] = useState(false);
+  const [showEditExam, setShowEditExam] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [selectedResult, setSelectedResult] = useState(null);
 
@@ -87,10 +86,6 @@ const ManageExam = () => {
     endIndexResults
   );
 
-  const handleImportFile = (file) => {
-    console.log("File selected:", file);
-  };
-
   const handleCancel = () => {
     setShowModal(false);
   };
@@ -112,31 +107,22 @@ const ManageExam = () => {
     }
   };
 
-  const handleEditClick = (exam) => {
-    setSelectedExam(exam);
-    setShowEditModal(true);
-  };
-
-  const handleEditModalClose = () => {
-    setShowEditModal(false);
-    setSelectedExam(null);
-  };
-
-  const handleSaveQuestion = (updatedQuestion) => {
-    if (!selectedExam) return;
-    const updatedExam = {
-      ...selectedExam,
-      questions: selectedExam.questions
-        ? selectedExam.questions.map((q) =>
-            q.id === updatedQuestion.id ? updatedQuestion : q
-          )
-        : [updatedQuestion],
-    };
-    toast.success(`Cập nhật đề thi ${updatedExam.testName} thành công`);
-    dispatch(fetchAllTests());
-    setShowEditModal(false);
-    setSelectedExam(null);
-  };
+const handleEditExam = async (examId) => {
+  try {
+    const response = await getTestDetail({ testId: examId }); 
+    const examData = response.data;
+    console.log("Exam data for editing:", examData);
+    setSelectedExam({
+      ...examData,
+      testId: examData.testId,
+      parts: examData.parts || [],
+      questions: examData.questions || [],
+    });
+    setShowEditExam(true);
+  } catch (error) {
+    toast.error(error || "Không tìm thấy đề thi");
+  }
+};
 
   return (
     <main className="max-w-6xl w-full mx-auto space-y-6 p-4">
@@ -195,7 +181,10 @@ const ManageExam = () => {
                         variant="default"
                         size="sm"
                         icon={<FontAwesomeIcon icon="fa-solid fa-pencil" />}
-                        onClick={() => handleEditClick(exam)}
+                        onClick={() => {
+                          handleEditExam(exam.idTest)
+                          setShowEditExam(true);
+                        }}
                       />
                       <Button
                         text="Xóa"
@@ -205,9 +194,8 @@ const ManageExam = () => {
                         icon={<FontAwesomeIcon icon="fa-solid fa-trash" />}
                         onClick={() =>{
                           setSelectedExam(exam);
-                          console.log("Selected exam for deletion:", exam);
-                          console.log("Exam ID:", exam.idTest);
                           setShowModal(true);
+                          console.log("Selected exam for deletion:", exam.idTest);
                         }}
                       />
                     </td>
@@ -322,10 +310,18 @@ const ManageExam = () => {
       </section>
 
       {/* Thêm đề thi */}
-      <AddExam
+      <AddOrEditExam
         show={showAddExam}
         onClose={() => setShowAddExam(false)}
-        onImport={handleImportFile}
+      />
+      {/* Chỉnh sửa đề thi */}
+      <AddOrEditExam
+        show={showEditExam}
+        onClose={() => {
+          setShowEditExam(false);
+          setSelectedExam(null);
+        }}
+        examData={selectedExam}
       />
 
       {/* Xóa đề thi */}
@@ -339,14 +335,7 @@ const ManageExam = () => {
         onCancel={handleCancel}
         onConfirm={() => handleDelete(selectedExam)}
       />
-
-      {/* Chỉnh sửa đề thi */}
-      <EditExam
-        show={showEditModal}
-        onClose={handleEditModalClose}
-        exam={selectedExam}
-        onSave={handleSaveQuestion}
-      />
+  
 
       {/* Xem chi tiết kết quả */}
       <DetailExamResult
