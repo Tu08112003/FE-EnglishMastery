@@ -12,12 +12,13 @@ import {
   fetchDeletePermissionOfUser,
 } from "../../redux/slice/adminSlice.js";
 import { toast } from "react-toastify";
+
 const EditUser = ({ show, onClose, user }) => {
-  const { permissionOfUser, loading } = useSelector(
-    (state) => state.admin
-  );
+  const { permissionOfUser, loading } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
-  const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showAllowModal, setShowAllowModal] = useState(false);
   const [permissionInput, setPermissionInput] = useState("");
   const [selectedPermission, setSelectedPermission] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,6 +26,7 @@ const EditUser = ({ show, onClose, user }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const totalPages = Math.ceil((permissionOfUser?.length || 0) / itemsPerPage);
+
   // Cập nhật quyền của user
   const handleUpdatePermissionUser = async ({
     idUser,
@@ -77,13 +79,44 @@ const EditUser = ({ show, onClose, user }) => {
       ).unwrap();
       await dispatch(fetchPermissionOfUser({ idUser: user.userId })).unwrap();
       toast.success("Xóa quyền thành công!");
-      setShowModal(false);
+      setShowDeleteModal(false);
       setSelectedPermission(null);
       setCurrentPage(1);
     } catch (err) {
       toast.error(err || "Xóa quyền thất bại");
     }
   };
+
+  // Xử lý chặn quyền
+  const handleBlockPermission = async () => {
+    try {
+      await handleUpdatePermissionUser({
+        idUser: user.userId,
+        namePermission: selectedPermission.name,
+        typeUpdate: "BLOCK",
+      });
+      setShowBlockModal(false);
+      setSelectedPermission(null);
+    } catch (err) {
+      toast.error(err || "Chặn quyền thất bại");
+    }
+  };
+
+  // Xử lý bỏ chặn quyền
+  const handleAllowPermission = async () => {
+    try {
+      await handleUpdatePermissionUser({
+        idUser: user.userId,
+        namePermission: selectedPermission.name,
+        typeUpdate: "ALLOW",
+      });
+      setShowAllowModal(false);
+      setSelectedPermission(null);
+    } catch (err) {
+      toast.error(err || "Bỏ chặn quyền thất bại");
+    }
+  };
+
   return (
     <ModalWrapper show={show} onClose={onClose}>
       <div
@@ -157,13 +190,7 @@ const EditUser = ({ show, onClose, user }) => {
                 <div className="text-center py-4 text-gray-600 font-semibold text-lg">
                   Đang tải...
                 </div>
-              ) 
-              // : error ? (
-              //   <div className="text-center py-4 text-red-600 font-semibold text-lg">
-              //     {error}
-              //   </div>
-              // ) 
-              : permissionOfUser?.length > 0 ? (
+              ) : permissionOfUser?.length > 0 ? (
                 <>
                   <table className="w-full text-center border-2 border-gray-200 shadow-lg rounded-2xl border-separate border-spacing-0 overflow-hidden">
                     <thead>
@@ -202,15 +229,10 @@ const EditUser = ({ show, onClose, user }) => {
                                   textColor="text-red-600"
                                   border="border-2 border-red-600"
                                   bg="bg-white"
-                                  icon={
-                                    <FontAwesomeIcon icon="fa-solid fa-ban" />
-                                  }
+                                  icon={<FontAwesomeIcon icon="fa-solid fa-ban" />}
                                   onClick={() => {
-                                    handleUpdatePermissionUser({
-                                      idUser: user.userId,
-                                      namePermission: permission.name,
-                                      typeUpdate: "BLOCK",
-                                    });
+                                    setSelectedPermission(permission);
+                                    setShowBlockModal(true);
                                   }}
                                 />
                               ) : (
@@ -220,15 +242,10 @@ const EditUser = ({ show, onClose, user }) => {
                                   size="sm"
                                   variant="default"
                                   border="border-2"
-                                  icon={
-                                    <FontAwesomeIcon icon="fa-solid fa-check" />
-                                  }
+                                  icon={<FontAwesomeIcon icon="fa-solid fa-check" />}
                                   onClick={() => {
-                                    handleUpdatePermissionUser({
-                                      idUser: user.userId,
-                                      namePermission: permission.name,
-                                      typeUpdate: "ALLOW",
-                                    });
+                                    setSelectedPermission(permission);
+                                    setShowAllowModal(true);
                                   }}
                                 />
                               )}
@@ -240,12 +257,10 @@ const EditUser = ({ show, onClose, user }) => {
                                 textColor="text-red-600"
                                 border="border-2 border-red-600"
                                 bg="bg-white"
-                                icon={
-                                  <FontAwesomeIcon icon="fa-solid fa-trash" />
-                                }
+                                icon={<FontAwesomeIcon icon="fa-solid fa-trash" />}
                                 onClick={() => {
                                   setSelectedPermission(permission);
-                                  setShowModal(true);
+                                  setShowDeleteModal(true);
                                 }}
                               />
                             </td>
@@ -273,16 +288,48 @@ const EditUser = ({ show, onClose, user }) => {
               )}
             </div>
 
-            {showModal && (
+            {/* Modal xác nhận xóa */}
+            {showDeleteModal && (
               <ModalConfirm
-                show={showModal}
+                show={showDeleteModal}
                 title="Xác nhận xóa quyền"
                 description={`Bạn có chắc chắn muốn xóa quyền '${selectedPermission.name}'? Hành động này không thể hoàn tác.`}
                 hoverBgConfirm="hover:bg-red-700"
-                onCancel={() => setShowModal(false)}
-                onConfirm={() =>
-                  handleDeletePermissionUser(selectedPermission.id)
-                }
+                onCancel={() => {
+                  setShowDeleteModal(false);
+                  setSelectedPermission(null);
+                }}
+                onConfirm={() => handleDeletePermissionUser(selectedPermission.id)}
+              />
+            )}
+
+            {/* Modal xác nhận chặn */}
+            {showBlockModal && (
+              <ModalConfirm
+                show={showBlockModal}
+                title="Xác nhận chặn quyền"
+                description={`Bạn có chắc chắn muốn chặn quyền '${selectedPermission.name}'?`}
+                hoverBgConfirm="hover:bg-red-700"
+                onCancel={() => {
+                  setShowBlockModal(false);
+                  setSelectedPermission(null);
+                }}
+                onConfirm={handleBlockPermission}
+              />
+            )}
+
+            {/* Modal xác nhận bỏ chặn */}
+            {showAllowModal && (
+              <ModalConfirm
+                show={showAllowModal}
+                title="Xác nhận bỏ chặn quyền"
+                description={`Bạn có chắc chắn muốn bỏ chặn quyền '${selectedPermission.name}'?`}
+                confirmVariant="primary"
+                onCancel={() => {
+                  setShowAllowModal(false);
+                  setSelectedPermission(null);
+                }}
+                onConfirm={handleAllowPermission}
               />
             )}
           </div>
