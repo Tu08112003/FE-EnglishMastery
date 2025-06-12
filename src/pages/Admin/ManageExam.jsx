@@ -36,7 +36,7 @@ const ManageExam = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [selectedResult, setSelectedResult] = useState(null);
 
-  const itemsPerPageExams = 10;
+  const itemsPerPageExams = 5;
   const itemsPerPageResults = 5;
 
   useEffect(() => {
