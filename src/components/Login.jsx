@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button.jsx";
 import { validateLogin } from "../utils/validate.js";
-import { authLogin } from "../service/authService.js";
-import { useDispatch} from "react-redux";
+import { authLogin, authGoogleLogin } from "../service/authService.js";
+import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slice/authSlice";
-import {toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const googleButton = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +49,7 @@ const Login = () => {
           localStorage.setItem("refresh_token", refreshToken);
           localStorage.setItem("role", role);
           dispatch(loginSuccess({ role }));
-          console.log(role)
+          console.log(role);
           toast.success("Đăng nhập thành công");
           if (role === "ADMIN") {
             navigate("/admin");
@@ -54,16 +57,75 @@ const Login = () => {
             navigate("/");
           }
         } else {
-          const errorMessage = res?.data?.message || res?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+          const errorMessage =
+            res?.data?.message ||
+            res?.message ||
+            "Đăng nhập thất bại. Vui lòng thử lại.";
           toast.error(errorMessage);
         }
       } catch (error) {
         console.error("Login Error:", error);
-        const message = error.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.";
+        const message =
+          error.response?.data?.message ||
+          "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.";
         toast.error(message);
       }
     }
   };
+
+  const handleGoogleCallbackResponse = async (response) => {
+    const idToken = response.credential;
+    try {
+      const res = await authGoogleLogin({ idToken });
+      if (res && res.data) {
+        const { accessToken, refreshToken, role } = res.data;
+
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("role", role);
+        dispatch(loginSuccess({ role }));
+        console.log(role);
+        toast.success("Đăng nhập thành công với Google");
+        if (role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else {
+        toast.error("Xác thực với Google thất bại. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      const message =
+        error.response?.data?.message ||
+        "Đã xảy ra lỗi khi đăng nhập bằng Google.";
+      toast.error(message);
+    }
+  };
+
+  const handleCustomGoogleLogin = () => {
+    if (googleButton.current) {
+      const clickableElement = googleButton.current.querySelector('[role="button"]');
+      if (clickableElement) {
+        clickableElement.click();
+      }
+    }
+  };
+
+  useEffect(() => {
+    /* global google */
+    if (window.google && google.accounts) {
+      google.accounts.id.initialize({
+        client_id: "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com",
+        callback: handleGoogleCallbackResponse,
+      });
+
+      google.accounts.id.renderButton(
+        googleButton.current,
+        { theme: "outline", size: "large", text: "signin_with", shape: "rectangular", logo_alignment: "left", width: "100%" }
+      );
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex justify-center">
@@ -157,14 +219,18 @@ const Login = () => {
           <span className="text-sm text-[#49719C]">hoặc</span>
           <div className="h-px flex-1 bg-gray-300"></div>
         </div>
-        {/* Đăng nhập với Google */}
+        
         <Button
           text="Đăng nhập với Google"
-          variant="default"
+          icon={<FontAwesomeIcon icon={faGoogle} size="lg"/>}
+          type="button" 
+          variant="default" 
           size="lg"
-          icon={<FontAwesomeIcon icon="fa-brands fa-google" size="lg" />}
-          iconPosition="left"
+          onClick={handleCustomGoogleLogin}
         />
+
+        <div ref={googleButton} style={{ display: "none" }}></div>
+
         {/* Đăng ký */}
         <div className="text-center text-sm">
           <span className="text-muted-foreground text-[#49719C]">
