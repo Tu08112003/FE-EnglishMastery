@@ -217,8 +217,8 @@ const QuestionDisplay = ({
     else if (currentAnswerChar === "D") selectedValueForOptions = answerD;
 
     return (
-      <div className="w-full h-full flex flex-col mx-3 lg:mx-4 p-3 lg:p-4">
-        <p className="text-md font-bold mb-2 flex items-center gap-1.5">
+      <div className="h-full flex flex-col mx-3 lg:mx-4 p-3 lg:p-4">
+        <p className="w-full text-md font-bold mb-2 flex items-center gap-2.5 lg:gap-1.5">
           <FontAwesomeIcon
             icon="fa-regular fa-bookmark"
             style={{ color: "#2C99E2" }}
