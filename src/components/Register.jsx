@@ -1,9 +1,12 @@
-import React, { useState} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button.jsx";
 import { validateRegister } from "../utils/validate.js";
-import { authRegister } from '../service/authService.js';
+import { authRegister, authGoogleLogin } from '../service/authService.js';
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/slice/authSlice";
 import { toast } from 'react-toastify';
 
 const Register = () => {
@@ -15,19 +18,20 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const googleButton = useRef(null);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     const updatedFormData = { ...formData, [id]: value };
     setFormData(updatedFormData);
-    console.log("Form data updated:", updatedFormData);
     const validationErrors = validateRegister(updatedFormData);
     setErrors(validationErrors);
   };
 
   const handleSignup = async () => {
-    console.log("Handle signup called:", formData);
     const validationErrors = validateRegister(formData);
     setErrors(validationErrors);
 
@@ -38,7 +42,6 @@ const Register = () => {
           email: formData.email,
           password: formData.password,
         });
-        console.log("API response:", res);
         if (res && res.data) {
           toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
           navigate('/login');
@@ -52,6 +55,60 @@ const Register = () => {
       }
     }
   };
+
+  const handleGoogleCallbackResponse = async (response) => {
+    const idToken = response.credential;
+    try {
+      const res = await authGoogleLogin({ idToken });
+      if (res && res.data) {
+        const { accessToken, refreshToken, role } = res.data;
+
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("role", role);
+        dispatch(loginSuccess({ role }));
+        
+        toast.success("Đăng nhập thành công với Google");
+        if (role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else {
+        toast.error("Xác thực với Google thất bại. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      const message =
+        error.response?.data?.message ||
+        "Đã xảy ra lỗi khi đăng nhập bằng Google.";
+      toast.error(message);
+    }
+  };
+
+  const handleCustomGoogleLogin = () => {
+    if (googleButton.current) {
+      const clickableElement = googleButton.current.querySelector('[role="button"]');
+      if (clickableElement) {
+        clickableElement.click();
+      }
+    }
+  };
+
+  useEffect(() => {
+    /* global google */
+    if (window.google && google.accounts) {
+      google.accounts.id.initialize({
+        client_id: "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com", 
+        callback: handleGoogleCallbackResponse,
+      });
+
+      google.accounts.id.renderButton(
+        googleButton.current,
+        { theme: "outline", size: "large" } 
+      );
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex justify-center mb-10">
@@ -197,15 +254,17 @@ const Register = () => {
           <span className="text-sm text-[#49719C]">hoặc</span>
           <div className="h-px flex-1 bg-gray-300"></div>
         </div>
-
-        {/* Google Login */}
+        {/* Đăng nhập bằng Google */}
         <Button
-          text="Đăng nhập với Google"
+          text="Đăng nhập với Google" 
+          type="button" 
           variant="default"
           size="lg"
-          icon={<FontAwesomeIcon icon="fa-brands fa-google" size="lg" />}
-          iconPosition="left"
+          icon={<FontAwesomeIcon icon={faGoogle} size="lg" />} 
+          onClick={handleCustomGoogleLogin} 
         />
+
+        <div ref={googleButton} style={{ display: "none" }}></div>
 
         {/* Login Link */}
         <div className="text-center text-sm">
