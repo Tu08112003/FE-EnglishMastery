@@ -8,12 +8,11 @@ import PricingCard from "../components/Home/PricingCard.jsx";
 import FeedbackCard from "../components/Home/FeedbackCard.jsx";
 import LearningStatisticsCard from "../components/StatisticsCard.jsx";
 import RecentResultsCard from "../components/Home/RecentResultsCard.jsx";
-import banner from "../assets/images/banner.png";
-import feedback_1 from "../assets/images/feedback_1.jpg";
-import feedback_2 from "../assets/images/feedback_2.jpg";
-import feedback_3 from "../assets/images/feedback_3.jpg";
 import { Link } from "react-router-dom";
-
+const banner = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/1.png";
+const feedback_1 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/2.png";
+const feedback_2 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/3.png";
+const feedback_3 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/4.png";
 const sectionData = {
   banner: {
     title: "Học Tiếng Anh hiệu quả cùng EnglishMastery",
