@@ -63,6 +63,7 @@ const Dictionary = () => {
     setShowSuggestion(false);
   };
 
+  
   // Fetch similar words when searchVocabulary changes
   const fetchSimilarWords = async (word) => {
     try {
