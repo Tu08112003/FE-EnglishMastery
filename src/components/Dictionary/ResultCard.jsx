@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const ResultCard = ({ wordData, query }) => {
+const ResultCard = ({ wordData, query}) => {
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-4 px-4 sm:px-6 lg:px-8">
       <h2 className="mb-4 text-center text-xl sm:text-2xl lg:text-3xl font-bold">

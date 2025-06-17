@@ -24,9 +24,7 @@ const AccountInformation = () => {
   const [userFormErrors, setUserFormErrors] = useState({});
   const [passwordFormErrors, setPasswordFormErrors] = useState({});
   const dispatch = useDispatch();
-  const { userInfo, loading, error} = useSelector(
-    (state) => state.user
-  );
+  const { userInfo, loading, error } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchUserInfo());
@@ -44,7 +42,8 @@ const AccountInformation = () => {
     }
   }, [userInfo]);
 
-  const inputStyle = "w-full px-3 py-1.5 text-[#49719C] font-medium placeholder-[#49719C] border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]";
+  const inputStyle =
+    "w-full px-3 py-1.5 text-[#49719C] font-medium placeholder-[#49719C] border border-[#CEDBE8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7BA4CE] focus:border-[#7BA4CE]";
 
   const handleUserChange = (e) => {
     const { name, value } = e.target;
@@ -90,8 +89,8 @@ const AccountInformation = () => {
 
     if (Object.keys(errors).length === 0) {
       try {
-       const res = await changePassword({
-          oldPassword: passwordFormData.password, 
+        const res = await changePassword({
+          oldPassword: passwordFormData.password,
           newPassword: passwordFormData.newPassword,
         });
         if (res.status === 200) {
@@ -101,9 +100,10 @@ const AccountInformation = () => {
             newPassword: "",
             confirmPassword: "",
           });
-        }
-        else {
-          toast.error(res.message || "Đổi mật khẩu thất bại! Vui lòng thử lại.");
+        } else {
+          toast.error(
+            res.message || "Đổi mật khẩu thất bại! Vui lòng thử lại."
+          );
         }
       } catch (error) {
         toast.error(error.message);
@@ -243,127 +243,137 @@ const AccountInformation = () => {
           )}
         </>
       ) : (
-        <p className="font-semibold text-gray-600">Không thể tải thông tin người dùng.</p>
+        <p className="font-semibold text-gray-600">
+          Không thể tải thông tin người dùng.
+        </p>
       )}
 
+
       {/* Đổi mật khẩu */}
-      <form
-        onSubmit={handleChangePassword}
-        className="w-full max-w-2xl flex flex-col gap-4 border-2 border-gray-200 px-8 py-6 rounded-xl shadow-md bg-white"
-      >
-        {/* Header */}
-        <h1 className="text-2xl font-bold text-center text-black">
-          Đổi mật khẩu
-        </h1>
-        {/* Mật khẩu hiện tại */}
-        <div className="flex flex-col gap-1">
-          <label className="font-semibold text-gray-600" htmlFor="password">
-            Mật khẩu hiện tại
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Nhập ít nhất 8 ký tự"
-              className={`${inputStyle} ${
-                passwordFormErrors.password
-                  ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  : "border-[#CEDBE8]"
-              }`}
-              value={passwordFormData.password}
-              onChange={handlePasswordChange}
-            />
-            <span
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-            </span>
-          </div>
-          {passwordFormErrors.password && (
-            <div className="text-sm text-red-500 font-medium mt-1">
-              {passwordFormErrors.password}
+      {userInfo?.picture == null ? (
+        <form
+          onSubmit={handleChangePassword}
+          className="w-full max-w-2xl flex flex-col gap-4 border-2 border-gray-200 px-8 py-6 rounded-xl shadow-md bg-white"
+        >
+          {/* Header */}
+          <h1 className="text-2xl font-bold text-center text-black">
+            Đổi mật khẩu
+          </h1>
+          {/* Mật khẩu hiện tại */}
+          <div className="flex flex-col gap-1">
+            <label className="font-semibold text-gray-600" htmlFor="password">
+              Mật khẩu hiện tại
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Nhập ít nhất 8 ký tự"
+                className={`${inputStyle} ${
+                  passwordFormErrors.password
+                    ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    : "border-[#CEDBE8]"
+                }`}
+                value={passwordFormData.password}
+                onChange={handlePasswordChange}
+              />
+              <span
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+              </span>
             </div>
-          )}
-        </div>
-        {/* Mật khẩu mới */}
-        <div className="flex flex-col gap-1">
-          <label className="font-semibold text-gray-600" htmlFor="newPassword">
-            Mật khẩu mới
-          </label>
-          <div className="relative">
-            <input
-              id="newPassword"
-              name="newPassword"
-              type={showPassword ? "text" : "password"}
-              placeholder="Nhập ít nhất 8 ký tự"
-              className={`${inputStyle} ${
-                passwordFormErrors.newPassword
-                  ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  : "border-[#CEDBE8]"
-              }`}
-              value={passwordFormData.newPassword}
-              onChange={handlePasswordChange}
-            />
-            <span
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-            </span>
+            {passwordFormErrors.password && (
+              <div className="text-sm text-red-500 font-medium mt-1">
+                {passwordFormErrors.password}
+              </div>
+            )}
           </div>
-          {passwordFormErrors.newPassword && (
-            <div className="text-sm text-red-500 font-medium mt-1">
-              {passwordFormErrors.newPassword}
-            </div>
-          )}
-        </div>
-        {/* Xác nhận mật khẩu */}
-        <div className="flex flex-col gap-1">
-          <label
-            className="font-semibold text-gray-600"
-            htmlFor="confirmPassword"
-          >
-            Xác nhận mật khẩu
-          </label>
-          <div className="relative">
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              placeholder="Nhập ít nhất 8 ký tự"
-              className={`${inputStyle} ${
-                passwordFormErrors.confirmPassword
-                  ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  : "border-[#CEDBE8]"
-              }`}
-              value={passwordFormData.confirmPassword}
-              onChange={handlePasswordChange}
-            />
-            <span
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-              onClick={() => setShowPassword(!showPassword)}
+          {/* Mật khẩu mới */}
+          <div className="flex flex-col gap-1">
+            <label
+              className="font-semibold text-gray-600"
+              htmlFor="newPassword"
             >
-              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
-            </span>
-          </div>
-          {passwordFormErrors.confirmPassword && (
-            <div className="text-sm text-red-500 font-medium mt-1">
-              {passwordFormErrors.confirmPassword}
+              Mật khẩu mới
+            </label>
+            <div className="relative">
+              <input
+                id="newPassword"
+                name="newPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Nhập ít nhất 8 ký tự"
+                className={`${inputStyle} ${
+                  passwordFormErrors.newPassword
+                    ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    : "border-[#CEDBE8]"
+                }`}
+                value={passwordFormData.newPassword}
+                onChange={handlePasswordChange}
+              />
+              <span
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+              </span>
             </div>
-          )}
-        </div>
-        {/* Button */}
-        <div className="flex justify-end">
-          <Button
-            text="Đổi mật khẩu"
-            variant="primary"
-            size="sm"
-            type="submit"
-          />
-        </div>
-      </form>
+            {passwordFormErrors.newPassword && (
+              <div className="text-sm text-red-500 font-medium mt-1">
+                {passwordFormErrors.newPassword}
+              </div>
+            )}
+          </div>
+          {/* Xác nhận mật khẩu */}
+          <div className="flex flex-col gap-1">
+            <label
+              className="font-semibold text-gray-600"
+              htmlFor="confirmPassword"
+            >
+              Xác nhận mật khẩu
+            </label>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                placeholder="Nhập ít nhất 8 ký tự"
+                className={`${inputStyle} ${
+                  passwordFormErrors.confirmPassword
+                    ? "border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    : "border-[#CEDBE8]"
+                }`}
+                value={passwordFormData.confirmPassword}
+                onChange={handlePasswordChange}
+              />
+              <span
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+              </span>
+            </div>
+            {passwordFormErrors.confirmPassword && (
+              <div className="text-sm text-red-500 font-medium mt-1">
+                {passwordFormErrors.confirmPassword}
+              </div>
+            )}
+          </div>
+          {/* Button */}
+          <div className="flex justify-end">
+            <Button
+              text="Đổi mật khẩu"
+              variant="primary"
+              size="sm"
+              type="submit"
+            />
+          </div>
+        </form>
+      ) : (
+        <></>
+      )}
     </main>
   );
 };
