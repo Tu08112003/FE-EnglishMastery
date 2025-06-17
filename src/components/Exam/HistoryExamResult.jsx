@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 const image_result = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/6.png"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../Button";
 import { Link } from "react-router-dom";
