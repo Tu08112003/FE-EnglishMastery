@@ -12,6 +12,7 @@ import {
   clearListWord,
 } from "../redux/slice/dictionarySlice";
 import { toast } from "react-toastify";
+import { getSimilarWords } from "../service/similarWordService.js";
 
 // Hàm debounce custom
 const debounce = (func, delay) => {
@@ -39,7 +40,7 @@ const Dictionary = () => {
         setShowSuggestion(true);
       } else {
         dispatch(clearCurrentWord());
-        dispatch(clearListWord())
+        dispatch(clearListWord());
         setHasSearched(false);
         setShowSuggestion(false);
       }
@@ -58,7 +59,23 @@ const Dictionary = () => {
     setSearchVocabulary(wordObj.word);
     setHasSearched(true);
     dispatch(getWord({ wordId: wordObj.wordId }));
+    fetchSimilarWords(wordObj.word);
     setShowSuggestion(false);
+  };
+
+  
+  // Fetch similar words when searchVocabulary changes
+  const fetchSimilarWords = async (word) => {
+    try {
+      const response = await getSimilarWords({ word });
+      if (response && response.data) {
+        return response.data.suggestions;
+      } else {
+        return
+      }
+    } catch (error) {
+      toast.error(error||"Không thể lấy danh sách từ tương tự.");
+    }
   };
 
   // Handle clear results
@@ -169,13 +186,13 @@ const Dictionary = () => {
             </p>
           ) : currentWord ? (
             <DictionaryResultCard
-            wordData={{
-              word: currentWord.word,
-              pronounce: currentWord.pronounce,
-              description: currentWord.description,
-            }}
-            query={searchVocabulary}
-          />
+              wordData={{
+                word: currentWord.word,
+                pronounce: currentWord.pronounce,
+                description: currentWord.description,
+              }}
+              query={searchVocabulary}
+            />
           ) : (
             <p className="text-center text-gray-600 font-semibold">
               Không tìm thấy thông tin cho từ này.

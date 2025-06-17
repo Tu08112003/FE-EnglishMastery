@@ -2,7 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "../Button.jsx";
 import PropTypes from "prop-types";
-import image_exame from "../../assets/images/img-exame.png";
+const image_exame = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/5.png"
+
 import { toast } from "react-toastify";
 const ExamCard = ({ title, onClick, locked = false }) => {
   const handleClick = () => {
