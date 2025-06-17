@@ -13,6 +13,7 @@ const banner = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web
 const feedback_1 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/2.png";
 const feedback_2 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/3.png";
 const feedback_3 = "https://pub-e860ef97c13d407c808df35aa1a698c7.r2.dev/material-web-app/4.png";
+
 const sectionData = {
   banner: {
     title: "Học Tiếng Anh hiệu quả cùng EnglishMastery",
