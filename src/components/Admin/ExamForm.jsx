@@ -193,7 +193,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
     try {
       const response = await uploadAudio({ file });
 
-      if (response.data?.status === 200) {
+      if (response.status === 200) {
         const audioUrl = response.data.url;
         if (!audioUrl) {
           throw new Error("Không nhận được URL file từ server");
@@ -254,7 +254,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
     setUploading((prev) => ({ ...prev, image: true }));
     try {
       const response = await uploadImage({ file });
-      if (response.data?.status === 200) {
+      if (response.status === 200) {
         const imageUrl = response.data.url;
         if (!imageUrl) {
           throw new Error("Không nhận được URL file từ server");
@@ -299,6 +299,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
       }
       const questionToSave = {
         ...questionForm,
+        questionNumber: parseInt(questionForm.questionNumber) - 1,
         options: questionForm.options.map((opt) => `${opt.id}. ${opt.value}`),
       };
       dispatch(addOrUpdateTempQuestion(questionToSave));
