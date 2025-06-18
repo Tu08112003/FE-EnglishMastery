@@ -100,6 +100,14 @@ const examSlice = createSlice({
     clearSubmitError: (state) => {
       state.submitError = null;
     },
+    resetExamState: (state) => {
+      state.exams = [];
+      state.examYears = [];
+      state.selectedYear = null;
+      state.selectedExam = null;
+      state.error = null;
+      state.loading = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -196,5 +204,5 @@ const examSlice = createSlice({
   },
 });
 
-export const { setSelectedYear, clearSubmitError } = examSlice.actions;
+export const { setSelectedYear, clearSubmitError, resetExamState } = examSlice.actions;
 export default examSlice.reducer;

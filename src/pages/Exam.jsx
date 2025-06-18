@@ -8,6 +8,7 @@ import {
   fetchAllExamsByYear,
   fetchExamsByYear,
   setSelectedYear,
+  resetExamState,
 } from "../redux/slice/examSlice.js";
 import Pagination from "../components/Pagination.jsx";
 
@@ -25,9 +26,12 @@ const Exam = () => {
     error,
     selectedYear,
   } = useSelector((state) => state.exam || {});
-
+  const {userInfo} = useSelector((state) => state.user || {});
   useEffect(() => {
     dispatch(fetchAllExamsByYear());
+    return () => {
+      dispatch(resetExamState());
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -66,11 +70,11 @@ const Exam = () => {
     // Đánh dấu đề thi khóa cho người dùng miễn phí
     const markedExams = filteredExams.map((exam) => ({
       ...exam,
-      locked: exam.testId === null,
+      locked: userInfo?.typeUser === 0 && exam.testId === null,
     }));
 
     return { totalPages, markedExams };
-  }, [filteredExams, examsPerPage]);
+  }, [filteredExams, examsPerPage, userInfo?.typeUser]);
 
   // Tính toán danh sách đề thi hiển thị cho trang hiện tại
   const displayExams = useMemo(() => {
