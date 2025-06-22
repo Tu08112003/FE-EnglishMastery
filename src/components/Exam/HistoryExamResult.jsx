@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import DetailExamResult from "../Exam/DetailExamResult";
 import { fetchUserInfo } from "../../redux/slice/userSlice";
 import { fetchHistoryExamById } from "../../redux/slice/examSlice";
-import formatDate from "../../utils/formatDate";
+// import formatDate from "../../utils/formatDate";
 
 const HistoryExamResult = () => {
   const [activePart, setActivePart] = useState(1);
@@ -153,7 +153,7 @@ const HistoryExamResult = () => {
               </div>
               <div>
                 <p className="text-gray-600">Ngày làm:</p>
-                <p className="font-semibold">{formatDate(completedDate)}</p>
+                <p className="font-semibold">{completedDate}</p>
               </div>
               <div>
                 <p className="text-gray-600">Thời gian hoàn thành:</p>
