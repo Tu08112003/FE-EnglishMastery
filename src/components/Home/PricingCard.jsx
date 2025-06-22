@@ -4,10 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Payment from "../Payment.jsx";
+
 const PricingCard = () => {
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
-  const {userInfo} = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.user);
   const [showPayment, setShowPayment] = useState(false);
+
 
   const handleShowPayment = () => {
     setShowPayment(true);
@@ -15,6 +17,7 @@ const PricingCard = () => {
   const handleClosePayment = () => {
     setShowPayment(false);
   };
+
   return (
     <div className="container mx-auto px-4">
       <h2 className="text-3xl font-bold text-center mb-12">Gói học nâng cấp</h2>
@@ -60,9 +63,7 @@ const PricingCard = () => {
                 text="Đăng ký ngay"
                 variant="primary"
                 size="lg"
-                onClick={() => {
-                  handleShowPayment();
-                }}
+                onClick={handleShowPayment}
               />
             ) : (
               <Button
