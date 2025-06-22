@@ -279,8 +279,8 @@ const SubmitExamResult = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-600 col-span-full text-center">
-                No answers available for Part {activePart}
+              <p className="text-gray-600 font-semibold text-center">
+                Không có câu trả lời nào cho Part {activePart}
               </p>
             )}
           </div>

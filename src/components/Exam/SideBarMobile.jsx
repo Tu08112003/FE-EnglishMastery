@@ -90,7 +90,7 @@ const SideBarMobile = ({
             variant="primary"
             size="lg"
             onClick={() => isStarted && setShowModal(true)}
-            disabled={!isStarted || submitting}
+            disabled={!isStarted || submitting || answeredQuestions === 0}
           />
         </div>
       </div>
