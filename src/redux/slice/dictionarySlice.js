@@ -7,9 +7,13 @@ export const searchVocabulary = createAsyncThunk(
     async ({ word }, { rejectWithValue }) => {
         try {
             const res = await searchWord({ word });
-            return res.data;
+            if (res.status === 200) {
+                return res.data;
+            } else {
+                return rejectWithValue(res?.message || 'Không thể tìm kiếm từ vựng');
+            }
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Không thể tìm kiếm từ vựng');
+            return rejectWithValue(err.response?.message || 'Không thể tìm kiếm từ vựng');
         }
     }
 );
@@ -20,13 +24,16 @@ export const getVocabulary = createAsyncThunk(
     async ({ wordId }, { rejectWithValue }) => {
         try {
             const res = await getWord({ wordId });
-            return res.data; 
+            if (res.status === 200) {
+                return res.data;
+            } else {
+                return rejectWithValue(res?.message || 'Không thể tìm kiếm chi tiết từ vựng');
+            }
         } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Không thể tìm kiếm chi tiết từ vựng');
+            return rejectWithValue(err.response?.message || 'Không thể tìm kiếm chi tiết từ vựng');
         }
     }
 );
-
 
 const dictionarySlice = createSlice({
     name: 'dictionary',
