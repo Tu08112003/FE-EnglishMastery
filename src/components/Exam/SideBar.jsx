@@ -76,7 +76,7 @@ const Sidebar = ({
           variant="primary"
           size="md"
           onClick={() => isStarted && setShowModal(true)}
-          disabled={!isStarted || submitting}
+          disabled={!isStarted || submitting || answeredQuestions === 0}
         />
       </div>
     </div>
