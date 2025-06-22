@@ -165,10 +165,6 @@ const TakeTheExam = () => {
   // Nộp bài thi
   const handleSubmit = async () => {
         if (!isStarted || !selectedExam) return;
-        if(Object.keys(userAnswers).length === 0) {
-            toast.warning("Bạn chưa trả lời câu hỏi nào. Vui lòng trả lời ít nhất một câu hỏi trước khi nộp bài.");
-            return;
-        }
         const questionMap = new Map();
         Object.values(selectedExam.questionsByPart).forEach(partQuestions => {
             partQuestions.forEach(question => {
