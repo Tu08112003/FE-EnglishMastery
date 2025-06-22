@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchQRCode, fetchCheckPayment } from "../redux/slice/paymentSlice";
 import { fetchUserInfo } from "../redux/slice/userSlice";
 import { toast } from "react-toastify";
-
 const Payment = ({ show, onClose }) => {
   const { qrCode, loadingQRCode, loadingPayment, errorQRCode} =
     useSelector((state) => state.payment);
