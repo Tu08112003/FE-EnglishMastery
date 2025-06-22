@@ -1,85 +1,129 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getExamByYear, getExamById, getAllExamByYear, resultSubmitExam, getHistoryExam, getHistoryExamById } from '../../service/examService';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  getExamByYear,
+  getExamById,
+  getAllExamByYear,
+  resultSubmitExam,
+  getHistoryExam,
+  getHistoryExamById,
+} from "../../service/examService";
 
 // Lấy tất cả các năm có đề thi
 export const fetchAllExamsByYear = createAsyncThunk(
-  'exam/fetchAllExamsByYear',
+  "exam/fetchAllExamsByYear",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getAllExamByYear();
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy các năm có đề thi");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không tìm thấy các năm có đề thi');
+      return rejectWithValue(
+        error.message || "Không tìm thấy các năm có đề thi"
+      );
     }
   }
 );
 
 // Lấy đề thi có trong năm
 export const fetchExamsByYear = createAsyncThunk(
-  'exam/fetchExamsByYear',
+  "exam/fetchExamsByYear",
   async (year, { rejectWithValue }) => {
     try {
       const response = await getExamByYear({ year });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy đề thi có trong năm này");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không tìm thấy đề thi có trong năm này');
+      return rejectWithValue(
+        error.message || "Không tìm thấy đề thi có trong năm này"
+      );
     }
   }
 );
 
 // Lấy thông tin đề thi bằng id
 export const fetchExamById = createAsyncThunk(
-  'exam/fetchExamById',
+  "exam/fetchExamById",
   async (testId, { rejectWithValue }) => {
     try {
       const response = await getExamById({ testId });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy thông tin đề thi");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không tìm thấy thông tin đề thi');
+      return rejectWithValue(
+        error.message || "Không tìm thấy thông tin đề thi"
+      );
     }
   }
 );
 
 // Nộp bài thi
 export const submitExam = createAsyncThunk(
-  'exam/submitExam',
+  "exam/submitExam",
   async (examData, { rejectWithValue }) => {
     try {
       const response = await resultSubmitExam({ obj: examData });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không thể nộp bài thi. Vui lòng thử lại.");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không thể nộp bài thi. Vui lòng thử lại.');
+      return rejectWithValue(
+        error.message || "Không thể nộp bài thi. Vui lòng thử lại."
+      );
     }
   }
 );
 
 // Lịch sử làm bài thi
 export const fetchAllHistoryExam = createAsyncThunk(
-  'exam/fetchAllHistoryExam',
+  "exam/fetchAllHistoryExam",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getHistoryExam();
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy lịch sử làm bài thi");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');
+      return rejectWithValue(
+        error.message || "Không tìm thấy lịch sử làm bài thi"
+      );
     }
   }
 );
 
 // Lịch sử làm bài thi theo id
 export const fetchHistoryExamById = createAsyncThunk(
-  'exam/fetchHistoryExamById',
+  "exam/fetchHistoryExamById",
   async (testId, { rejectWithValue }) => {
     try {
       const response = await getHistoryExamById({ testId });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy lịch sử làm bài thi");
+      }
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Không tìm thấy lịch sử làm bài thi');
+      return rejectWithValue(
+        error.message || "Không tìm thấy lịch sử làm bài thi"
+      );
     }
   }
 );
+
 const examSlice = createSlice({
-  name: 'exam',
+  name: "exam",
   initialState: {
     exams: [],
     examYears: [],
@@ -87,9 +131,9 @@ const examSlice = createSlice({
     selectedExam: null,
     error: null,
     selectedYear: null,
-    submitting: false, 
-    submitError: null, 
-    submitResult: null, 
+    submitting: false,
+    submitError: null,
+    submitResult: null,
     historyExam: null,
     historyExamById: null,
   },
