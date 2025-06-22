@@ -184,7 +184,7 @@ const Dashboard = () => {
                             {exam.score}/990
                           </td>
                           <td className="px-4 py-2 font-semibold text-gray-600">
-                            {formatDate(exam.dateTest)}
+                            {exam.dateTest}
                           </td>
                         </tr>
                       ))}
