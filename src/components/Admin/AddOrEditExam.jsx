@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ModalWrapper from "../ModalWrapper.jsx";
 import ExamForm from "./ExamForm.jsx";
 import Button from "../Button.jsx";
+import SearchBar from "../SearchBar.jsx";
 import {
   setTempExam,
   updateTempExamDetails,
@@ -23,7 +24,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
   const [activePart, setActivePart] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
-
+  const [searchQuery, setSearchQuery] = useState(""); 
   useEffect(() => {
     if (show) {
       if (examData && (examData.idTest || examData.testId)) {
@@ -39,6 +40,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
         dispatch(resetTempExam());
         setActivePart(1);
       }
+      setSearchQuery(""); 
     }
   }, [show, examData, dispatch]);
 
@@ -46,6 +48,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
     dispatch(resetTempExam());
     setActivePart(1);
     setSelectedQuestion(null);
+    setSearchQuery(""); 
     onClose();
   };
 
@@ -65,7 +68,6 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
       return;
     }
     if (examData && (examData.idTest || examData.testId)) {
-      // Edit mode
       try {
         await dispatch(
           fetchUpdateTest({
@@ -85,7 +87,6 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
         toast.error(error || "Cập nhật đề thi thất bại!");
       }
     } else {
-      // Add mode
       try {
         await dispatch(
           fetchCreateTest({
@@ -111,7 +112,11 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
     dispatch(updateTempExamDetails({ [id]: value }));
   };
 
-  // ******** START: PHẦN SỬA LỖI ********
+  // Hàm xử lý thay đổi ô tìm kiếm
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
   const defaultParts = Array.from({ length: 7 }, (_, i) => ({
     partNumber: i + 1,
   }));
@@ -123,11 +128,21 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
     return existingPart ? { ...defaultPart, ...existingPart } : defaultPart;
   });
 
+  // Lọc các câu hỏi theo phần và tìm kiếm
+  const filteredQuestions = tempExam.questions
+  .filter((q) => q.partNumber === activePart)
+  .filter((q) =>
+    searchQuery
+      ? (q.questionNumber + 1).toString() === searchQuery ||
+        q.questionText.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
+
   return (
     <ModalWrapper show={show} onClose={showModal ? () => {} : handleClose}>
       <form
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-xl py-6 flex flex-col px-5 w-full max-w-6xl h-full shadow-lg"
+        className="bg-white rounded-xl py-6 flex flex-col px-5 w-full max-w-6xl h-full shadow-lg max-h-[95vh] overflow-y-auto custom-scrollbar"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
@@ -211,8 +226,14 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                 </li>
               ))}
             </ul>
-            <div className="w-full flex-1 border-2 border-gray-300 rounded-lg mb-4 p-2">
-              <div className="flex justify-end mb-2">
+            <div className="w-full flex-1 border-2 border-gray-300 rounded-lg mb-4 p-4">
+              <div className="flex gap-3 p-2">
+                <SearchBar
+                  text="Nhập vào id câu hỏi hoặc nội dung câu hỏi ví dụ: '1' hoặc 'What is your name?'"
+                  focusBorderColor="focus:ring-gray-400"
+                  value={searchQuery} 
+                  onChange={handleSearchChange} 
+                />
                 <Button
                   text="Thêm câu hỏi"
                   variant="primary"
@@ -221,22 +242,21 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                   icon={<FontAwesomeIcon icon="fa-solid fa-plus" />}
                 />
               </div>
-              <div className="max-h-[210px] overflow-y-auto hide-scrollbar rounded-2xl border border-gray-300">
+              <div className="flex-1 max-h-[370px] h-full overflow-y-auto rounded-2xl border border-gray-300">
                 <table className="w-full text-sm text-gray-700 font-semibold border-separate border-spacing-0">
                   <thead className="bg-gray-200 sticky top-0 z-10">
                     <tr className="text-black font-bold">
-                      <th className="py-3 px-4 text-center">STT</th>
+                      <th className="py-3 px-4 text-center">ID</th>
                       <th className="py-3 px-4 text-left">Câu hỏi</th>
                       <th className="py-3 px-4 text-center">Đáp án</th>
                       <th className="py-3 px-4 text-center">Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {tempExam.questions
-                      .filter((q) => q.partNumber === activePart)
-                      .map((question, index) => (
-                        <tr key={question.questionNumber}>
-                          <td className="px-4 py-2 text-center">{index + 1}</td>
+                    {filteredQuestions.length > 0 ? (
+                      filteredQuestions.map((question) => (
+                        <tr key={question.questionNumber} className="hover:bg-gray-100 hover:cursor-pointer">
+                          <td className="px-4 py-2 text-center">{question.questionNumber + 1}</td>
                           <td className="px-4 py-2 text-left max-w-[300px] truncate whitespace-nowrap">
                             {question.questionText}
                           </td>
@@ -275,7 +295,14 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-4 py-2 text-center">
+                          Không tìm thấy câu hỏi phù hợp
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
