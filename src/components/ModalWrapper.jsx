@@ -6,9 +6,7 @@ const ModalWrapper = ({ show, onClose, children }) => {
         onClick={onClose}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 py-4 px-4 sm:px-6"
       >
-        <>
-            {children}
-        </>
+        {children}
       </div>
     )
   }

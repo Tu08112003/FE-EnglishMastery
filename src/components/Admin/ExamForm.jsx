@@ -515,7 +515,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
                           id="questionNumber"
                           placeholder="Nhập vào số thứ tự câu"
                           type="text"
-                          value={questionForm.questionNumber}
+                          value={questionForm.questionNumber + 1}
                           onChange={handleQuestionInputChange}
                         />
                       </div>
