@@ -12,7 +12,7 @@ import {
   submitExam,
   clearSubmitError,
 } from "../../redux/slice/examSlice";
-import formatDate from "../../utils/formatDate";
+import formatDateTime from "../../utils/formatDateTime";
 import formatTime from "../../utils/formatTime";
 import { toast } from "react-toastify";
 
@@ -67,7 +67,12 @@ const TakeTheExam = () => {
       }, 1000);
     } else if (timeLeft <= 0 && isStarted) {
       setTimeLeft(0);
-      handleSubmit();
+        if (Object.keys(userAnswers).length === 0) {
+            toast.warning("Hết thời gian! Bạn chưa trả lời câu hỏi nào, bài thi sẽ không được nộp.");
+            navigate("/exam");
+        } else {
+            handleSubmit();
+        }
     }
     return () => clearInterval(timer);
   }, [isStarted, timeLeft]);
@@ -160,6 +165,10 @@ const TakeTheExam = () => {
   // Nộp bài thi
   const handleSubmit = async () => {
         if (!isStarted || !selectedExam) return;
+        if(Object.keys(userAnswers).length === 0) {
+            toast.warning("Bạn chưa trả lời câu hỏi nào. Vui lòng trả lời ít nhất một câu hỏi trước khi nộp bài.");
+            return;
+        }
         const questionMap = new Map();
         Object.values(selectedExam.questionsByPart).forEach(partQuestions => {
             partQuestions.forEach(question => {
@@ -186,7 +195,7 @@ const TakeTheExam = () => {
 
         const timeSpentInHours = 2 - timeLeft;
         const timeDoTest = formatTime(timeSpentInHours);
-        const dateTest = formatDate(new Date());
+        const dateTest = formatDateTime(new Date());
 
         const payload = {
             testId: testId, 
