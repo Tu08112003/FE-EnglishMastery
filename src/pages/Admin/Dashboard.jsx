@@ -148,7 +148,7 @@ const Dashboard = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-semibold mb-2">
+            <h2 className="text-lg font-semibold mb-2">
               Lịch sử làm đề gần đây
             </h2>
             {loading ? (
