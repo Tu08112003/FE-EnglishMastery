@@ -280,7 +280,7 @@ const HistoryExamResult = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-600 col-span-full text-center">
+              <p className="text-gray-600 font-semibold text-center">
                 Không có câu trả lời cho Part {activePart}
               </p>
             )}
