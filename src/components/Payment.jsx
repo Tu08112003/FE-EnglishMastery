@@ -32,8 +32,10 @@ const Payment = ({ show, onClose }) => {
     try {
       await dispatch(fetchCheckPayment({ code: qrCode.code })).unwrap();
       toast.success("Thanh toán thành công");
-      await dispatch(fetchUserInfo()).unwrap();
-      setTimeout(onClose, 2000);
+      const result = await dispatch(fetchUserInfo()).unwrap();
+      if (result.typeUser !== 0) {
+        onClose(); 
+      }
     } catch (err) {
       toast.error(err || "Thanh toán thất bại! Vui lòng thử lại");
     }
