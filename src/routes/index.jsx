@@ -117,11 +117,9 @@ const routes = [
       {
         path: "/forbidden",
         component: (
-          <PrivateRoute>
             <ForbiddenPage />
-          </PrivateRoute>
         ),
-        protected: true,
+        protected: false,
       }
     ],
   },

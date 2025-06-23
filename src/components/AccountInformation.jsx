@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserInfo } from "../redux/slice/userSlice";
+import { fetchUserInfo ,clearError} from "../redux/slice/userSlice";
 import Button from "./Button";
 import { toast } from "react-toastify";
 import { updateUser, changePassword } from "../service/userService";
@@ -27,14 +27,17 @@ const AccountInformation = () => {
   const { userInfo, loading, error } = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(fetchUserInfo());
-  }, [dispatch]);
+    if (!loading && !error) {
+      dispatch(fetchUserInfo());
+    }
+  }, [dispatch, userInfo, loading, error]);
 
   useEffect(() => {
     if (error) {
       toast.error(error);
+      dispatch(clearError());
     }
-  }, [error]);
+  }, [error, dispatch]);
 
   useEffect(() => {
     if (userInfo) {
