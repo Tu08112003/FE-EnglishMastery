@@ -2,7 +2,6 @@ import axios from "axios";
 import { logout } from "../redux/slice/authSlice";
 import { clearUserInfo } from "../redux/slice/userSlice";
 import { getStore } from "../redux/storeAccessor";
-
 import { toast } from "react-toastify";
 import { checkRefreshToken } from "../service/authService";
 const instance = axios.create({
@@ -86,8 +85,11 @@ instance.interceptors.response.use(
       }
     }
 
-    if(error.response && error.response.status === 403){
-      window.location.href = "/forbidden";
+    if (error.response && error.response.status === 403) {
+      if (window.location.pathname !== "/forbidden") {
+        window.location.href = "/forbidden";
+      }
+      return Promise.reject(error);
     }
 
     if (error.response && error.response.data) {
