@@ -30,7 +30,7 @@ const AccountInformation = () => {
     if (!loading && !error) {
       dispatch(fetchUserInfo());
     }
-  }, [dispatch, userInfo, loading, error]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (error) {

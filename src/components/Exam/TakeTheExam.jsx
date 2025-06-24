@@ -282,7 +282,7 @@ const TakeTheExam = () => {
         <Button text="Quay lại" size="sm" onClick={() => navigate(-1)} variant="default" icon={<FontAwesomeIcon icon="fa-solid fa-arrow-left" />}/>
       </div>
     );
-  }
+ }
 
   return (
     <main className="container mx-auto flex flex-row items-center justify-center py-6 gap-4">
