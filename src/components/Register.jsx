@@ -4,21 +4,23 @@ import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button.jsx";
 import { validateRegister } from "../utils/validate.js";
-import { authRegister, authGoogleLogin } from '../service/authService.js';
+import { authRegister, authGoogleLogin } from "../service/authService.js";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slice/authSlice";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    userName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const googleButton = useRef(null);
@@ -36,6 +38,7 @@ const Register = () => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
+      setIsLoading(true);
       try {
         const res = await authRegister({
           userName: formData.userName,
@@ -43,21 +46,26 @@ const Register = () => {
           password: formData.password,
         });
         if (res && res.data) {
-          toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
-          navigate('/login');
+          toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+          navigate("/login");
         } else {
-          toast.error(res.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+          toast.error(res.message || "Đăng ký thất bại. Vui lòng thử lại.");
         }
       } catch (error) {
-        console.error('Signup Error:', error);
-        const message = error.response?.data?.message || 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+        console.error("Signup Error:", error);
+        const message =
+          error.response?.data?.message ||
+          "Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.";
         toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleGoogleCallbackResponse = async (response) => {
     const idToken = response.credential;
+    setIsGoogleLoading(true);
     try {
       const res = await authGoogleLogin({ idToken });
       if (res && res.data) {
@@ -67,7 +75,7 @@ const Register = () => {
         localStorage.setItem("refresh_token", refreshToken);
         localStorage.setItem("role", role);
         dispatch(loginSuccess({ role }));
-        
+
         toast.success("Đăng nhập thành công với Google");
         if (role === "ADMIN") {
           navigate("/admin");
@@ -83,15 +91,23 @@ const Register = () => {
         error.response?.data?.message ||
         "Đã xảy ra lỗi khi đăng nhập bằng Google.";
       toast.error(message);
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
+  
   const handleCustomGoogleLogin = () => {
+    setIsGoogleLoading(true); 
     if (googleButton.current) {
       const clickableElement = googleButton.current.querySelector('[role="button"]');
       if (clickableElement) {
         clickableElement.click();
+      } else {
+        setIsGoogleLoading(false); 
       }
+    } else {
+      setIsGoogleLoading(false); 
     }
   };
 
@@ -99,14 +115,15 @@ const Register = () => {
     /* global google */
     if (window.google && google.accounts) {
       google.accounts.id.initialize({
-        client_id: "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com", 
+        client_id:
+          "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com",
         callback: handleGoogleCallbackResponse,
       });
 
-      google.accounts.id.renderButton(
-        googleButton.current,
-        { theme: "outline", size: "large" } 
-      );
+      google.accounts.id.renderButton(googleButton.current, {
+        theme: "outline",
+        size: "large",
+      });
     }
   }, []);
 
@@ -247,7 +264,13 @@ const Register = () => {
         </div>
 
         {/* Register Button */}
-        <Button text="Đăng ký" variant="primary" size="lg" type="submit" />
+        <Button
+          text={isLoading ? "Đang đăng ký..." : "Đăng ký"}
+          variant="primary"
+          size="lg"
+          type="submit"
+          disabled={isLoading || isGoogleLoading}
+        />
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-300"></div>
@@ -256,12 +279,13 @@ const Register = () => {
         </div>
         {/* Đăng nhập bằng Google */}
         <Button
-          text="Đăng nhập với Google" 
-          type="button" 
+          text={isGoogleLoading ? "Đang đăng nhập với Google..." : "Đăng nhập với Google"}
+          icon={<FontAwesomeIcon icon={faGoogle} size="lg" />}
+          type="button"
           variant="default"
           size="lg"
-          icon={<FontAwesomeIcon icon={faGoogle} size="lg" />} 
-          onClick={handleCustomGoogleLogin} 
+          onClick={handleCustomGoogleLogin}
+          disabled={isGoogleLoading || isLoading}
         />
 
         <div ref={googleButton} style={{ display: "none" }}></div>
