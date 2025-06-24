@@ -234,7 +234,10 @@ const Home = () => {
               </div>
             ) : recentResults.length === 0 ? (
               <div className="text-gray-600 font-semibold text-center text-lg">
-                Chưa có lịch sử làm bài thi
+                Bạn chưa làm bài thi nào.{" "}
+                <Link to="/exam" className="text-[#2C99E2] hover:underline">
+                    Thử làm bài thi ngay!
+                </Link>
               </div>
             ) : (
               <RecentResultsCard data={recentResults} />
