@@ -16,6 +16,8 @@ const Login = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,6 +37,7 @@ const Login = () => {
     setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
+      setIsLoading(true);
       try {
         const res = await authLogin({
           email: formData.email,
@@ -69,12 +72,15 @@ const Login = () => {
           error.response?.data?.message ||
           "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.";
         toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleGoogleCallbackResponse = async (response) => {
     const idToken = response.credential;
+    setIsGoogleLoading(true);
     try {
       const res = await authGoogleLogin({ idToken });
       if (res && res.data) {
@@ -100,15 +106,23 @@ const Login = () => {
         error.response?.data?.message ||
         "Đã xảy ra lỗi khi đăng nhập bằng Google.";
       toast.error(message);
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
+  
   const handleCustomGoogleLogin = () => {
+    setIsGoogleLoading(true); 
     if (googleButton.current) {
       const clickableElement = googleButton.current.querySelector('[role="button"]');
       if (clickableElement) {
         clickableElement.click();
+      } else {
+        setIsGoogleLoading(false); 
       }
+    } else {
+      setIsGoogleLoading(false); 
     }
   };
 
@@ -116,14 +130,19 @@ const Login = () => {
     /* global google */
     if (window.google && google.accounts) {
       google.accounts.id.initialize({
-        client_id: "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com",
+        client_id:
+          "495739615131-v8oqk6va02oc5oevr08r5a5a4hrb5ctb.apps.googleusercontent.com",
         callback: handleGoogleCallbackResponse,
       });
 
-      google.accounts.id.renderButton(
-        googleButton.current,
-        { theme: "outline", size: "large", text: "signin_with", shape: "rectangular", logo_alignment: "left", width: "100%" }
-      );
+      google.accounts.id.renderButton(googleButton.current, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "rectangular",
+        logo_alignment: "left",
+        width: "100%",
+      });
     }
   }, []);
 
@@ -212,21 +231,28 @@ const Login = () => {
           </div>
         </div>
         {/* Đăng nhập */}
-        <Button text="Đăng nhập" variant="primary" size="lg" type="submit" />
+        <Button
+          text={isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+          variant="primary"
+          size="lg"
+          type="submit"
+          disabled={isLoading || isGoogleLoading}
+        />
         {/* Divide */}
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-300"></div>
           <span className="text-sm text-[#49719C]">hoặc</span>
           <div className="h-px flex-1 bg-gray-300"></div>
         </div>
-        
+
         <Button
-          text="Đăng nhập với Google"
-          icon={<FontAwesomeIcon icon={faGoogle} size="lg"/>}
-          type="button" 
-          variant="default" 
+          text={isGoogleLoading ? "Đang đăng nhập với Google..." : "Đăng nhập với Google"}
+          icon={<FontAwesomeIcon icon={faGoogle} size="lg" />}
+          type="button"
+          variant="default"
           size="lg"
           onClick={handleCustomGoogleLogin}
+          disabled={isGoogleLoading || isLoading}
         />
 
         <div ref={googleButton} style={{ display: "none" }}></div>

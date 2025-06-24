@@ -164,6 +164,10 @@ const EditUser = ({ show, onClose, user }) => {
               <p className="font-semibold text-gray-600">Loại người dùng</p>
               <p className="font-bold">User</p>
             </div>
+            <div className="space-y-2">
+              <p className="font-semibold text-gray-600">Gói học đã đăng ký</p>
+              <p className="font-bold">{user?.typeUser === 0? "Chưa đăng ký gói học nào": "Lifetime"}</p>
+            </div>
           </div>
           {/* Danh sách các quyền */}
           <div className="w-full flex flex-col gap-4 border-gray-200 py-3">
