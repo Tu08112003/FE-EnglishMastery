@@ -264,7 +264,7 @@ const Note = () => {
           </p>
         ) : filteredVocabularies.length === 0 ? (
           <p className="text-center text-gray-600 text-lg font-medium py-8">
-            Không tìm thấy từ vựng nào.
+            Bạn hiện tại chưa có từ vựng nào. Hãy thêm từ vựng mới đi nào!
           </p>
         ) :(
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
