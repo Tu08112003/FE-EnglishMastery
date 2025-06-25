@@ -40,7 +40,7 @@ const TakeTheExam = () => {
   const { testId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedExam, examNotSubmit, loading, error, submitting, submitError } = useSelector(
+  const { selectedExam, examNotSubmit, loading, error, submitting } = useSelector(
     (state) => state.exam || {}
   );
 
@@ -134,11 +134,7 @@ const TakeTheExam = () => {
         
         // Gọi handleSubmit với status "0" để lưu nháp
         if (handleSubmitRef.current) {
-          handleSubmitRef.current("0").then(() => {
-            toast.info("Đã tự động lưu tiến độ do không hoạt động trong 5 phút");
-          }).catch(() => {
-            toast.error("Tự động lưu thất bại");
-          });
+          handleSubmitRef.current("0");
         }
       }, 1 * 60 * 1000); 
     }
@@ -294,12 +290,12 @@ const TakeTheExam = () => {
         navigate("/exam/result");
       } else {
         // Auto-save - user tiếp tục làm bài
-        toast.success("Đã lưu tiến độ bài thi!");
-        // Không set setIsStarted(false) để user có thể tiếp tục làm bài
       }
     } catch (error) {
       setShowModal(false);
-      toast.error(error.message || "Nộp bài thất bại. Vui lòng thử lại.");
+      if (status === "1") {
+        toast.error(error.message || "Nộp bài thất bại. Vui lòng thử lại.");
+      }
     }
   };
 
@@ -488,7 +484,6 @@ const TakeTheExam = () => {
         onCancel={() => {setShowModal(false); dispatch(clearSubmitError());}}
         onConfirm={() => handleSubmit("1")}
       />
-      {submitError && toast.error(submitError)}
       <SideBarMobile
         parts={parts}
         allQuestionIds={allQuestionIds}
