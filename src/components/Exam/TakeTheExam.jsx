@@ -15,7 +15,7 @@ import {
 } from "../../redux/slice/examSlice";
 import formatDateTime from "../../utils/formatDateTime";
 import formatTime from "../../utils/formatTime";
-import parseFomatTime from "../../utils/parseFormatTime";
+import convertFormatTime from "../../utils/convertFormatTime";
 import { toast } from "react-toastify";
 
 // Cấu hình các phần
@@ -83,7 +83,7 @@ const TakeTheExam = () => {
       }, {});
       
       setUserAnswers(restoredAnswers);
-      setTimeLeft(2 - parseFomatTime(examNotSubmit.timeSpent));
+      setTimeLeft(2 - convertFormatTime(examNotSubmit.timeSpent));
       setIsStarted(true);
       
       // Focus vào câu trả lời cuối cùng
