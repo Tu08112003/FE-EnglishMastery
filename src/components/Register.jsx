@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
@@ -63,9 +63,17 @@ const Register = () => {
     }
   };
 
-  const handleGoogleCallbackResponse = async (response) => {
+  const handleGoogleCallbackResponse = useCallback(async (response) => {
+    // Clear timeout ngay khi callback được gọi vì API đã bắt đầu
+    if (window.googleLoginTimeout) {
+      clearTimeout(window.googleLoginTimeout);
+      window.googleLoginTimeout = null;
+    }
+    
     const idToken = response.credential;
+    // Đảm bảo loading state được set (có thể đã bị timeout reset)
     setIsGoogleLoading(true);
+    
     try {
       const res = await authGoogleLogin({ idToken });
       if (res && res.data) {
@@ -94,20 +102,38 @@ const Register = () => {
     } finally {
       setIsGoogleLoading(false);
     }
-  };
+  }, [dispatch, navigate]);
 
   
   const handleCustomGoogleLogin = () => {
     setIsGoogleLoading(true); 
+    
+    // Timeout chỉ để xử lý trường hợp người dùng không chọn tài khoản
+    // Sẽ bị clear ngay khi callback được gọi (tức là user đã chọn tài khoản)
+    const timeoutId = setTimeout(() => {
+      // Chỉ reset nếu chưa có API call nào đang thực hiện
+      if (window.googleLoginTimeout === timeoutId) {
+        setIsGoogleLoading(false);
+        window.googleLoginTimeout = null;
+      }
+    }, 4000);
+    
+    // Lưu timeout ID để có thể clear nó nếu login thành công
+    window.googleLoginTimeout = timeoutId;
+    
     if (googleButton.current) {
       const clickableElement = googleButton.current.querySelector('[role="button"]');
       if (clickableElement) {
         clickableElement.click();
       } else {
+        clearTimeout(timeoutId);
         setIsGoogleLoading(false); 
+        window.googleLoginTimeout = null;
       }
     } else {
+      clearTimeout(timeoutId);
       setIsGoogleLoading(false); 
+      window.googleLoginTimeout = null;
     }
   };
 
@@ -125,7 +151,15 @@ const Register = () => {
         size: "large",
       });
     }
-  }, []);
+
+    // Cleanup function để clear timeout khi component unmount
+    return () => {
+      if (window.googleLoginTimeout) {
+        clearTimeout(window.googleLoginTimeout);
+        window.googleLoginTimeout = null;
+      }
+    };
+  }, [handleGoogleCallbackResponse]);
 
   return (
     <div className="min-h-screen flex justify-center mb-10">
