@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "../Button";
@@ -9,19 +9,21 @@ import Sidebar from "../Exam/SideBar";
 import SideBarMobile from "./SideBarMobile";
 import {
   fetchExamById,
+  fetchExamNotSubmit,
   submitExam,
   clearSubmitError,
 } from "../../redux/slice/examSlice";
 import formatDateTime from "../../utils/formatDateTime";
 import formatTime from "../../utils/formatTime";
+import parseFomatTime from "../../utils/parseFormatTime";
 import { toast } from "react-toastify";
 
-// Cấu hình các phần của bài thi
+// Cấu hình các phần
 const parts = [
   { part: 1, question: Array.from({ length: 6 }, (_, i) => i) },
   { part: 2, question: Array.from({ length: 25 }, (_, i) => i + 6) },
-  { part: 3, question: Array.from({ length: 39 }, (_, i) => i + 31) }, 
-  { part: 4, question: Array.from({ length: 30 }, (_, i) => i + 70) }, 
+  { part: 3, question: Array.from({ length: 39 }, (_, i) => i + 31) },
+  { part: 4, question: Array.from({ length: 30 }, (_, i) => i + 70) },
   { part: 5, question: Array.from({ length: 30 }, (_, i) => i + 100) },
   { part: 6, question: Array.from({ length: 16 }, (_, i) => i + 130) },
   { part: 7, question: Array.from({ length: 54 }, (_, i) => i + 146) },
@@ -29,7 +31,7 @@ const parts = [
 
 const allQuestionIds = Array.from({ length: 200 }, (_, i) => i);
 
-// Hàm tìm cấu hình của một phần dựa trên ID câu hỏi
+// Hàm tìm cấu hình phần
 const findPartConfig = (questionId) => {
   return parts.find((p) => p.question.includes(questionId)) || null;
 };
@@ -38,52 +40,129 @@ const TakeTheExam = () => {
   const { testId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedExam, loading, error, submitting, submitError } = useSelector(
+  const { selectedExam, examNotSubmit, loading, error, submitting, submitError } = useSelector(
     (state) => state.exam || {}
   );
 
-  // State quản lý trạng thái của bài thi
+  // State
   const [isStarted, setIsStarted] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(2); 
+  const [timeLeft, setTimeLeft] = useState(2);
   const [selectedQuestionId, setSelectedQuestionId] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
 
-  // Fetch dữ liệu bài thi khi component được mount
+  // Ref để lưu timeout ID cho auto-save
+  const inactivityTimerRef = useRef(null);
+  const handleSubmitRef = useRef(null);
+
+  // Fetch dữ liệu
   useEffect(() => {
     if (testId) {
       dispatch(fetchExamById(testId));
+      dispatch(fetchExamNotSubmit(testId));
     }
   }, [dispatch, testId]);
+
+  // Map dữ liệu từ examNotSubmit
+  useEffect(() => {
+    if (examNotSubmit && examNotSubmit.userAnswer && examNotSubmit.timeSpent !== undefined) {
+      const restoredAnswers = examNotSubmit.userAnswer.reduce((acc, answer) => {
+        // Kiểm tra các điều kiện khác nhau để lọc câu đã trả lời
+        const hasValidAnswer = answer.userAnswer && 
+                              answer.userAnswer !== null && 
+                              answer.userAnswer !== undefined && 
+                              answer.userAnswer.toString().trim() !== "" && 
+                              answer.userAnswer !== "N/A" &&
+                              answer.userAnswer !== "null";
+        
+        if (hasValidAnswer) {
+          acc[answer.questionNumber] = answer.userAnswer;
+        }
+        return acc;
+      }, {});
+      
+      setUserAnswers(restoredAnswers);
+      setTimeLeft(2 - parseFomatTime(examNotSubmit.timeSpent));
+      setIsStarted(true);
+      
+      // Focus vào câu trả lời cuối cùng
+      const answeredQuestionNumbers = Object.keys(restoredAnswers).map(Number).sort((a, b) => b - a);
+      if (answeredQuestionNumbers.length > 0) {
+        const lastAnsweredQuestion = answeredQuestionNumbers[0]; // Câu cuối cùng (số lớn nhất)
+        setSelectedQuestionId(lastAnsweredQuestion);
+      }
+    } else if (examNotSubmit === null) {
+      setUserAnswers({});
+      setTimeLeft(2);
+      setIsStarted(false);
+    }
+  }, [examNotSubmit]);
 
   // Bộ đếm thời gian
   useEffect(() => {
     let timer;
     if (isStarted && timeLeft > 0) {
       timer = setInterval(() => {
-        // Trừ đi 1 giây, nhưng được biểu diễn dưới dạng giờ (1/3600)
         setTimeLeft((prev) => prev - 1 / 3600);
       }, 1000);
     } else if (timeLeft <= 0 && isStarted) {
       setTimeLeft(0);
-        if (Object.keys(userAnswers).length === 0) {
-            toast.warning("Hết thời gian! Bạn chưa trả lời câu hỏi nào, bài thi sẽ không được nộp.");
-            navigate("/exam");
-        } else {
-            handleSubmit();
+      if (Object.keys(userAnswers).length === 0) {
+        toast.warning("Hết thời gian! Bạn chưa trả lời câu hỏi nào, bài thi sẽ không được nộp.");
+        navigate("/exam");
+      } else {
+        // Gọi handleSubmit thông qua ref để tránh dependency
+        if (handleSubmitRef.current) {
+          handleSubmitRef.current("0");
         }
+      }
     }
     return () => clearInterval(timer);
-  }, [isStarted, timeLeft]);
+  }, [isStarted, timeLeft, userAnswers, navigate]);
 
-  // Tìm cấu hình của phần hiện tại dựa trên câu hỏi đang được chọn
+  // Hàm reset timer không hoạt động
+  const resetInactivityTimer = useCallback(() => {
+    // Clear timeout cũ nếu có
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    
+    // Chỉ set timer mới khi đang làm bài và có ít nhất 1 câu trả lời
+    if (isStarted && Object.keys(userAnswers).length > 0) {
+      inactivityTimerRef.current = setTimeout(() => {
+        
+        // Gọi handleSubmit với status "0" để lưu nháp
+        if (handleSubmitRef.current) {
+          handleSubmitRef.current("0").then(() => {
+            toast.info("Đã tự động lưu tiến độ do không hoạt động trong 5 phút");
+          }).catch(() => {
+            toast.error("Tự động lưu thất bại");
+          });
+        }
+      }, 1 * 60 * 1000); 
+    }
+  }, [isStarted, userAnswers]);
+
+  // Reset timer khi userAnswers thay đổi (có hoạt động)
+  useEffect(() => {
+    resetInactivityTimer();
+    
+    // Cleanup khi component unmount
+    return () => {
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
+    };
+  }, [userAnswers, resetInactivityTimer]);
+
+  // Tìm cấu hình phần
   const currentPartConfig = useMemo(
     () => findPartConfig(selectedQuestionId),
     [selectedQuestionId]
   );
 
-  // Chuẩn bị dữ liệu cho component QuestionDisplay
+  // Chuẩn bị dữ liệu QuestionDisplay
   const questionData = useMemo(() => {
     if (!selectedExam || !currentPartConfig) return null;
 
@@ -93,12 +172,10 @@ const TakeTheExam = () => {
 
     const partType = currentPartConfig.part;
 
-    // Xử lý các phần câu hỏi đơn
     if ([1, 2, 5].includes(partType)) {
       return partQuestions.find((q) => q.questionNumber === selectedQuestionId) || null;
     }
 
-    // Xử lý các phần câu hỏi nhóm
     if ([3, 4, 6, 7].includes(partType)) {
       const currentQuestion = partQuestions.find((q) => q.questionNumber === selectedQuestionId);
       if (!currentQuestion || !currentQuestion.groupId) return null;
@@ -132,14 +209,14 @@ const TakeTheExam = () => {
     }
   };
 
-  // Chọn một câu hỏi cụ thể
+  // Chọn câu hỏi
   const handleQuestionSelect = useCallback((questionId) => {
     if (questionId >= 0 && questionId <= 199) {
       setSelectedQuestionId(questionId);
     }
   }, []);
 
-  // Ghi nhận câu trả lời của người dùng
+  // Ghi nhận câu trả lời
   const handleAnswer = useCallback(
     (questionId, answer) => {
       const qId = parseInt(questionId, 10);
@@ -162,73 +239,94 @@ const TakeTheExam = () => {
 
   const answeredQuestions = Object.keys(userAnswers).length;
 
-  // Nộp bài thi
-  const handleSubmit = async () => {
-        if (!isStarted || !selectedExam) return;
-        const questionMap = new Map();
-        Object.values(selectedExam.questionsByPart).forEach(partQuestions => {
-            partQuestions.forEach(question => {
-                questionMap.set(question.questionNumber, {
-                    id: question.id, 
-                });
-            });
+  // Nộp bài
+  const handleSubmit = async (status) => {
+    // Clear inactivity timer khi submit
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+
+    if (!isStarted || !selectedExam) return;
+    
+    const questionMap = new Map();
+    Object.values(selectedExam.questionsByPart).forEach(partQuestions => {
+      partQuestions.forEach(question => {
+        questionMap.set(question.questionNumber, {
+          id: question.id,
         });
+      });
+    });
 
-        const formattedUserAnswers = Object.entries(userAnswers).map(([questionNumberStr, userAnswer]) => {
-            const questionNumber = parseInt(questionNumberStr, 10);
-            const questionInfo = questionMap.get(questionNumber);
+    const formattedUserAnswers = Object.entries(userAnswers).map(([questionNumberStr, userAnswer]) => {
+      const questionNumber = parseInt(questionNumberStr, 10);
+      const questionInfo = questionMap.get(questionNumber);
 
-            if (!questionInfo) {
-                console.warn(`Không tìm thấy thông tin cho câu hỏi số: ${questionNumber}`);
-                return null;
-            }
+      if (!questionInfo) {
+        console.warn(`Không tìm thấy thông tin cho câu hỏi số: ${questionNumber}`);
+        return null;
+      }
 
-            return {
-                questionId: questionInfo.id, 
-                userAnswer: userAnswer,       
-            };
-        }).filter(Boolean); 
+      return {
+        questionId: questionInfo.id,
+        userAnswer: userAnswer,
+      };
+    }).filter(Boolean);
 
-        const timeSpentInHours = 2 - timeLeft;
-        const timeDoTest = formatTime(timeSpentInHours);
-        const dateTest = formatDateTime(new Date());
+    const timeSpentInHours = 2 - timeLeft;
+    const timeDoTest = formatTime(timeSpentInHours);
+    const dateTest = formatDateTime(new Date());
 
-        const payload = {
-            testId: testId, 
-            timeDoTest: timeDoTest,
-            dateTest: dateTest,
-            userAnswers: formattedUserAnswers,
-        };
-        try {
-            await dispatch(submitExam(payload)).unwrap();
-            setIsStarted(false);
-            setShowModal(false);
-            navigate("/exam/result");
-        } catch (error) {
-            setShowModal(false);
-            toast.error(error.message ||  "Nộp bài thất bại. Vui lòng thử lại.");
-        }
+    const payload = {
+      testId: testId,
+      timeSpent: timeSpentInHours,
+      timeDoTest: timeDoTest,
+      dateTest: dateTest,
+      userAnswers: formattedUserAnswers,
+      status,
     };
-  // Điều hướng lùi lại
+    
+    try {
+      await dispatch(submitExam(payload)).unwrap();
+      setShowModal(false);
+      if (status === "1") {
+        // Nộp bài hoàn thành - chuyển trang kết quả
+        setIsStarted(false);
+        navigate("/exam/result");
+      } else {
+        // Auto-save - user tiếp tục làm bài
+        toast.success("Đã lưu tiến độ bài thi!");
+        // Không set setIsStarted(false) để user có thể tiếp tục làm bài
+      }
+    } catch (error) {
+      setShowModal(false);
+      toast.error(error.message || "Nộp bài thất bại. Vui lòng thử lại.");
+    }
+  };
+
+  // Update ref khi handleSubmit thay đổi
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  });
+
+  // Điều hướng lùi
   const handlePrevious = () => {
     if (!isStarted || selectedQuestionId === 0) return;
 
     if ([3, 4, 6, 7].includes(currentPartConfig?.part)) {
-        const partQuestions = selectedExam.questionsByPart[currentPartConfig.part.toString()];
-        const currentGroupId = questionData.groupId;
-        const uniqueGroupIds = [...new Set(partQuestions.map(q => q.groupId))];
-        const currentGroupIndex = uniqueGroupIds.indexOf(currentGroupId);
+      const partQuestions = selectedExam.questionsByPart[currentPartConfig.part.toString()];
+      const currentGroupId = questionData.groupId;
+      const uniqueGroupIds = [...new Set(partQuestions.map(q => q.groupId))];
+      const currentGroupIndex = uniqueGroupIds.indexOf(currentGroupId);
 
-        if (currentGroupIndex > 0) {
-            const prevGroupId = uniqueGroupIds[currentGroupIndex - 1];
-            const firstQuestionOfPrevGroup = partQuestions.find(q => q.groupId === prevGroupId);
-            if (firstQuestionOfPrevGroup) {
-                handleQuestionSelect(firstQuestionOfPrevGroup.questionNumber);
-                return;
-            }
+      if (currentGroupIndex > 0) {
+        const prevGroupId = uniqueGroupIds[currentGroupIndex - 1];
+        const firstQuestionOfPrevGroup = partQuestions.find(q => q.groupId === prevGroupId);
+        if (firstQuestionOfPrevGroup) {
+          handleQuestionSelect(firstQuestionOfPrevGroup.questionNumber);
+          return;
         }
+      }
     }
-    // Trường hợp mặc định (câu hỏi đơn hoặc nhóm đầu tiên của part)
     handleQuestionSelect(selectedQuestionId - 1);
   };
 
@@ -237,36 +335,35 @@ const TakeTheExam = () => {
     if (!isStarted || selectedQuestionId === 199) return;
 
     if ([3, 4, 6, 7].includes(currentPartConfig?.part)) {
-        const partQuestions = selectedExam.questionsByPart[currentPartConfig.part.toString()];
-        const currentGroupId = questionData.groupId;
-        const uniqueGroupIds = [...new Set(partQuestions.map(q => q.groupId))];
-        const currentGroupIndex = uniqueGroupIds.indexOf(currentGroupId);
+      const partQuestions = selectedExam.questionsByPart[currentPartConfig.part.toString()];
+      const currentGroupId = questionData.groupId;
+      const uniqueGroupIds = [...new Set(partQuestions.map(q => q.groupId))];
+      const currentGroupIndex = uniqueGroupIds.indexOf(currentGroupId);
 
-        if (currentGroupIndex < uniqueGroupIds.length - 1) {
-            const nextGroupId = uniqueGroupIds[currentGroupIndex + 1];
-            const firstQuestionOfNextGroup = partQuestions.find(q => q.groupId === nextGroupId);
-            if (firstQuestionOfNextGroup) {
-                handleQuestionSelect(firstQuestionOfNextGroup.questionNumber);
-                return;
-            }
-        } else {
-            const nextPart = parts.find(p => p.part === currentPartConfig.part + 1);
-            if (nextPart) {
-                handleQuestionSelect(nextPart.question[0]);
-                return;
-            }
+      if (currentGroupIndex < uniqueGroupIds.length - 1) {
+        const nextGroupId = uniqueGroupIds[currentGroupIndex + 1];
+        const firstQuestionOfNextGroup = partQuestions.find(q => q.groupId === nextGroupId);
+        if (firstQuestionOfNextGroup) {
+          handleQuestionSelect(firstQuestionOfNextGroup.questionNumber);
+          return;
         }
+      } else {
+        const nextPart = parts.find(p => p.part === currentPartConfig.part + 1);
+        if (nextPart) {
+          handleQuestionSelect(nextPart.question[0]);
+          return;
+        }
+      }
     }
-    // Trường hợp mặc định
     handleQuestionSelect(selectedQuestionId + 1);
   };
 
-  // Lấy danh sách ID của các câu hỏi trong nhóm hiện tại
+  // Lấy ID câu hỏi nhóm
   const currentGroupQuestionIds = useMemo(() => {
     return questionData?.listQuestion?.map((q) => q.questionNumber) || null;
   }, [questionData]);
 
-  // Xử lý trạng thái loading và error
+  // Xử lý loading và error
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-screen">
@@ -282,11 +379,10 @@ const TakeTheExam = () => {
         <Button text="Quay lại" size="sm" onClick={() => navigate(-1)} variant="default" icon={<FontAwesomeIcon icon="fa-solid fa-arrow-left" />}/>
       </div>
     );
- }
+  }
 
   return (
     <main className="container mx-auto flex flex-row items-center justify-center py-6 gap-4">
-      {/* Sidebar Desktop */}
       <Sidebar
         timeLeft={timeLeft}
         formatTime={formatTime}
@@ -302,10 +398,7 @@ const TakeTheExam = () => {
         setShowModal={setShowModal}
         submitting={submitting}
       />
-
-      {/* Main Content */}
       <div className="w-full h-[700px] mx-3 lg:mx-0 border-2 border-gray-200 rounded-2xl shadow-xl flex flex-col">
-        {/* Header */}
         <div className="border-b border-gray-200 py-3 flex justify-between items-center px-6 bg-gray-50 rounded-t-2xl">
           <button
             className="text-white font-bold flex items-center justify-center w-9 h-9 border-2 border-gray-700 rounded-lg bg-gray-700 hover:bg-gray-800 hover:border-gray-800 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
@@ -314,17 +407,14 @@ const TakeTheExam = () => {
           >
             <FontAwesomeIcon icon="fa-solid fa-chevron-left" />
           </button>
-          
           {isStarted && currentPartConfig ? (
             <>
-              {/* Desktop Title */}
-              <span className="hidden lg:flex xl:flex text-xl font-bold text-gray-700">
+              <span className="hidden lg:flex xl:flex text-xl font-bold text-gray-700 items-center gap-2">
                 Part {currentPartConfig.part} |
                 {currentGroupQuestionIds && currentGroupQuestionIds.length > 1
                   ? ` Question ${currentGroupQuestionIds[0] + 1} - ${currentGroupQuestionIds[currentGroupQuestionIds.length - 1] + 1}`
                   : ` Question ${selectedQuestionId + 1}`}
               </span>
-              {/* Mobile Title & Timer */}
               <div
                 className="flex flex-col lg:hidden xl:hidden justify-center items-center border border-gray-600 rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-100"
                 onClick={() => setIsSidebarMobileOpen(true)}
@@ -342,7 +432,6 @@ const TakeTheExam = () => {
               {selectedExam?.testName || "TOEIC Practice Test"}
             </h1>
           )}
-          
           <button
             className="text-white font-bold flex items-center justify-center w-9 h-9 border-2 border-gray-700 rounded-lg bg-gray-700 hover:bg-gray-800 hover:border-gray-800 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
             onClick={handleNext}
@@ -351,8 +440,6 @@ const TakeTheExam = () => {
             <FontAwesomeIcon icon="fa-solid fa-chevron-right" />
           </button>
         </div>
-
-        {/* Question Display Area */}
         <div className="p-2 flex-grow overflow-y-auto">
           {isStarted ? (
             questionData && currentPartConfig ? (
@@ -390,8 +477,6 @@ const TakeTheExam = () => {
           )}
         </div>
       </div>
-
-      {/* Modals and Mobile Sidebar */}
       <ConfirmModal
         show={showModal}
         title="Xác nhận nộp bài"
@@ -401,7 +486,7 @@ const TakeTheExam = () => {
         confirmVariant="primary"
         onClose={() => {setShowModal(false); dispatch(clearSubmitError());}}
         onCancel={() => {setShowModal(false); dispatch(clearSubmitError());}}
-        onConfirm={handleSubmit}
+        onConfirm={() => handleSubmit("1")}
       />
       {submitError && toast.error(submitError)}
       <SideBarMobile
@@ -414,7 +499,7 @@ const TakeTheExam = () => {
         isStarted={isStarted}
         handleQuestionSelect={(id) => {
           handleQuestionSelect(id);
-          setIsSidebarMobileOpen(false); 
+          setIsSidebarMobileOpen(false);
         }}
         answeredQuestions={answeredQuestions}
         setShowModal={setShowModal}

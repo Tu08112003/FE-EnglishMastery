@@ -6,6 +6,7 @@ import {
   resultSubmitExam,
   getHistoryExam,
   getHistoryExamById,
+  getExamNotSubmit,
 } from "../../service/examService";
 
 // Lấy tất cả các năm có đề thi
@@ -122,6 +123,23 @@ export const fetchHistoryExamById = createAsyncThunk(
   }
 );
 
+// Lấy đề thi chưa nộp do rớt mạng
+export const fetchExamNotSubmit = createAsyncThunk(
+  "exam/fetchExamNotSubmit",
+  async (testId, { rejectWithValue }) => {
+    try {
+      const response = await getExamNotSubmit({ testId });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue("Không tìm thấy đề thi chưa nộp");
+      }
+    } catch (error) {
+      return rejectWithValue( error.message || "Không tìm thấy đề thi chưa nộp");
+    }
+    }
+);
+
 const examSlice = createSlice({
   name: "exam",
   initialState: {
@@ -130,12 +148,14 @@ const examSlice = createSlice({
     loading: false,
     selectedExam: null,
     error: null,
+    errorNotSubmit: null,
     selectedYear: null,
     submitting: false,
     submitError: null,
     submitResult: null,
     historyExam: null,
     historyExamById: null,
+    examNotSubmit: null,
   },
   reducers: {
     setSelectedYear: (state, action) => {
@@ -244,6 +264,22 @@ const examSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.historyExamById = null;
+      })
+      
+      // Handle fetchExamNotSubmit
+      .addCase(fetchExamNotSubmit.pending, (state) => {
+        state.loading = true;
+        state.errorNotSubmit = null;
+        state.examNotSubmit = null;
+      })
+      .addCase(fetchExamNotSubmit.fulfilled, (state, action) => {
+        state.loading = false;
+        state.examNotSubmit = action.payload;
+      })
+      .addCase(fetchExamNotSubmit.rejected, (state, action) => {
+        state.loading = false;
+        state.errorNotSubmit = action.payload;
+        state.examNotSubmit = null;
       });
   },
 });
