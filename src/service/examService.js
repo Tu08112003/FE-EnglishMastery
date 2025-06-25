@@ -19,10 +19,16 @@ const resultSubmitExam = ({ obj }) => {
     timeDoTest: obj.timeDoTest,
     dateTest: obj.dateTest,
     userAnswers: obj.userAnswers,
+    status: obj.status,
   };
   return axios.post(URL_BACKEND, data);
 };
 
+// Lấy ra bài làm những chưa nộp đã rớt mạng
+const getExamNotSubmit = ({testId}) => {
+  const URL_BACKEND = `exam-service/getHistoryDraftByUserAndTest?testId=${testId}`;
+  return axios.get(URL_BACKEND);
+};
 
 // Lấy ra chi tiết đề thi
 const getExamById = ({ testId }) => {
@@ -41,4 +47,4 @@ const getHistoryExamById = ({ testId }) => {
     const URL_BACKEND = `exam-service/getHistoryTestById?historyTestId=${testId}`;
     return axios.get(URL_BACKEND);
 }
-export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getHistoryExam, getHistoryExamById };
+export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getHistoryExam, getHistoryExamById, getExamNotSubmit};
