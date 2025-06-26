@@ -12,6 +12,7 @@ import {
   fetchExamNotSubmit,
   submitExam,
   clearSubmitError,
+  fetchDeleteHistoryExamById,
 } from "../../redux/slice/examSlice";
 import formatDateTime from "../../utils/formatDateTime";
 import formatTime from "../../utils/formatTime";
@@ -47,6 +48,7 @@ const TakeTheExam = () => {
   // State
   const [isStarted, setIsStarted] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [timeLeft, setTimeLeft] = useState(2);
   const [selectedQuestionId, setSelectedQuestionId] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
@@ -66,6 +68,18 @@ const TakeTheExam = () => {
 
   // Map dữ liệu từ examNotSubmit
   useEffect(() => {
+    if (examNotSubmit && examNotSubmit.userAnswer && examNotSubmit.timeSpent !== undefined) {
+      // Hiển thị modal xác nhận để cho user chọn làm tiếp hay làm lại
+      setShowRestoreModal(true);
+    } else if (examNotSubmit === null) {
+      setUserAnswers({});
+      setTimeLeft(2);
+      setIsStarted(false);
+    }
+  }, [examNotSubmit]);
+
+  // Hàm xử lý khi user chọn "Làm tiếp"
+  const handleContinueExam = () => {
     if (examNotSubmit && examNotSubmit.userAnswer && examNotSubmit.timeSpent !== undefined) {
       const restoredAnswers = examNotSubmit.userAnswer.reduce((acc, answer) => {
         // Kiểm tra các điều kiện khác nhau để lọc câu đã trả lời
@@ -92,12 +106,30 @@ const TakeTheExam = () => {
         const lastAnsweredQuestion = answeredQuestionNumbers[0]; // Câu cuối cùng (số lớn nhất)
         setSelectedQuestionId(lastAnsweredQuestion);
       }
-    } else if (examNotSubmit === null) {
-      setUserAnswers({});
-      setTimeLeft(2);
-      setIsStarted(false);
     }
-  }, [examNotSubmit]);
+    setShowRestoreModal(false);
+  };
+
+  // Hàm xử lý khi user chọn "Làm lại"
+  const handleRestartExam = async () => {
+    if (examNotSubmit && examNotSubmit.idTestHistory) {
+      try {
+        await dispatch(fetchDeleteHistoryExamById({ 
+          historyTestId: examNotSubmit.idTestHistory 
+        })).unwrap();
+        
+        // Reset về trạng thái ban đầu
+        setUserAnswers({});
+        setTimeLeft(2);
+        setIsStarted(false);
+        setSelectedQuestionId(0);
+        setShowRestoreModal(false);
+      } catch (error) {
+        console.error("Error deleting history:", error);
+        setShowRestoreModal(false);
+      }
+    }
+  };
 
   // Bộ đếm thời gian
   useEffect(() => {
@@ -483,6 +515,17 @@ const TakeTheExam = () => {
         onClose={() => {setShowModal(false); dispatch(clearSubmitError());}}
         onCancel={() => {setShowModal(false); dispatch(clearSubmitError());}}
         onConfirm={() => handleSubmit("1")}
+      />
+      <ConfirmModal
+        show={showRestoreModal}
+        title="Bài thi chưa hoàn tất"
+        description="Bài thi này bạn chưa hoàn thành. Bạn có muốn tiếp tục làm bài cũ hay bắt đầu làm lại từ đầu?"
+        cancelText="Làm lại"
+        confirmText="Làm tiếp"
+        confirmVariant="primary"
+        onClose={() => setShowRestoreModal(false)}
+        onCancel={handleRestartExam}
+        onConfirm={handleContinueExam}
       />
       <SideBarMobile
         parts={parts}
