@@ -29,7 +29,10 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
   useEffect(() => {
     if (show) {
       if (examData && (examData.idTest || examData.testId)) {
+        // Reset tempExam trước để tránh hiển thị dữ liệu cũ
+        dispatch(resetTempExam());
         setIsLoadingData(true);
+        
         setTimeout(() => {
           dispatch(
             setTempExam({
@@ -40,7 +43,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
           );
           setActivePart(examData.parts?.[0]?.partNumber || 1);
           setIsLoadingData(false);
-        }, 500); 
+        }, 800); // Tăng thời gian để thấy rõ loading effect
       } else {
         setIsLoadingData(false);
         dispatch(resetTempExam());
@@ -143,9 +146,6 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
       : true
   );
 
-  // Kiểm tra trạng thái loading dữ liệu
-  const isDataReady = tempExam && tempExam.questions !== undefined && !isLoadingData;
-
   return (
     <ModalWrapper show={show} onClose={showModal ? () => {} : handleClose}>
       <form
@@ -172,7 +172,13 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
         </div>
 
         <div className="flex-1 flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
+          {isLoadingData ? (
+            <div className="flex items-center justify-center py-20">
+              <span className="text-gray-600 text-lg font-medium">Đang tải...</span>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2 px-2">
               <label className="font-semibold text-gray-800" htmlFor="testName">
                 Tên đề thi
@@ -240,7 +246,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                   text="Nhập vào id câu hỏi hoặc nội dung câu hỏi ví dụ: '1' hoặc 'What is your name?'"
                   focusBorderColor="focus:ring-gray-400"
                   value={searchQuery} 
-                  onChange={handleSearchChange} 
+                  onChange={handleSearchChange}
                 />
                 <Button
                   text="Thêm câu hỏi"
@@ -310,13 +316,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                           </td>
                         </tr>
                       ))
-                    ) : !isDataReady ? (
-                      <tr>
-                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
-                          Đang khởi tạo...
-                        </td>
-                      </tr>
-                    ) : searchQuery ? (
+                    ): searchQuery ? (
                       <tr>
                         <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
                           Không tìm thấy câu hỏi phù hợp với "{searchQuery}"
@@ -338,6 +338,8 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
               </div>
             </div>
           </div>
+            </>
+          )}
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <Button
