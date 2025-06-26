@@ -7,6 +7,7 @@ import {
   getHistoryExam,
   getHistoryExamById,
   getExamNotSubmit,
+  deleteHistoryExamById,
 } from "../../service/examService";
 
 // Lấy tất cả các năm có đề thi
@@ -138,6 +139,25 @@ export const fetchExamNotSubmit = createAsyncThunk(
       return rejectWithValue( error.message || "Không tìm thấy đề thi chưa nộp");
     }
     }
+);
+
+// Xóa lịch sử làm bài thi
+export const fetchDeleteHistoryExamById = createAsyncThunk(
+  "admin/fetchDeleteHistoryExamById",
+  async ({ historyTestId }, { rejectWithValue }) => {
+    try {
+      const response = await deleteHistoryExamById({ historyTestId });
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response?.message || "Lỗi khi xóa lịch sử làm bài! Vui lòng thử lại."
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.message || "Lỗi khi xóa lịch sử làm bài");
+    }
+  }
 );
 
 const examSlice = createSlice({
@@ -280,6 +300,19 @@ const examSlice = createSlice({
         state.loading = false;
         state.errorNotSubmit = action.payload;
         state.examNotSubmit = null;
+      })
+
+      // Handle fetchDeleteHistoryExamById
+      .addCase(fetchDeleteHistoryExamById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDeleteHistoryExamById.fulfilled, (state) => {
+        state.loading = false; 
+      })
+      .addCase(fetchDeleteHistoryExamById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
