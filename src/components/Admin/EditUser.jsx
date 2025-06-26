@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ModalWrapper from "../ModalWrapper";
 import Button from "../../components/Button.jsx";
+import SearchBar from "../SearchBar.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import Pagination from "../Pagination";
 import ModalConfirm from "../ConfirmModal.jsx";
@@ -21,11 +22,27 @@ const EditUser = ({ show, onClose, user }) => {
   const [showAllowModal, setShowAllowModal] = useState(false);
   const [permissionInput, setPermissionInput] = useState("");
   const [selectedPermission, setSelectedPermission] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
+  
+  // Lọc danh sách quyền theo search query
+  const filteredPermissions = permissionOfUser?.filter((permission) =>
+    searchQuery
+      ? permission.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (permission.description && permission.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      : true
+  ) || [];
+  
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const totalPages = Math.ceil((permissionOfUser?.length || 0) / itemsPerPage);
+  const totalPages = Math.ceil(filteredPermissions.length / itemsPerPage);
+
+  // Hàm xử lý thay đổi search
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset về trang đầu khi search
+  };
 
   // Cập nhật quyền của user
   const handleUpdatePermissionUser = async ({
@@ -120,7 +137,7 @@ const EditUser = ({ show, onClose, user }) => {
   return (
     <ModalWrapper show={show} onClose={onClose}>
       <div
-        className="w-full max-w-4xl mx-auto flex flex-col bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 sm:px-4 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar"
+        className="w-full max-w-6xl mx-auto flex flex-col bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-6 sm:px-4 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -147,7 +164,7 @@ const EditUser = ({ show, onClose, user }) => {
         </div>
         {/* Thông tin user */}
         <div className="w-full px-8 py-6 flex flex-col gap-6 bg-white">
-          <div className="grid grid-cols-2 p-2 gap-5">
+          <div className="grid grid-cols-3 p-2 gap-5">
             <div className="space-y-2">
               <p className="font-semibold text-gray-600">ID</p>
               <p className="font-bold">{user?.userId}</p>
@@ -189,27 +206,39 @@ const EditUser = ({ show, onClose, user }) => {
                 onClick={handleAddPermissionUser}
               />
             </div>
+            <div className="w-full flex gap-2 items-center">
+              <SearchBar
+                text="Tìm kiếm quyền theo URL hoặc mô tả..."
+                focusBorderColor="focus:ring-gray-400"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
             <div className="w-full">
               {loading ? (
                 <div className="text-center py-4 text-gray-600 font-semibold text-lg">
                   Đang tải...
                 </div>
-              ) : permissionOfUser?.length > 0 ? (
+              ) : filteredPermissions.length > 0 ? (
                 <>
                   <table className="w-full text-center border-2 border-gray-200 shadow-lg rounded-2xl border-separate border-spacing-0 overflow-hidden">
                     <thead>
                       <tr className="bg-gray-200 text-black font-bold">
                         <th className="px-2 py-4">URL</th>
+                        <th className="px-2 py-4">Mô tả</th>
                         <th className="px-2 py-4">Trạng thái</th>
                         <th className="px-2 py-4">Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {permissionOfUser
+                      {filteredPermissions
                         .slice(startIndex, endIndex)
                         .map((permission, index) => (
                           <tr key={index}>
                             <td className="px-2 py-4">{permission.name}</td>
+                            <td className="px-2 py-4 ">
+                              {permission.description || "Không có mô tả"}
+                            </td>
                             <td className="px-2 py-4 justify-center items-center">
                               <span
                                 className={`justify-center items-center rounded-3xl border-2 px-4 py-1 
@@ -275,16 +304,22 @@ const EditUser = ({ show, onClose, user }) => {
                   <div className="flex justify-between items-center p-4">
                     <span className="text-sm text-gray-600 font-semibold">
                       Hiển thị từ {startIndex + 1} đến{" "}
-                      {Math.min(endIndex, permissionOfUser.length)} trong số{" "}
-                      {permissionOfUser.length} quyền của người dùng
+                      {Math.min(endIndex, filteredPermissions.length)} trong số{" "}
+                      {filteredPermissions.length} quyền của người dùng
                     </span>
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={(page) => setCurrentPage(page)}
-                    />
+                    {totalPages > 1 && (
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(page) => setCurrentPage(page)}
+                      />
+                    )}
                   </div>
                 </>
+              ) : searchQuery ? (
+                <div className="text-center py-4 text-gray-600 font-semibold text-lg">
+                  Không tìm thấy quyền nào phù hợp với "{searchQuery}"
+                </div>
               ) : (
                 <div className="text-center py-4 text-gray-600 font-semibold text-lg">
                   Không có quyền nào
