@@ -12,6 +12,7 @@ import {
   fetchExamNotSubmit,
   submitExam,
   clearSubmitError,
+  clearExamNotSubmit,
   fetchDeleteHistoryExamById,
 } from "../../redux/slice/examSlice";
 import formatDateTime from "../../utils/formatDateTime";
@@ -118,7 +119,8 @@ const TakeTheExam = () => {
           historyTestId: examNotSubmit.idTestHistory 
         })).unwrap();
         
-        // Reset về trạng thái ban đầu
+        // Reset về trạng thái ban đầu và clear examNotSubmit
+        dispatch(clearExamNotSubmit());
         setUserAnswers({});
         setTimeLeft(2);
         setIsStarted(false);
@@ -317,7 +319,8 @@ const TakeTheExam = () => {
       await dispatch(submitExam(payload)).unwrap();
       setShowModal(false);
       if (status === "1") {
-        // Nộp bài hoàn thành - chuyển trang kết quả
+        // Nộp bài hoàn thành - clear examNotSubmit và chuyển trang kết quả
+        dispatch(clearExamNotSubmit());
         setIsStarted(false);
         navigate("/exam/result");
       } else {
