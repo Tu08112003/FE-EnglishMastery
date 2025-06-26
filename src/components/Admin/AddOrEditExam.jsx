@@ -25,18 +25,24 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); 
+  const [isLoadingData, setIsLoadingData] = useState(false); 
   useEffect(() => {
     if (show) {
       if (examData && (examData.idTest || examData.testId)) {
-        dispatch(
-          setTempExam({
-            ...examData,
-            parts: examData.parts || [],
-            questions: examData.questions || [],
-          })
-        );
-        setActivePart(examData.parts?.[0]?.partNumber || 1);
+        setIsLoadingData(true);
+        setTimeout(() => {
+          dispatch(
+            setTempExam({
+              ...examData,
+              parts: examData.parts || [],
+              questions: examData.questions || [],
+            })
+          );
+          setActivePart(examData.parts?.[0]?.partNumber || 1);
+          setIsLoadingData(false);
+        }, 500); 
       } else {
+        setIsLoadingData(false);
         dispatch(resetTempExam());
         setActivePart(1);
       }
@@ -129,20 +135,22 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
   });
 
   // Lọc các câu hỏi theo phần và tìm kiếm
-  const filteredQuestions = tempExam.questions
-  .filter((q) => q.partNumber === activePart)
-  .filter((q) =>
+  const allQuestionsForPart = tempExam.questions?.filter((q) => q.partNumber === activePart) || [];
+  const filteredQuestions = allQuestionsForPart.filter((q) =>
     searchQuery
       ? (q.questionNumber + 1).toString() === searchQuery ||
         q.questionText.toLowerCase().includes(searchQuery.toLowerCase())
       : true
   );
 
+  // Kiểm tra trạng thái loading dữ liệu
+  const isDataReady = tempExam && tempExam.questions !== undefined && !isLoadingData;
+
   return (
     <ModalWrapper show={show} onClose={showModal ? () => {} : handleClose}>
       <form
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-xl py-6 flex flex-col px-5 w-full max-w-6xl h-full shadow-lg max-h-[95vh] overflow-y-auto custom-scrollbar"
+        className="bg-white rounded-xl py-6 flex flex-col px-5 w-full max-w-6xl shadow-lg max-h-[95vh] overflow-y-auto custom-scrollbar"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
@@ -242,7 +250,7 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                   icon={<FontAwesomeIcon icon="fa-solid fa-plus" />}
                 />
               </div>
-              <div className="flex-1 max-h-[370px] h-full overflow-y-auto rounded-2xl border border-gray-300">
+              <div className="flex-1 max-h-[370px] overflow-y-auto rounded-2xl border border-gray-300">
                 <table className="w-full text-sm text-gray-700 font-semibold border-separate border-spacing-0">
                   <thead className="bg-gray-200 sticky top-0 z-10">
                     <tr className="text-black font-bold">
@@ -253,7 +261,13 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredQuestions.length > 0 ? (
+                    {isLoadingData ? (
+                      <tr>
+                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                          Đang tải...
+                        </td>
+                      </tr>
+                    ) : filteredQuestions.length > 0 ? (
                       filteredQuestions.map((question) => (
                         <tr key={question.questionNumber} className="hover:bg-gray-100 hover:cursor-pointer">
                           <td className="px-4 py-2 text-center">{question.questionNumber + 1}</td>
@@ -296,10 +310,26 @@ const AddOrEditExam = ({ show, onClose, examData }) => {
                           </td>
                         </tr>
                       ))
+                    ) : !isDataReady ? (
+                      <tr>
+                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                          Đang khởi tạo...
+                        </td>
+                      </tr>
+                    ) : searchQuery ? (
+                      <tr>
+                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                          Không tìm thấy câu hỏi phù hợp với "{searchQuery}"
+                          <br />
+                          <span className="text-sm">Thử tìm kiếm với từ khóa khác</span>
+                        </td>
+                      </tr>
                     ) : (
                       <tr>
-                        <td colSpan="4" className="px-4 py-2 text-center">
-                          Không tìm thấy câu hỏi phù hợp
+                        <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                          Chưa có câu hỏi nào trong phần này
+                          <br />
+                          <span className="text-sm">Nhấn "Thêm câu hỏi" để bắt đầu</span>
                         </td>
                       </tr>
                     )}
