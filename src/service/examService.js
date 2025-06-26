@@ -47,4 +47,10 @@ const getHistoryExamById = ({ testId }) => {
     const URL_BACKEND = `exam-service/getHistoryTestById?historyTestId=${testId}`;
     return axios.get(URL_BACKEND);
 }
-export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getHistoryExam, getHistoryExamById, getExamNotSubmit};
+
+// Xóa lịch sử làm bài thi
+const deleteHistoryExamById = ({ historyTestId }) => {
+    const URL_BACKEND = `exam-service/deleteHistoryTest?historyTestId=${historyTestId}`;
+    return axios.delete(URL_BACKEND);
+}
+export { getExamByYear, resultSubmitExam, getExamById, getAllExamByYear, getHistoryExam, getHistoryExamById, getExamNotSubmit, deleteHistoryExamById };
