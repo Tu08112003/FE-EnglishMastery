@@ -22,7 +22,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
   });
   const [questionForm, setQuestionForm] = useState({
     partNumber: partNumber || 1,
-    questionNumber: 0,
+    questionNumber: "",
     questionType: "",
     questionText: "",
     options: [
@@ -43,72 +43,70 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
   const imageInputRef = useRef(null);
 
   useEffect(() => {
-    // Initialize questionForm
-    if (questionData) {
-      const options =
-        Array.isArray(questionData.options) && questionData.options.length > 0
-          ? questionData.options.map((opt, idx) => {
-              if (typeof opt === "string") {
-                const match = opt.match(/^([A-Z])\.\s*(.*)$/);
-                return {
-                  id: match ? match[1] : String.fromCharCode(65 + idx),
-                  value: match ? match[2] : opt,
-                };
-              }
-              return {
-                id: opt.id || String.fromCharCode(65 + idx),
-                value: opt.value || opt.text || "",
-              };
-            })
-          : [
+        // Initialize questionForm
+        if (questionData) {
+          const options =
+            Array.isArray(questionData.options) && questionData.options.length > 0
+              ? questionData.options.map((opt, idx) => {
+                  if (typeof opt === "string") {
+                    const match = opt.match(/^([A-Z])\.\s*(.*)$/);
+                    return {
+                      id: match ? match[1] : String.fromCharCode(65 + idx),
+                      value: match ? match[2] : opt,
+                    };
+                  }
+                  return {
+                    id: opt.id || String.fromCharCode(65 + idx),
+                    value: opt.value || opt.text || "",
+                  };
+                })
+              : [
+                  { id: "A", value: "" },
+                  { id: "B", value: "" },
+                  { id: "C", value: "" },
+                  { id: "D", value: "" },
+                ];
+          setQuestionForm({
+            partNumber: questionData.partNumber || partNumber || 1,
+            // Convert từ 0-based (database) sang 1-based (UI display)
+            questionNumber: (questionData.questionNumber + 1).toString(),
+            questionType: questionData.questionType || "",
+            questionText: questionData.questionText || "",
+            options,
+            correctAnswer: questionData.correctAnswer || "",
+            mediaFiles: questionData.mediaFiles || { audio: "", image: "" },
+            transcript: questionData.transcript || "",
+            groupId: questionData.groupId || "",
+          });
+        } else {
+          setQuestionForm({
+            partNumber: partNumber || 1,
+            questionNumber: "",
+            questionType: "",
+            questionText: "",
+            options: [
               { id: "A", value: "" },
               { id: "B", value: "" },
               { id: "C", value: "" },
               { id: "D", value: "" },
-            ];
-      setQuestionForm({
-        partNumber: questionData.partNumber || partNumber || 1,
-        questionNumber: questionData.questionNumber || 0,
-        questionType: questionData.questionType || "",
-        questionText: questionData.questionText || "",
-        options,
-        correctAnswer: questionData.correctAnswer || "",
-        mediaFiles: questionData.mediaFiles || { audio: "", image: "" },
-        transcript: questionData.transcript || "",
-        groupId: questionData.groupId || "",
-      });
-    } else {
-      const questionCount =
-        tempExam?.questions?.filter((q) => q.partNumber === (partNumber || 1))
-          .length || 0;
-      setQuestionForm({
-        partNumber: partNumber || 1,
-        questionNumber: questionCount + 1,
-        questionType: "",
-        questionText: "",
-        options: [
-          { id: "A", value: "" },
-          { id: "B", value: "" },
-          { id: "C", value: "" },
-          { id: "D", value: "" },
-        ],
-        correctAnswer: "",
-        mediaFiles: { audio: "", image: "" },
-        transcript: "",
-        groupId: "",
-      });
-    }
+            ],
+            correctAnswer: "",
+            mediaFiles: { audio: "", image: "" },
+            transcript: "",
+            groupId: "",
+          });
+        }
 
-    // Initialize partForm
-    const existingPart =
-      tempExam?.parts?.find((p) => p.partNumber === partNumber) || {};
-    setPartForm({
-      partNumber: partNumber || 1,
-      partName: existingPart.partName || "",
-      instructions: existingPart.instructions || "",
-      questionCount: existingPart.questionCount || 0,
-      timeLimit: existingPart.timeLimit || 0,
-    });
+        // Initialize partForm
+        const existingPart =
+          tempExam?.parts?.find((p) => p.partNumber === partNumber) || {};
+        setPartForm({
+          partNumber: partNumber || 1,
+          partName: existingPart.partName || "",
+          instructions: existingPart.instructions || "",
+          questionCount: existingPart.questionCount || 0,
+          timeLimit: existingPart.timeLimit || 0,
+        });
   }, [partNumber, questionData, tempExam?.parts, tempExam?.questions]);
 
   const handleClose = () => {
@@ -159,7 +157,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
     const { id, value } = e.target;
     setQuestionForm({
       ...questionForm,
-      [id]: id === "questionNumber" ? parseInt(value) || 0 : value,
+      [id]: id === "questionNumber" ? value : value,
     });
   };
 
@@ -287,8 +285,8 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
       dispatch(addOrUpdateTempPart(partForm));
       toast.success("Đã lưu cấu trúc phần thi!");
     } else {
-      if (!questionForm.partNumber || !questionForm.questionNumber) {
-        toast.error("Vui lòng nhập số phần và số thứ tự câu!");
+      if (!questionForm.questionNumber || isNaN(parseInt(questionForm.questionNumber)) || parseInt(questionForm.questionNumber) <= 0) {
+        toast.error("Vui lòng nhập số thứ tự câu hợp lệ (từ 1 trở lên)!");
         return;
       }
       if (
@@ -299,6 +297,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
       }
       const questionToSave = {
         ...questionForm,
+        // Convert từ 1-based (UI) sang 0-based (database)
         questionNumber: parseInt(questionForm.questionNumber) - 1,
         options: questionForm.options.map((opt) => `${opt.id}. ${opt.value}`),
       };
@@ -317,7 +316,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
     >
       <form
         onClick={(e) => e.stopPropagation()}
-        className="w-full h-full flex flex-col max-w-7xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-4 sm:px-6 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar"
+        className="w-full flex flex-col max-w-7xl mx-auto bg-white border-2 border-gray-200 shadow-lg rounded-2xl px-4 sm:px-6 pt-6 pb-6 max-h-[95vh] overflow-y-auto custom-scrollbar relative"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">
@@ -515,7 +514,7 @@ const ExamForm = ({ show, onClose, partNumber, questionData }) => {
                           id="questionNumber"
                           placeholder="Nhập vào số thứ tự câu"
                           type="text"
-                          value={questionForm.questionNumber + 1}
+                          value={questionForm.questionNumber}
                           onChange={handleQuestionInputChange}
                         />
                       </div>
